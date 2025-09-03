@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
@@ -453,6 +453,55 @@
   </div>
 </div>
 
+<!-- Modal para desatribuir itens/feitiços -->
+<div id="unassign-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <h2>Desatribuir de <span id="character-name-unassign-modal"></span></h2>
+    <div class="assign-grid">
+      <div>
+        <h3>Itens Atribuídos</h3>
+        <div id="assigned-items"></div>
+      </div>
+      <div>
+        <h3>Feitiços Atribuídos</h3>
+        <div id="assigned-spells"></div>
+      </div>
+    </div>
+    <button id="confirm-unassign" class="submit-btn">Confirmar Desatribuição</button>
+  </div>
+</div>
+
+<!-- Modal para desatribuir ferramentas -->
+<div id="unassign-tools-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <h2>Desatribuir Ferramentas de <span id="character-name-unassign-tools-modal"></span></h2>
+    <div id="assigned-tools"></div>
+    <button id="confirm-unassign-tools" class="submit-btn">Confirmar Desatribuição</button>
+  </div>
+</div>
+
+<!-- Modal para desatribuir habilidades mágicas -->
+<div id="unassign-magic-abilities-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <h2>Desatribuir Habilidades Mágicas de <span id="character-name-unassign-magic-modal"></span></h2>
+    <div id="assigned-magic-abilities"></div>
+    <button id="confirm-unassign-magic" class="submit-btn">Confirmar Desatribuição</button>
+  </div>
+</div>
+
+<!-- Modal para desatribuir perícias -->
+<div id="unassign-skills-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <h2>Desatribuir Perícias de <span id="character-name-unassign-skills-modal"></span></h2>
+    <div id="assigned-skills"></div>
+    <button id="confirm-unassign-skills" class="submit-btn">Confirmar Desatribuição</button>
+  </div>
+</div>
+
 <!-- Modal para edição de personagem -->
 <div id="edit-character-modal" class="modal">
   <div class="modal-content">
@@ -511,6 +560,13 @@ let selectedTools = [];
 let selectedMagicAbilities = [];
 let selectedSkills = [];
 let currentEditCharacterId = null;
+
+// Variáveis para desatribuição
+let itemsToRemove = [];
+let spellsToRemove = [];
+let toolsToRemove = [];
+let magicAbilitiesToRemove = [];
+let skillsToRemove = [];
 
 async function loginPrompt() {
   let email = prompt("Email do mestre:");
@@ -682,7 +738,7 @@ function listenCollection(collectionName, ulElement, renderItem) {
 // --- RENDERIZADORES ---
 function renderItemWithDelete(id, data, collectionName) {
   const li = document.createElement("li");
-  // Exibir nome ou campo "Nome" ou "nome" ou id
+  // Exibir nome ou campo "Nome" или "nome" или id
   const displayName = data.Nome || data.nome || data.Name || data.name || id;
   li.textContent = displayName;
 
@@ -786,7 +842,7 @@ async function loadItemsAndSpells() {
     const label = document.createElement("label");
     label.htmlFor = `spell-${docSnap.id}`;
     label.textContent = spellData.Nome || docSnap.id;
-    
+      
     spellDiv.appendChild(checkbox);
     spellDiv.appendChild(label);
     availableSpellsDiv.appendChild(spellDiv);
@@ -818,6 +874,153 @@ confirmAssignBtn.addEventListener("click", async () => {
     assignModal.style.display = "none";
   } catch (e) {
     alert("Erro ao atribuir itens/feitiços: " + e.message);
+  }
+});
+
+// --- MODAL PARA DESATRIBUIR ITENS E FEITIÇOS ---
+const unassignModal = document.getElementById("unassign-modal");
+const characterNameUnassignModal = document.getElementById("character-name-unassign-modal");
+const assignedItemsDiv = document.getElementById("assigned-items");
+const assignedSpellsDiv = document.getElementById("assigned-spells");
+const confirmUnassignBtn = document.getElementById("confirm-unassign");
+
+// Carregar itens e feitiços atribuídos
+async function loadAssignedItemsAndSpells() {
+  // Limpar seleções anteriores
+  itemsToRemove = [];
+  spellsToRemove = [];
+  
+  try {
+    // Carregar dados do personagem
+    const charRef = doc(db, "characters", currentCharacterId);
+    const charSnap = await getDoc(charRef);
+    
+    if (!charSnap.exists()) {
+      alert("Personagem não encontrado!");
+      return;
+    }
+    
+    const charData = charSnap.data();
+    
+    // Carregar itens atribuídos
+    assignedItemsDiv.innerHTML = "";
+    if (charData.itens && Array.isArray(charData.itens) && charData.itens.length > 0) {
+      for (const itemId of charData.itens) {
+        try {
+          const itemRef = doc(db, "items", itemId);
+          const itemSnap = await getDoc(itemRef);
+          
+          if (itemSnap.exists()) {
+            const itemData = itemSnap.data();
+            const itemDiv = document.createElement("div");
+            itemDiv.className = "assign-item";
+            
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.value = itemId;
+            checkbox.id = `remove-item-${itemId}`;
+            checkbox.addEventListener("change", (e) => {
+              if (e.target.checked) {
+                itemsToRemove.push(itemId);
+              } else {
+                itemsToRemove = itemsToRemove.filter(id => id !== itemId);
+              }
+            });
+            
+            const label = document.createElement("label");
+            label.htmlFor = `remove-item-${itemId}`;
+            label.textContent = itemData.Nome || itemId;
+            
+            itemDiv.appendChild(checkbox);
+            itemDiv.appendChild(label);
+            assignedItemsDiv.appendChild(itemDiv);
+          }
+        } catch (error) {
+          console.error(`Erro ao carregar item ${itemId}:`, error);
+        }
+      }
+    } else {
+      assignedItemsDiv.innerHTML = "<div class='assign-item'>Nenhum item atribuído</div>";
+    }
+    
+    // Carregar feitiços atribuídos
+    assignedSpellsDiv.innerHTML = "";
+    if (charData.feiticos && Array.isArray(charData.feiticos) && charData.feiticos.length > 0) {
+      for (const spellId of charData.feiticos) {
+        try {
+          const spellRef = doc(db, "spells", spellId);
+          const spellSnap = await getDoc(spellRef);
+          
+          if (spellSnap.exists()) {
+            const spellData = spellSnap.data();
+            const spellDiv = document.createElement("div");
+            spellDiv.className = "assign-item";
+            
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.value = spellId;
+            checkbox.id = `remove-spell-${spellId}`;
+            checkbox.addEventListener("change", (e) => {
+              if (e.target.checked) {
+                spellsToRemove.push(spellId);
+              } else {
+                spellsToRemove = spellsToRemove.filter(id => id !== spellId);
+              }
+            });
+            
+            const label = document.createElement("label");
+            label.htmlFor = `remove-spell-${spellId}`;
+            label.textContent = spellData.Nome || spellId;
+            
+            spellDiv.appendChild(checkbox);
+            spellDiv.appendChild(label);
+            assignedSpellsDiv.appendChild(spellDiv);
+          }
+        } catch (error) {
+          console.error(`Erro ao carregar feitiço ${spellId}:`, error);
+        }
+      }
+    } else {
+      assignedSpellsDiv.innerHTML = "<div class='assign-item'>Nenhum feitiço atribuído</div>";
+    }
+  } catch (error) {
+    console.error("Erro ao carregar itens e feitiços atribuídos:", error);
+    alert("Erro ao carregar dados do personagem.");
+  }
+}
+
+// Abrir modal para desatribuição
+function openUnassignModal(characterId, characterName) {
+  currentCharacterId = characterId;
+  characterNameUnassignModal.textContent = characterName;
+  unassignModal.style.display = "block";
+  loadAssignedItemsAndSpells();
+}
+
+// Confirmar desatribuição de itens e feitiços
+confirmUnassignBtn.addEventListener("click", async () => {
+  if (!currentCharacterId) return;
+  
+  try {
+    const characterRef = doc(db, "characters", currentCharacterId);
+    
+    // Remover itens e feitiços selecionados
+    if (itemsToRemove.length > 0) {
+      await updateDoc(characterRef, {
+        itens: arrayRemove(...itemsToRemove)
+      });
+    }
+    
+    if (spellsToRemove.length > 0) {
+      await updateDoc(characterRef, {
+        feiticos: arrayRemove(...spellsToRemove)
+      });
+    }
+    
+    alert("Itens e feitiços removidos com sucesso!");
+    unassignModal.style.display = "none";
+  } catch (e) {
+    alert("Erro ao remover itens/feitiços: " + e.message);
   }
 });
 
@@ -890,6 +1093,103 @@ confirmToolsAssignBtn.addEventListener("click", async () => {
   }
 });
 
+// --- MODAL PARA DESATRIBUIR FERRAMENTAS ---
+const unassignToolsModal = document.getElementById("unassign-tools-modal");
+const characterNameUnassignToolsModal = document.getElementById("character-name-unassign-tools-modal");
+const assignedToolsDiv = document.getElementById("assigned-tools");
+const confirmUnassignToolsBtn = document.getElementById("confirm-unassign-tools");
+
+// Carregar ferramentas atribuídas
+async function loadAssignedTools() {
+  toolsToRemove = [];
+  assignedToolsDiv.innerHTML = "";
+  
+  try {
+    // Carregar dados do personagem
+    const charRef = doc(db, "characters", currentCharacterId);
+    const charSnap = await getDoc(charRef);
+    
+    if (!charSnap.exists()) {
+      alert("Personagem não encontrado!");
+      return;
+    }
+    
+    const charData = charSnap.data();
+    
+    // Carregar ferramentas atribuídas
+    if (charData.ferramentas && Array.isArray(charData.ferramentas) && charData.ferramentas.length > 0) {
+      for (const toolId of charData.ferramentas) {
+        try {
+          const toolRef = doc(db, "items", toolId);
+          const toolSnap = await getDoc(toolRef);
+          
+          if (toolSnap.exists()) {
+            const toolData = toolSnap.data();
+            const toolDiv = document.createElement("div");
+            toolDiv.className = "assign-item";
+            
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.value = toolId;
+            checkbox.id = `remove-tool-${toolId}`;
+            checkbox.addEventListener("change", (e) => {
+              if (e.target.checked) {
+                toolsToRemove.push(toolId);
+              } else {
+                toolsToRemove = toolsToRemove.filter(id => id !== toolId);
+              }
+            });
+            
+            const label = document.createElement("label");
+            label.htmlFor = `remove-tool-${toolId}`;
+            label.textContent = toolData.Nome || toolId;
+            
+            toolDiv.appendChild(checkbox);
+            toolDiv.appendChild(label);
+            assignedToolsDiv.appendChild(toolDiv);
+          }
+        } catch (error) {
+          console.error(`Erro ao carregar ferramenta ${toolId}:`, error);
+        }
+      }
+    } else {
+      assignedToolsDiv.innerHTML = "<div class='assign-item'>Nenhuma ferramenta atribuída</div>";
+    }
+  } catch (error) {
+    console.error("Erro ao carregar ferramentas atribuídas:", error);
+    alert("Erro ao carregar dados do personagem.");
+  }
+}
+
+// Abrir modal para desatribuição de ferramentas
+function openUnassignToolsModal(characterId, characterName) {
+  currentCharacterId = characterId;
+  characterNameUnassignToolsModal.textContent = characterName;
+  unassignToolsModal.style.display = "block";
+  loadAssignedTools();
+}
+
+// Confirmar desatribuição de ferramentas
+confirmUnassignToolsBtn.addEventListener("click", async () => {
+  if (!currentCharacterId) return;
+  
+  try {
+    const characterRef = doc(db, "characters", currentCharacterId);
+    
+    // Remover ferramentas selecionadas
+    if (toolsToRemove.length > 0) {
+      await updateDoc(characterRef, {
+        ferramentas: arrayRemove(...toolsToRemove)
+      });
+    }
+    
+    alert("Ferramentas removidas com sucesso!");
+    unassignToolsModal.style.display = "none";
+  } catch (e) {
+    alert("Erro ao remover ferramentas: " + e.message);
+  }
+});
+
 // --- MODAL PARA ATRIBUIR HABILIDADES MÁGICAS ---
 const assignMagicModal = document.getElementById("assign-magic-abilities-modal");
 const characterNameMagicModal = document.getElementById("character-name-magic-modal");
@@ -959,6 +1259,103 @@ confirmMagicAssignBtn.addEventListener("click", async () => {
   }
 });
 
+// --- MODAL PARA DESATRIBUIR HABILIDADES MÁGICAS ---
+const unassignMagicModal = document.getElementById("unassign-magic-abilities-modal");
+const characterNameUnassignMagicModal = document.getElementById("character-name-unassign-magic-modal");
+const assignedMagicDiv = document.getElementById("assigned-magic-abilities");
+const confirmUnassignMagicBtn = document.getElementById("confirm-unassign-magic");
+
+// Carregar habilidades mágicas atribuídas
+async function loadAssignedMagicAbilities() {
+  magicAbilitiesToRemove = [];
+  assignedMagicDiv.innerHTML = "";
+  
+  try {
+    // Carregar dados do personagem
+    const charRef = doc(db, "characters", currentCharacterId);
+    const charSnap = await getDoc(charRef);
+    
+    if (!charSnap.exists()) {
+      alert("Personagem não encontrado!");
+      return;
+    }
+    
+    const charData = charSnap.data();
+    
+    // Carregar habilidades mágicas atribuídas
+    if (charData.habilidades_magicas && Array.isArray(charData.habilidades_magicas) && charData.habilidades_magicas.length > 0) {
+      for (const magicId of charData.habilidades_magicas) {
+        try {
+          const magicRef = doc(db, "items", magicId);
+          const magicSnap = await getDoc(magicRef);
+          
+          if (magicSnap.exists()) {
+            const magicData = magicSnap.data();
+            const magicDiv = document.createElement("div");
+            magicDiv.className = "assign-item";
+            
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.value = magicId;
+            checkbox.id = `remove-magic-${magicId}`;
+            checkbox.addEventListener("change", (e) => {
+              if (e.target.checked) {
+                magicAbilitiesToRemove.push(magicId);
+              } else {
+                magicAbilitiesToRemove = magicAbilitiesToRemove.filter(id => id !== magicId);
+              }
+            });
+            
+            const label = document.createElement("label");
+            label.htmlFor = `remove-magic-${magicId}`;
+            label.textContent = magicData.Nome || magicId;
+            
+            magicDiv.appendChild(checkbox);
+            magicDiv.appendChild(label);
+            assignedMagicDiv.appendChild(magicDiv);
+          }
+        } catch (error) {
+          console.error(`Erro ao carregar habilidade mágica ${magicId}:`, error);
+        }
+      }
+    } else {
+      assignedMagicDiv.innerHTML = "<div class='assign-item'>Nenhuma habilidade mágica atribuída</div>";
+    }
+  } catch (error) {
+    console.error("Erro ao carregar habilidades mágicas atribuídas:", error);
+    alert("Erro ao carregar dados do personagem.");
+  }
+}
+
+// Abrir modal para desatribuição de habilidades mágicas
+function openUnassignMagicModal(characterId, characterName) {
+  currentCharacterId = characterId;
+  characterNameUnassignMagicModal.textContent = characterName;
+  unassignMagicModal.style.display = "block";
+  loadAssignedMagicAbilities();
+}
+
+// Confirmar desatribuição de habilidades mágicas
+confirmUnassignMagicBtn.addEventListener("click", async () => {
+  if (!currentCharacterId) return;
+  
+  try {
+    const characterRef = doc(db, "characters", currentCharacterId);
+    
+    // Remover habilidades mágicas selecionadas
+    if (magicAbilitiesToRemove.length > 0) {
+      await updateDoc(characterRef, {
+        habilidades_magicas: arrayRemove(...magicAbilitiesToRemove)
+      });
+    }
+    
+    alert("Habilidades mágicas removidas com sucesso!");
+    unassignMagicModal.style.display = "none";
+  } catch (e) {
+    alert("Erro ao remover habilidades mágicas: " + e.message);
+  }
+});
+
 // --- MODAL PARA ATRIBUIR PERÍCIAS ---
 const assignSkillsModal = document.getElementById("assign-skills-modal");
 const characterNameSkillsModal = document.getElementById("character-name-skills-modal");
@@ -1022,6 +1419,103 @@ confirmSkillsAssignBtn.addEventListener("click", async () => {
     assignSkillsModal.style.display = "none";
   } catch (e) {
     alert("Erro ao atribuir perícias: " + e.message);
+  }
+});
+
+// --- MODAL PARA DESATRIBUIR PERÍCIAS ---
+const unassignSkillsModal = document.getElementById("unassign-skills-modal");
+const characterNameUnassignSkillsModal = document.getElementById("character-name-unassign-skills-modal");
+const assignedSkillsDiv = document.getElementById("assigned-skills");
+const confirmUnassignSkillsBtn = document.getElementById("confirm-unassign-skills");
+
+// Carregar perícias atribuídas
+async function loadAssignedSkills() {
+  skillsToRemove = [];
+  assignedSkillsDiv.innerHTML = "";
+  
+  try {
+    // Carregar dados do personagem
+    const charRef = doc(db, "characters", currentCharacterId);
+    const charSnap = await getDoc(charRef);
+    
+    if (!charSnap.exists()) {
+      alert("Personagem não encontrado!");
+      return;
+    }
+    
+    const charData = charSnap.data();
+    
+    // Carregar perícias atribuídas
+    if (charData.pericias && Array.isArray(charData.pericias) && charData.pericias.length > 0) {
+      for (const skillId of charData.pericias) {
+        try {
+          const skillRef = doc(db, "skills", skillId);
+          const skillSnap = await getDoc(skillRef);
+          
+          if (skillSnap.exists()) {
+            const skillData = skillSnap.data();
+            const skillDiv = document.createElement("div");
+            skillDiv.className = "assign-item";
+            
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.value = skillId;
+            checkbox.id = `remove-skill-${skillId}`;
+            checkbox.addEventListener("change", (e) => {
+              if (e.target.checked) {
+                skillsToRemove.push(skillId);
+              } else {
+                skillsToRemove = skillsToRemove.filter(id => id !== skillId);
+              }
+            });
+            
+            const label = document.createElement("label");
+            label.htmlFor = `remove-skill-${skillId}`;
+            label.textContent = skillData.Nome || skillId;
+            
+            skillDiv.appendChild(checkbox);
+            skillDiv.appendChild(label);
+            assignedSkillsDiv.appendChild(skillDiv);
+          }
+        } catch (error) {
+          console.error(`Erro ao carregar perícia ${skillId}:`, error);
+        }
+      }
+    } else {
+      assignedSkillsDiv.innerHTML = "<div class='assign-item'>Nenhuma perícia atribuída</div>";
+    }
+  } catch (error) {
+    console.error("Erro ao carregar perícias atribuídas:", error);
+    alert("Erro ao carregar dados do personagem.");
+  }
+}
+
+// Abrir modal para desatribuição de perícias
+function openUnassignSkillsModal(characterId, characterName) {
+  currentCharacterId = characterId;
+  characterNameUnassignSkillsModal.textContent = characterName;
+  unassignSkillsModal.style.display = "block";
+  loadAssignedSkills();
+}
+
+// Confirmar desatribuição de perícias
+confirmUnassignSkillsBtn.addEventListener("click", async () => {
+  if (!currentCharacterId) return;
+  
+  try {
+    const characterRef = doc(db, "characters", currentCharacterId);
+    
+    // Remover perícias selecionadas
+    if (skillsToRemove.length > 0) {
+      await updateDoc(characterRef, {
+        pericias: arrayRemove(...skillsToRemove)
+      });
+    }
+    
+    alert("Perícias removidas com sucesso!");
+    unassignSkillsModal.style.display = "none";
+  } catch (e) {
+    alert("Erro ao remover perícias: " + e.message);
   }
 });
 
@@ -1290,6 +1784,15 @@ listenCollection("characters", listCharacters, (id, data) => {
     openAssignModal(id, data.Nome || id);
   });
 
+  // Botão para desatribuir itens/feitiços
+  const btnUnassign = document.createElement("button");
+  btnUnassign.textContent = "Desatribuir";
+  btnUnassign.className = "assign-btn";
+  btnUnassign.style.backgroundColor = "#a03a3a";
+  btnUnassign.addEventListener("click", () => {
+    openUnassignModal(id, data.Nome || id);
+  });
+
   // Botão para atribuir ferramentas
   const btnAssignTools = document.createElement("button");
   btnAssignTools.textContent = "Ferramentas";
@@ -1297,6 +1800,15 @@ listenCollection("characters", listCharacters, (id, data) => {
   btnAssignTools.style.backgroundColor = "#5a7a5a";
   btnAssignTools.addEventListener("click", () => {
     openAssignToolsModal(id, data.Nome || id);
+  });
+
+  // Botão para desatribuir ferramentas
+  const btnUnassignTools = document.createElement("button");
+  btnUnassignTools.textContent = "Desatribuir Ferramentas";
+  btnUnassignTools.className = "assign-btn";
+  btnUnassignTools.style.backgroundColor = "#7a3a3a";
+  btnUnassignTools.addEventListener("click", () => {
+    openUnassignToolsModal(id, data.Nome || id);
   });
 
   // Botão para atribuir habilidades mágicas
@@ -1308,6 +1820,15 @@ listenCollection("characters", listCharacters, (id, data) => {
     openAssignMagicModal(id, data.Nome || id);
   });
 
+  // Botão para desatribuir habilidades mágicas
+  const btnUnassignMagic = document.createElement("button");
+  btnUnassignMagic.textContent = "Desatribuir Habilidades";
+  btnUnassignMagic.className = "assign-btn";
+  btnUnassignMagic.style.backgroundColor = "#5a3a7a";
+  btnUnassignMagic.addEventListener("click", () => {
+    openUnassignMagicModal(id, data.Nome || id);
+  });
+
   // Botão para atribuir perícias
   const btnAssignSkills = document.createElement("button");
   btnAssignSkills.textContent = "Perícias";
@@ -1315,6 +1836,15 @@ listenCollection("characters", listCharacters, (id, data) => {
   btnAssignSkills.style.backgroundColor = "#9a7a5a";
   btnAssignSkills.addEventListener("click", () => {
     openAssignSkillsModal(id, data.Nome || id);
+  });
+
+  // Botão para desatribuir perícias
+  const btnUnassignSkills = document.createElement("button");
+  btnUnassignSkills.textContent = "Desatribuir Perícias";
+  btnUnassignSkills.className = "assign-btn";
+  btnUnassignSkills.style.backgroundColor = "#7a5a3a";
+  btnUnassignSkills.addEventListener("click", () => {
+    openUnassignSkillsModal(id, data.Nome || id);
   });
 
   // Botão para editar personagem
@@ -1327,9 +1857,13 @@ listenCollection("characters", listCharacters, (id, data) => {
 
   li.appendChild(btnView);
   li.appendChild(btnAssign);
+  li.appendChild(btnUnassign);
   li.appendChild(btnAssignTools);
+  li.appendChild(btnUnassignTools);
   li.appendChild(btnAssignMagic);
+  li.appendChild(btnUnassignMagic);
   li.appendChild(btnAssignSkills);
+  li.appendChild(btnUnassignSkills);
   li.appendChild(btnEdit);
   li.appendChild(btnDel);
   return li;
