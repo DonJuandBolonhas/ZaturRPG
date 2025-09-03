@@ -1,0 +1,1113 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Zatur RPG - Jogador</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap');
+  
+  :root {
+    --dark-brown: #3a220a;
+    --medium-brown: #5a3e0a;
+    --light-brown: #8c6b3a;
+    --gold: #d4af37;
+    --parchment: #f5f1e9;
+    --dark-red: #8B0000;
+  }
+  
+  body {
+    margin: 0; 
+    font-family: 'MedievalSharp', cursive, serif;
+    background: linear-gradient(135deg, var(--dark-brown) 25%, var(--medium-brown) 75%);
+    color: var(--parchment);
+    min-height: 100vh; 
+    display: flex; 
+    flex-direction: column;
+  }
+  
+  header {
+    background: #4b2e0e; 
+    padding: 1rem 1.5rem;
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+    box-shadow: 0 0 10px #6b4c2a;
+  }
+  
+  header h1 { 
+    margin: 0; 
+    font-size: 1.5rem; 
+  }
+  
+  nav.tabs {
+    display: flex; 
+    flex-wrap: wrap; 
+    background: #3a220a;
+    box-shadow: inset 0 -3px 5px #6b4c2a;
+  }
+  
+  nav.tabs button {
+    flex: 1 1 50%;
+    background: none; 
+    border: none; 
+    color: #f5f1e9;
+    padding: 1rem; 
+    font-weight: bold; 
+    font-size: 1rem;
+    cursor: pointer; 
+    transition: background-color 0.3s ease;
+  }
+  
+  nav.tabs button.active,
+  nav.tabs button:hover {
+    background: #6b4c2a; 
+    color: #fff;
+    box-shadow: 0 0 10px #8c6b3a;
+  }
+
+  main.container {
+    flex: 1; 
+    max-width: 800px; 
+    margin: 1rem auto 2rem;
+    background: rgba(30,20,10,0.9); 
+    border-radius: 10px;
+    padding: 1rem 1.5rem; 
+    box-shadow: 0 0 15px #6b4c2a;
+  }
+
+  section.tab-content { 
+    display: none; 
+  }
+  
+  section.tab-content.active { 
+    display: block; 
+  }
+
+  .character-card {
+    background: rgba(75, 46, 14, 0.7);
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border: 2px solid var(--light-brown);
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  }
+  
+  .character-card h2 {
+    margin-top: 0;
+    color: var(--gold);
+    border-bottom: 2px solid var(--light-brown);
+    padding-bottom: 0.5rem;
+  }
+  
+  .character-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+  
+  .info-item {
+    margin-bottom: 0.5rem;
+  }
+  
+  .info-label {
+    font-weight: bold;
+    color: var(--gold);
+  }
+  
+  .attributes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .attribute-card {
+    background: rgba(75, 46, 14, 0.7);
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+    border: 1px solid var(--light-brown);
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  
+  .attribute-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px var(--gold);
+  }
+  
+  .attribute-name {
+    font-weight: bold;
+    color: var(--gold);
+    margin-bottom: 0.5rem;
+  }
+  
+  .attribute-value {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--parchment);
+  }
+  
+  ul.list-items {
+    list-style: none; 
+    padding-left: 0; 
+    max-height: 250px; 
+    overflow-y: auto;
+    border-top: 1px solid #6b4c2a; 
+    margin-top: 0.5rem;
+  }
+  
+  ul.list-items li {
+    background: #4b2e0e; 
+    margin: 0.3rem 0; 
+    padding: 0.5rem 0.8rem;
+    border-radius: 5px; 
+    display: flex; 
+    justify-content: space-between;
+    align-items: center; 
+    font-size: 1rem;
+  }
+  
+  .dice-buttons {
+    display: flex; 
+    gap: 0.5rem; 
+    flex-wrap: wrap; 
+    justify-content: center;
+    margin-top: 1rem;
+  }
+  
+  .dice-buttons button {
+    background: #6b4c2a; 
+    border: none; 
+    color: #f5f1e9;
+    padding: 0.7rem 1.2rem; 
+    border-radius: 5px;
+    font-weight: bold; 
+    font-size: 1.1rem; 
+    cursor: pointer;
+    flex: 1 1 30%;
+    max-width: 100px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .dice-buttons button:hover {
+    background: #8c6b3a;
+  }
+  
+  #dice-result {
+    margin-top: 1rem; 
+    font-size: 1.3rem; 
+    font-weight: bold;
+    text-align: center; 
+    padding: 1rem;
+    background: #4b2e0e; 
+    border-radius: 10px;
+    box-shadow: 0 0 10px #8c6b3a inset;
+  }
+  
+  .points-display {
+    display: flex;
+    justify-content: space-around;
+    margin: 1.5rem 0;
+  }
+  
+  .point-item {
+    text-align: center;
+    background: rgba(75, 46, 14, 0.7);
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--light-brown);
+    flex: 1;
+    margin: 0 0.5rem;
+    position: relative;
+  }
+  
+  .point-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--gold);
+    cursor: pointer;
+  }
+  
+  .point-value.editable:hover {
+    color: var(--light-brown);
+    text-decoration: underline;
+  }
+  
+  .point-max {
+    font-size: 0.9rem;
+    color: #ccc;
+  }
+  
+  .point-label {
+    font-weight: bold;
+    margin-top: 0.5rem;
+  }
+  
+  .loading {
+    text-align: center;
+    font-size: 1.2rem;
+    padding: 2rem;
+  }
+
+  /* Modal para edição de pontos */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+  }
+  
+  .modal-content {
+    background: #3a220a;
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #6b4c2a;
+    width: 80%;
+    max-width: 400px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px #8c6b3a;
+  }
+  
+  .close-modal {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  .close-modal:hover {
+    color: #fff;
+  }
+  
+  .modal-form {
+    margin-top: 15px;
+  }
+  
+  .modal-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+  
+  .modal-form input {
+    width: 100%;
+    padding: 8px;
+    border-radius: 5px;
+    border: none;
+    margin-bottom: 15px;
+  }
+  
+  .modal-form button {
+    background: #6b4c2a;
+    border: none;
+    color: #f5f1e9;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    width: 100%;
+  }
+  
+  .modal-form button:hover {
+    background: #8c6b3a;
+  }
+
+  /* Estilo para itens com descrição */
+  .item-with-description {
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .item-with-description:hover {
+    background-color: #5a3e0a;
+  }
+  
+  .item-description {
+    display: none;
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background: rgba(58, 34, 10, 0.8);
+    border-radius: 5px;
+    font-size: 0.9rem;
+    font-style: italic;
+  }
+
+  /* Scrollbar para listas */
+  ul.list-items::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  ul.list-items::-webkit-scrollbar-thumb {
+    background: #6b4c2a; 
+    border-radius: 4px;
+  }
+  
+  ul.list-items::-webkit-scrollbar-track {
+    background: #3a220a;
+  }
+
+  /* Responsividade */
+  @media (min-width: 600px) {
+    nav.tabs button {
+      flex: 1 1 auto;
+      max-width: none;
+    }
+  }
+  
+  @media (max-width: 500px) {
+    .points-display {
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .point-item {
+      margin: 0;
+    }
+    
+    .character-info {
+      grid-template-columns: 1fr;
+    }
+    
+    .attributes-grid {
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Zatur RPG - Jogador</h1>
+  <div id="character-name-header">Carregando...</div>
+</header>
+
+<nav class="tabs" role="tablist" aria-label="Seções da ficha do personagem">
+  <button class="tab-btn active" data-tab="overview" role="tab" aria-selected="true" aria-controls="overview" id="tab-overview">Visão Geral</button>
+  <button class="tab-btn" data-tab="attributes" role="tab" aria-selected="false" aria-controls="attributes" id="tab-attributes">Atributos</button>
+  <button class="tab-btn" data-tab="items" role="tab" aria-selected="false" aria-controls="items" id="tab-items">Itens</button>
+  <button class="tab-btn" data-tab="spells" role="tab" aria-selected="false" aria-controls="spells" id="tab-spells">Feitiços</button>
+  <button class="tab-btn" data-tab="dice" role="tab" aria-selected="false" aria-controls="dice" id="tab-dice">Rolagem de Dados</button>
+</nav>
+
+<main class="container" role="main">
+  <div id="loading" class="loading">Carregando personagem...</div>
+
+  <!-- Visão Geral -->
+  <section id="overview" class="tab-content active" role="tabpanel" aria-labelledby="tab-overview">
+    <div class="character-card">
+      <h2>Informações Básicas</h2>
+      <div class="character-info">
+        <div class="info-item">
+          <span class="info-label">Nome:</span>
+          <span id="char-name">-</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Origem:</span>
+          <span id="char-origin">-</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Classe:</span>
+          <span id="char-class">-</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Clã:</span>
+          <span id="char-clan">-</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Nível:</span>
+          <span id="char-level">-</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Campanha:</span>
+          <span id="char-campaign">-</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="points-display">
+      <div class="point-item">
+        <div class="point-value editable" id="hp-value" data-type="hp">0</div>
+        <div class="point-max" id="hp-max">Máx: 0</div>
+        <div class="point-label">Pontos de Vida</div>
+      </div>
+      <div class="point-item">
+        <div class="point-value editable" id="effort-value" data-type="effort">0</div>
+        <div class="point-max" id="effort-max">Máx: 0</div>
+        <div class="point-label">Pontos de Esforço</div>
+      </div>
+      <div class="point-item">
+        <div class="point-value editable" id="mana-value" data-type="mana">0</div>
+        <div class="point-max" id="mana-max">Máx: 0</div>
+        <div class="point-label">Pontos de Mana</div>
+      </div>
+    </div>
+
+    <div class="character-card">
+      <h2>História & Descrição</h2>
+      <div class="info-item">
+        <span class="info-label">História:</span>
+        <div id="char-history">-</div>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Aparência:</span>
+        <div id="char-appearance">-</div>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Personalidade:</span>
+        <div id="char-personality">-</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Atributos -->
+  <section id="attributes" class="tab-content" role="tabpanel" aria-labelledby="tab-attributes">
+    <div class="attributes-grid">
+      <div class="attribute-card" data-attr="Força">
+        <div class="attribute-name">Força</div>
+        <div class="attribute-value" id="attr-strength">0</div>
+      </div>
+      <div class="attribute-card" data-attr="Agilidade">
+        <div class="attribute-name">Agilidade</div>
+        <div class="attribute-value" id="attr-agility">0</div>
+      </div>
+      <div class="attribute-card" data-attr="Mana">
+        <div class="attribute-name">Mana</div>
+        <div class="attribute-value" id="attr-mana">0</div>
+      </div>
+      <div class="attribute-card" data-attr="Intelecto">
+        <div class="attribute-name">Intelecto</div>
+        <div class="attribute-value" id="attr-intellect">0</div>
+      </div>
+      <div class="attribute-card" data-attr="Vigor">
+        <div class="attribute-name">Vigor</div>
+        <div class="attribute-value" id="attr-vigor">0</div>
+      </div>
+    </div>
+
+    <div class="character-card">
+      <h2>Perícias</h2>
+      <ul id="skills-list" class="list-items">
+        <li>Carregando...</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Itens -->
+  <section id="items" class="tab-content" role="tabpanel" aria-labelledby="tab-items">
+    <div class="character-card">
+      <h2>Inventário</h2>
+      <ul id="inventory-list" class="list-items">
+        <li>Carregando itens...</li>
+      </ul>
+    </div>
+
+    <div class="character-card">
+      <h2>Ferramentas</h2>
+      <ul id="tools-list" class="list-items">
+        <li>Carregando ferramentas...</li>
+      </ul>
+    </div>
+
+    <div class="character-card">
+      <h2>Equipamento</h2>
+      <ul id="equipment-list" class="list-items">
+        <li>Carregando equipamentos...</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Feitiços -->
+  <section id="spells" class="tab-content" role="tabpanel" aria-labelledby="tab-spells">
+    <div class="character-card">
+      <h2>Feitiços Conhecidos</h2>
+      <ul id="spells-list" class="list-items">
+        <li>Carregando feitiços...</li>
+      </ul>
+    </div>
+
+    <div class="character-card">
+      <h2>Habilidades Mágicas</h2>
+      <ul id="magic-abilities-list" class="list-items">
+        <li>Carregando habilidades...</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Rolagem de Dados -->
+  <section id="dice" class="tab-content" role="tabpanel" aria-labelledby="tab-dice">
+    <div class="character-card">
+      <h2>Rolagem de Dados</h2>
+      <p>Use os dados abaixo para fazer suas rolagens durante o jogo.</p>
+      
+      <div class="dice-buttons" role="group" aria-label="Botões para rolar dados">
+        <button data-dice="4" aria-label="Rolar D4">D4</button>
+        <button data-dice="6" aria-label="Rolar D6">D6</button>
+        <button data-dice="8" aria-label="Rolar D8">D8</button>
+        <button data-dice="10" aria-label="Rolar D10">D10</button>
+        <button data-dice="12" aria-label="Rolar D12">D12</button>
+        <button data-dice="20" aria-label="Rolar D20">D20</button>
+        <button data-dice="100" aria-label="Rolar D100">D100</button>
+      </div>
+      
+      <div id="dice-result" aria-live="polite" aria-atomic="true">Role os dados para ver o resultado</div>
+    </div>
+
+    <div class="character-card">
+      <h2>Rolagens de Atributos</h2>
+      <p>Clique em um atributo para rolar nD20 (onde n é o valor do atributo)</p>
+      <div class="attributes-grid" role="group" aria-label="Botões para rolar testes de atributo">
+        <div class="attribute-card" data-attr="Força">
+          <div class="attribute-name">Força</div>
+          <div class="attribute-value" id="roll-strength">0</div>
+        </div>
+        <div class="attribute-card" data-attr="Agilidade">
+          <div class="attribute-name">Agilidade</div>
+          <div class="attribute-value" id="roll-agility">0</div>
+        </div>
+        <div class="attribute-card" data-attr="Mana">
+          <div class="attribute-name">Mana</div>
+          <div class="attribute-value" id="roll-mana">0</div>
+        </div>
+        <div class="attribute-card" data-attr="Intelecto">
+          <div class="attribute-name">Intelecto</div>
+          <div class="attribute-value" id="roll-intellect">0</div>
+        </div>
+        <div class="attribute-card" data-attr="Vigor">
+          <div class="attribute-name">Vigor</div>
+          <div class="attribute-value" id="roll-vigor">0</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Modal para edição de pontos -->
+<div id="points-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <h2 id="modal-title">Editar Pontos</h2>
+    <div class="modal-form">
+      <label for="points-input">Novo valor:</label>
+      <input type="number" id="points-input" min="0" />
+      <div id="points-max-info">Máximo: <span id="points-max-value">0</span></div>
+      <button id="save-points">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+// Firebase imports
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+  onSnapshot,
+  updateDoc
+} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+
+// Config Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyAgYVod9B99WIc_QysFx73htOf9O8XtuE8",
+  authDomain: "zatur-rpg.firebaseapp.com",
+  projectId: "zatur-rpg",
+  storageBucket: "zatur-rpg.firebasestorage.app",
+  messagingSenderId: "797058283992",
+  appId: "1:797058283992:web:7132e71691a225c1255aad"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// Pega o ID do personagem da query string ?id=...
+const urlParams = new URLSearchParams(window.location.search);
+const charId = urlParams.get("id");
+
+if (!charId) {
+  alert("ID do personagem não fornecido na URL.");
+  document.getElementById("loading").textContent = "ID do personagem não fornecido.";
+  throw new Error("ID do personagem não fornecido.");
+}
+
+// Variáveis globais
+let characterData = {};
+let maxHp = 0;
+let maxEffort = 0;
+let maxMana = 0;
+
+// --- CONTROLE DE ABAS ---
+const tabs = document.querySelectorAll("nav.tabs button");
+const tabContents = document.querySelectorAll("section.tab-content");
+
+tabs.forEach(tab => {
+  tab.addEventListener("click", () => {
+    tabs.forEach(t => {
+      t.classList.remove("active");
+      t.setAttribute("aria-selected", "false");
+    });
+    tab.classList.add("active");
+    tab.setAttribute("aria-selected", "true");
+
+    tabContents.forEach(tc => {
+      tc.classList.remove("active");
+    });
+    const target = tab.dataset.tab;
+    document.getElementById(target).classList.add("active");
+  });
+});
+
+// --- ROLAGEM DE DADOS ---
+const diceButtons = document.querySelectorAll(".dice-buttons button");
+const diceResult = document.getElementById("dice-result");
+
+diceButtons.forEach(btn => {
+  btn.addEventListener("click", () => {
+    // Rolagem de dados normais
+    if (btn.dataset.dice) {
+      const sides = parseInt(btn.dataset.dice);
+      const roll = Math.floor(Math.random() * sides) + 1;
+      diceResult.textContent = `Você rolou um D${sides} e tirou: ${roll}`;
+    }
+  });
+});
+
+// --- ROLAGEM DE ATRIBUTOS (nD20) ---
+const attributeCards = document.querySelectorAll(".attribute-card[data-attr]");
+
+attributeCards.forEach(card => {
+  card.addEventListener("click", () => {
+    const attrName = card.dataset.attr;
+    const attrValue = parseInt(card.querySelector(".attribute-value").textContent) || 0;
+    
+    if (attrValue <= 0) {
+      diceResult.textContent = `Atributo ${attrName} é muito baixo para rolar dados.`;
+      return;
+    }
+    
+    // Rolagem de nD20
+    let rolls = [];
+    let total = 0;
+    
+    for (let i = 0; i < attrValue; i++) {
+      const roll = Math.floor(Math.random() * 20) + 1;
+      rolls.push(roll);
+      total += roll;
+    }
+    
+    const rollsText = rolls.join(" + ");
+    diceResult.textContent = `${attrValue}D20 (${attrName}): ${rollsText} = ${total}`;
+  });
+});
+
+// --- MODAL PARA EDIÇÃO DE PONTOS ---
+const pointsModal = document.getElementById("points-modal");
+const closeModalBtn = document.querySelector(".close-modal");
+const modalTitle = document.getElementById("modal-title");
+const pointsInput = document.getElementById("points-input");
+const pointsMaxValue = document.getElementById("points-max-value");
+const savePointsBtn = document.getElementById("save-points");
+let currentPointType = "";
+
+// Fechar modal
+closeModalBtn.addEventListener("click", () => {
+  pointsModal.style.display = "none";
+});
+
+// Fechar modal clicando fora dele
+window.addEventListener("click", (e) => {
+  if (e.target === pointsModal) {
+    pointsModal.style.display = "none";
+  }
+});
+
+// Abrir modal para edição de pontos
+document.querySelectorAll(".point-value.editable").forEach(element => {
+  element.addEventListener("click", () => {
+    currentPointType = element.dataset.type;
+    const currentValue = parseInt(element.textContent);
+    let maxValue = 0;
+    
+    switch(currentPointType) {
+      case "hp":
+        maxValue = maxHp;
+        modalTitle.textContent = "Editar Pontos de Vida";
+        break;
+      case "effort":
+        maxValue = maxEffort;
+        modalTitle.textContent = "Editar Pontos de Esforço";
+        break;
+      case "mana":
+        maxValue = maxMana;
+        modalTitle.textContent = "Editar Pontos de Mana";
+        break;
+    }
+    
+    pointsInput.value = currentValue;
+    pointsInput.max = maxValue;
+    pointsMaxValue.textContent = maxValue;
+    
+    pointsModal.style.display = "block";
+  });
+});
+
+// Salvar pontos
+savePointsBtn.addEventListener("click", async () => {
+  const newValue = parseInt(pointsInput.value);
+  const maxValue = parseInt(pointsInput.max);
+  
+  if (isNaN(newValue) || newValue < 0) {
+    alert("Por favor, insira um valor válido.");
+    return;
+  }
+  
+  if (newValue > maxValue) {
+    alert(`O valor não pode ser maior que ${maxValue}.`);
+    return;
+  }
+  
+  try {
+    // Atualizar no Firebase
+    const charRef = doc(db, "characters", charId);
+    let fieldName = "";
+    
+    switch(currentPointType) {
+      case "hp":
+        fieldName = "Pontos de Vida Atuais";
+        break;
+      case "effort":
+        fieldName = "Pontos de Esforço Atuais";
+        break;
+      case "mana":
+        fieldName = "Pontos de Mana Atuais";
+        break;
+    }
+    
+    await updateDoc(charRef, {
+      [fieldName]: newValue
+    });
+    
+    // Atualizar localmente
+    document.getElementById(`${currentPointType}-value`).textContent = newValue;
+    
+    pointsModal.style.display = "none";
+    alert("Pontos atualizados com sucesso!");
+  } catch (error) {
+    console.error("Erro ao atualizar pontos:", error);
+    alert("Erro ao atualizar pontos. Tente novamente.");
+  }
+});
+
+// --- CARREGAR DADOS DO PERSONAGEM ---
+const loadingDiv = document.getElementById("loading");
+const charNameHeader = document.getElementById("character-name-header");
+
+// Elementos da visão geral
+const charName = document.getElementById("char-name");
+const charOrigin = document.getElementById("char-origin");
+const charClass = document.getElementById("char-class");
+const charClan = document.getElementById("char-clan");
+const charLevel = document.getElementById("char-level");
+const charCampaign = document.getElementById("char-campaign");
+const charHistory = document.getElementById("char-history");
+const charAppearance = document.getElementById("char-appearance");
+const charPersonality = document.getElementById("char-personality");
+
+// Pontos
+const hpValue = document.getElementById("hp-value");
+const effortValue = document.getElementById("effort-value");
+const manaValue = document.getElementById("mana-value");
+const hpMax = document.getElementById("hp-max");
+const effortMax = document.getElementById("effort-max");
+const manaMax = document.getElementById("mana-max");
+
+// Atributos
+const attrStrength = document.getElementById("attr-strength");
+const attrAgility = document.getElementById("attr-agility");
+const attrMana = document.getElementById("attr-mana");
+const attrIntellect = document.getElementById("attr-intellect");
+const attrVigor = document.getElementById("attr-vigor");
+
+// Atributos para rolagem
+const rollStrength = document.getElementById("roll-strength");
+const rollAgility = document.getElementById("roll-agility");
+const rollMana = document.getElementById("roll-mana");
+const rollIntellect = document.getElementById("roll-intellect");
+const rollVigor = document.getElementById("roll-vigor");
+
+// Listas
+const skillsList = document.getElementById("skills-list");
+const inventoryList = document.getElementById("inventory-list");
+const toolsList = document.getElementById("tools-list");
+const equipmentList = document.getElementById("equipment-list");
+const spellsList = document.getElementById("spells-list");
+const magicAbilitiesList = document.getElementById("magic-abilities-list");
+
+// Função para carregar dados do personagem
+async function loadCharacter() {
+  const charRef = doc(db, "characters", charId);
+  const charSnap = await getDoc(charRef);
+  
+  if (!charSnap.exists()) {
+    alert("Personagem não encontrado.");
+    loadingDiv.textContent = "Personagem não encontrado.";
+    return;
+  }
+  
+  characterData = charSnap.data();
+  
+  // Preencher cabeçalho
+  charNameHeader.textContent = characterData.Nome || "Personagem Sem Nome";
+  
+  // Preencher visão geral
+  charName.textContent = characterData.Nome || "-";
+  charOrigin.textContent = characterData.Origem || "-";
+  charClass.textContent = characterData.Classe || "-";
+  charClan.textContent = characterData.Clã || "-";
+  charLevel.textContent = characterData.Nível || characterData.Nivel || 1;
+  
+  // Carregar nome da campanha se existir
+  if (characterData.Campanha) {
+    try {
+      const campaignRef = doc(db, "campaigns", characterData.Campanha);
+      const campaignSnap = await getDoc(campaignRef);
+      if (campaignSnap.exists()) {
+        const campaignData = campaignSnap.data();
+        charCampaign.textContent = campaignData.Nome || campaignData.name || "Campanha";
+      } else {
+        charCampaign.textContent = "Campanha não encontrada";
+      }
+    } catch (error) {
+      console.error("Erro ao carregar campanha:", error);
+      charCampaign.textContent = characterData.Campanha;
+    }
+  } else {
+    charCampaign.textContent = "Nenhuma campanha";
+  }
+  
+  charHistory.textContent = characterData.História || characterData.Historia || "-";
+  charAppearance.textContent = characterData.Aparência || characterData.Aparencia || "-";
+  charPersonality.textContent = characterData.Personalidade || "-";
+  
+  // Calcular valores máximos
+  maxHp = characterData.Vigor ? 100 * parseInt(characterData.Vigor) : 0;
+  maxEffort = (characterData.Força && characterData.Agilidade) ? 
+              30 * (parseInt(characterData.Força) + parseInt(characterData.Agilidade)) : 0;
+  maxMana = characterData.Mana ? 200 * parseInt(characterData.Mana) : 0;
+  
+  // Preencher pontos (usar valores atuais se existirem, senão usar máximos)
+  const currentHp = characterData["Pontos de Vida Atuais"] || maxHp;
+  const currentEffort = characterData["Pontos de Esforço Atuais"] || maxEffort;
+  const currentMana = characterData["Pontos de Mana Atuais"] || maxMana;
+  
+  hpValue.textContent = currentHp;
+  effortValue.textContent = currentEffort;
+  manaValue.textContent = currentMana;
+  
+  hpMax.textContent = `Máx: ${maxHp}`;
+  effortMax.textContent = `Máx: ${maxEffort}`;
+  manaMax.textContent = `Máx: ${maxMana}`;
+  
+  // Preencher atributos
+  attrStrength.textContent = characterData.Força || characterData.Forca || 0;
+  attrAgility.textContent = characterData.Agilidade || 0;
+  attrMana.textContent = characterData.Mana || 0;
+  attrIntellect.textContent = characterData.Intelecto || 0;
+  attrVigor.textContent = characterData.Vigor || 0;
+  
+  // Preencher atributos para rolagem
+  rollStrength.textContent = characterData.Força || characterData.Forca || 0;
+  rollAgility.textContent = characterData.Agilidade || 0;
+  rollMana.textContent = characterData.Mana || 0;
+  rollIntellect.textContent = characterData.Intelecto || 0;
+  rollVigor.textContent = characterData.Vigor || 0;
+
+  // Carregar perícias
+  loadSkills();
+  
+  // Carregar itens, ferramentas e equipamentos
+  loadItems();
+  
+  // Carregar feitiços e habilidades mágicas
+  loadSpells();
+  
+  // Esconder loading e mostrar conteúdo
+  loadingDiv.style.display = "none";
+}
+
+// Função para carregar perícias
+async function loadSkills() {
+  skillsList.innerHTML = "";
+  
+  // Verificar se há perícias definidas
+  if (characterData.pericias && Array.isArray(characterData.pericias) && characterData.pericias.length > 0) {
+    // Carregar cada perícia pelo ID
+    for (const skillId of characterData.pericias) {
+      try {
+        const skillRef = doc(db, "skills", skillId);
+        const skillSnap = await getDoc(skillRef);
+        
+        if (skillSnap.exists()) {
+          const skill = skillSnap.data();
+          const li = document.createElement("li");
+          li.className = "item-with-description";
+          
+          li.innerHTML = `
+            <div>${skill.Nome || "Perícia sem nome"}</div>
+            <div class="item-description">${skill.Descrição || "Sem descrição"}</div>
+          `;
+          
+          // Adicionar evento para mostrar/ocultar descrição
+          li.addEventListener("click", function() {
+            const description = this.querySelector(".item-description");
+            description.style.display = description.style.display === "block" ? "none" : "block";
+          });
+          
+          skillsList.appendChild(li);
+        }
+      } catch (error) {
+        console.error(`Erro ao carregar perícia ${skillId}:`, error);
+        const li = document.createElement("li");
+        li.textContent = `Erro ao carregar perícia: ${skillId}`;
+        skillsList.appendChild(li);
+      }
+    }
+  } else {
+    skillsList.innerHTML = "<li>Nenhuma perícia atribuída</li>";
+  }
+}
+
+// Função para carregar itens, ferramentas e equipamentos
+async function loadItems() {
+  try {
+    inventoryList.innerHTML = "";
+    toolsList.innerHTML = "";
+    equipmentList.innerHTML = "";
+    
+    // Carregar itens comuns
+    if (characterData.itens && Array.isArray(characterData.itens) && characterData.itens.length > 0) {
+      for (const itemId of characterData.itens) {
+        try {
+          const itemRef = doc(db, "items", itemId);
+          const itemSnap = await getDoc(itemRef);
+          
+          if (itemSnap.exists()) {
+            const item = itemSnap.data();
+            const li = document.createElement("li");
+            li.textContent = item.Nome || "Item sem nome";
+            
+            inventoryList.appendChild(li);
+          }
+        } catch (error) {
+          console.error(`Erro ao carregar item ${itemId}:`, error);
+        }
+      }
+    } else {
+      inventoryList.innerHTML = "<li>Nenhum item no inventário</li>";
+    }
+    
+    // Carregar ferramentas
+    if (characterData.ferramentas && Array.isArray(characterData.ferramentas) && characterData.ferramentas.length > 0) {
+      for (const toolId of characterData.ferramentas) {
+        try {
+          const toolRef = doc(db, "items", toolId);
+          const toolSnap = await getDoc(toolRef);
+          
+          if (toolSnap.exists()) {
+            const tool = toolSnap.data();
+            const li = document.createElement("li");
+            li.textContent = tool.Nome || "Ferramenta sem nome";
+            
+            toolsList.appendChild(li);
+          }
+        } catch (error) {
+          console.error(`Erro ao carregar ferramenta ${toolId}:`, error);
+        }
+      }
+    } else {
+      toolsList.innerHTML = "<li>Nenhuma ferramenta</li>";
+    }
+    
+    // Verificar se há equipamentos (não implementado ainda)
+    equipmentList.innerHTML = "<li>Nenhum equipamento</li>";
+    
+  } catch (error) {
+    console.error("Erro ao carregar itens:", error);
+    inventoryList.innerHTML = "<li>Erro ao carregar itens</li>";
+    toolsList.innerHTML = "<li>Erro ao carregar ferramentas</li>";
+    equipmentList.innerHTML = "<li>Erro ao carregar equipamentos</li>";
+  }
+}
+
+// Função para carregar feitiços e habilidades mágicas
+async function loadSpells() {
+  try {
+    spellsList.innerHTML = "";
+    magicAbilitiesList.innerHTML = "";
+    
+    // Carregar feitiços
+    if (characterData.feiticos && Array.isArray(characterData.feiticos) && characterData.feiticos.length > 0) {
+      for (const spellId of characterData.feiticos) {
+        try {
+          const spellRef = doc(db, "spells", spellId);
+          const spellSnap = await getDoc(spellRef);
+          
+          if (spellSnap.exists()) {
+            const spell = spellSnap.data();
+            const li = document.createElement("li");
+            li.textContent = spell.Nome || "Feitiço sem nome";
+            
+            spellsList.appendChild(li);
+          }
+        } catch (error) {
+          console.error(`Erro ao carregar feitiço ${spellId}:`, error);
+        }
+      }
+    } else {
+      spellsList.innerHTML = "<li>Nenhum feitiço conhecido</li>";
+    }
+    
+    // Carregar habilidades mágicas
+    if (characterData.habilidades_magicas && Array.isArray(characterData.habilidades_magicas) && characterData.habilidades_magicas.length > 0) {
+      for (const magicId of characterData.habilidades_magicas) {
+        try {
+          const magicRef = doc(db, "items", magicId);
+          const magicSnap = await getDoc(magicRef);
+          
+          if (magicSnap.exists()) {
+            const magic = magicSnap.data();
+            const li = document.createElement("li");
+            li.textContent = magic.Nome || "Habilidade sem nome";
+            
+            magicAbilitiesList.appendChild(li);
+          }
+        } catch (error) {
+          console.error(`Erro ao carregar habilidade mágica ${magicId}:`, error);
+        }
+      }
+    } else {
+      magicAbilitiesList.innerHTML = "<li>Nenhuma habilidade mágica</li>";
+    }
+    
+  } catch (error) {
+    console.error("Erro ao carregar feitiços:", error);
+    spellsList.innerHTML = "<li>Erro ao carregar feitiços</li>";
+    magicAbilitiesList.innerHTML = "<li>Erro ao carregar habilidades</li>";
+  }
+}
+
+// Inicializar a página
+loadCharacter();
+</script>
+</body>
+</html>
