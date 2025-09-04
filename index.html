@@ -6,221 +6,540 @@
 <title>Zatur RPG - Mestre</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap');
+  :root {
+    --color-primary: #6b4c2a;
+    --color-primary-dark: #4b2e0e;
+    --color-primary-light: #8c6b3a;
+    --color-secondary: #3a220a;
+    --color-accent: #a07c3f;
+    --color-text: #f5f1e9;
+    --color-background: #3a220a;
+    --color-success: #4a7a4a;
+    --color-danger: #a03a3a;
+    --color-warning: #9a7a5a;
+    --color-info: #3a5a8a;
+    --border-radius: 8px;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    --transition: all 0.3s ease;
+  }
+  
+  * {
+    box-sizing: border-box;
+  }
+  
   body {
-    margin: 0; font-family: 'MedievalSharp', cursive, serif;
-    background: linear-gradient(135deg, #3a220a 25%, #5a3e0a 75%);
-    color: #f5f1e9;
-    min-height: 100vh; display: flex; flex-direction: column;
+    margin: 0; 
+    font-family: 'MedievalSharp', cursive, serif;
+    background: linear-gradient(135deg, var(--color-secondary) 25%, var(--color-primary-dark) 75%);
+    color: var(--color-text);
+    min-height: 100vh; 
+    display: flex; 
+    flex-direction: column;
+    line-height: 1.6;
   }
+  
+  /* Header Styles */
   header {
-    background: #4b2e0e; padding: 1rem 1.5rem;
-    display: flex; justify-content: space-between; align-items: center;
-    box-shadow: 0 0 10px #6b4c2a;
+    background: var(--color-primary-dark); 
+    padding: 1rem 1.5rem;
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+    box-shadow: var(--shadow);
+    position: sticky;
+    top: 0;
+    z-index: 100;
   }
-  header h1 { margin: 0; font-size: 1.5rem; }
+  
+  header h1 { 
+    margin: 0; 
+    font-size: 1.5rem; 
+  }
+  
   header button {
-    background: #6b4c2a; border: none; padding: 0.5rem 1rem;
-    border-radius: 5px; color: #f5f1e9; font-weight: bold;
-    cursor: pointer; transition: background-color 0.3s ease;
+    background: var(--color-primary); 
+    border: none; 
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius); 
+    color: var(--color-text); 
+    font-weight: bold;
+    cursor: pointer; 
+    transition: var(--transition);
   }
-  header button:hover { background: #8c6b3a; }
+  
+  header button:hover { 
+    background: var(--color-primary-light); 
+  }
 
+  /* Navigation Tabs */
   nav.tabs {
-    display: flex; flex-wrap: wrap; background: #3a220a;
-    box-shadow: inset 0 -3px 5px #6b4c2a;
+    display: flex; 
+    flex-wrap: wrap; 
+    background: var(--color-secondary);
+    box-shadow: inset 0 -3px 5px var(--color-primary);
+    position: sticky;
+    top: 68px;
+    z-index: 90;
   }
+  
   nav.tabs button {
-    flex: 1 1 50%;
-    background: none; border: none; color: #f5f1e9;
-    padding: 1rem; font-weight: bold; font-size: 1rem;
-    cursor: pointer; transition: background-color 0.3s ease;
+    flex: 1 1 auto;
+    background: none; 
+    border: none; 
+    color: var(--color-text);
+    padding: 1rem; 
+    font-weight: bold; 
+    font-size: 1rem;
+    cursor: pointer; 
+    transition: var(--transition);
+    min-width: 120px;
   }
+  
   nav.tabs button.active,
   nav.tabs button:hover {
-    background: #6b4c2a; color: #fff;
-    box-shadow: 0 0 10px #8c6b3a;
+    background: var(--color-primary); 
+    color: #fff;
+    box-shadow: 0 0 10px var(--color-primary-light);
   }
 
+  /* Main Content */
   main.container {
-    flex: 1; max-width: 800px; margin: 1rem auto 2rem;
-    background: rgba(30,20,10,0.9); border-radius: 10px;
-    padding: 1rem 1.5rem; box-shadow: 0 0 15px #6b4c2a;
+    flex: 1; 
+    max-width: 1200px; 
+    margin: 1rem auto 2rem;
+    background: rgba(30,20,10,0.9); 
+    border-radius: 10px;
+    padding: 1.5rem; 
+    box-shadow: var(--shadow);
   }
 
-  section.tab-content { display: none; }
-  section.tab-content.active { display: block; }
+  section.tab-content { 
+    display: none; 
+  }
+  
+  section.tab-content.active { 
+    display: block; 
+  }
 
+  /* Form Styles */
   form {
+    margin-bottom: 1.5rem;
+    background: rgba(75, 46, 14, 0.3);
+    padding: 1rem;
+    border-radius: var(--border-radius);
+  }
+  
+  .field-pair {
+    display: flex; 
+    gap: 0.5rem; 
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+  }
+  
+  .field-pair input,
+  .field-pair select,
+  .field-pair textarea {
+    flex: 1; 
+    padding: 0.6rem 0.8rem; 
+    border-radius: var(--border-radius);
+    border: 2px solid var(--color-primary); 
+    font-family: 'MedievalSharp', cursive;
+    font-size: 1rem;
+    background-color: rgba(255,248,231,0.85);
+    min-width: 150px;
+  }
+  
+  .field-pair input.name-field {
+    max-width: 200px;
+  }
+  
+  .add-field-btn {
+    background: var(--color-accent); 
+    border: none; 
+    color: var(--color-text);
+    padding: 0.5rem 1rem; 
+    border-radius: var(--border-radius);
+    cursor: pointer; 
+    font-weight: bold; 
     margin-bottom: 1rem;
+    transition: var(--transition);
   }
-  form > div.field-pair {
-    display: flex; gap: 0.5rem; margin-bottom: 0.5rem;
+  
+  .add-field-btn:hover {
+    background: var(--color-primary-light);
   }
-  form > div.field-pair input,
-  form > div.field-pair select,
-  form > div.field-pair textarea {
-    flex: 1; padding: 0.4rem 0.6rem; border-radius: 5px;
-    border: none; font-size: 1rem;
-  }
-  form > div.field-pair input.name-field {
-    max-width: 40%;
-  }
-  form > button.add-field-btn {
-    background: #8c6b3a; border: none; color: #f5f1e9;
-    padding: 0.4rem 0.8rem; border-radius: 5px;
-    cursor: pointer; font-weight: bold; margin-bottom: 1rem;
-  }
-  form > button.add-field-btn:hover {
-    background: #a07c3f;
-  }
-  form > button.submit-btn {
-    background: #6b4c2a; border: none; color: #f5f1e9;
-    padding: 0.7rem 1rem; border-radius: 5px;
-    cursor: pointer; font-weight: bold; width: 100%;
+  
+  .submit-btn {
+    background: var(--color-primary); 
+    border: none; 
+    color: var(--color-text);
+    padding: 0.8rem 1.2rem; 
+    border-radius: var(--border-radius);
+    cursor: pointer; 
+    font-weight: bold; 
+    width: 100%;
     font-size: 1.1rem;
+    transition: var(--transition);
   }
-  form > button.submit-btn:hover {
-    background: #8c6b3a;
+  
+  .submit-btn:hover {
+    background: var(--color-primary-light);
   }
 
-  ul.list-items {
-    list-style: none; padding-left: 0; max-height: 250px; overflow-y: auto;
-    border-top: 1px solid #6b4c2a; margin-top: 0.5rem;
+  /* List Items */
+  .list-items {
+    list-style: none; 
+    padding-left: 0; 
+    max-height: 400px; 
+    overflow-y: auto;
+    border-top: 1px solid var(--color-primary); 
+    margin-top: 0.5rem;
+    display: grid;
+    gap: 0.5rem;
   }
-  ul.list-items li {
-    background: #4b2e0e; margin: 0.3rem 0; padding: 0.5rem 0.8rem;
-    border-radius: 5px; display: flex; justify-content: space-between;
-    align-items: center; font-size: 1rem;
+  
+  .list-items li {
+    background: var(--color-primary-dark); 
+    padding: 0.8rem 1rem;
+    border-radius: var(--border-radius); 
+    display: flex; 
+    justify-content: space-between;
+    align-items: center; 
+    font-size: 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
   }
-  ul.list-items li button.del-btn {
-    background: #a03a3a; border: none; color: #f5f1e9;
-    border-radius: 5px; padding: 0.3rem 0.6rem; cursor: pointer;
-    font-weight: bold; font-size: 0.9rem;
+  
+  .list-items li .character-info {
+    flex: 1;
+    min-width: 200px;
   }
-  ul.list-items li button.del-btn:hover {
+  
+  .list-items li .character-actions {
+    display: flex;
+    gap: 0.3rem;
+    flex-wrap: wrap;
+  }
+  
+  /* Button Styles */
+  .btn {
+    border: none; 
+    border-radius: var(--border-radius); 
+    padding: 0.4rem 0.8rem; 
+    cursor: pointer;
+    font-weight: bold; 
+    font-size: 0.9rem;
+    transition: var(--transition);
+    color: var(--color-text);
+  }
+  
+  .btn-sm {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.8rem;
+  }
+  
+  .del-btn {
+    background: var(--color-danger);
+  }
+  
+  .del-btn:hover {
     background: #c04a4a;
   }
-  ul.list-items li button.edit-btn {
-    background: #4a7a4a; border: none; color: #f5f1e9;
-    border-radius: 5px; padding: 0.3rem 0.6rem; cursor: pointer;
-    font-weight: bold; font-size: 0.9rem; margin-right: 5px;
+  
+  .edit-btn {
+    background: var(--color-success);
   }
-  ul.list-items li button.edit-btn:hover {
+  
+  .edit-btn:hover {
     background: #5fa75f;
   }
-  ul.list-items li button.view-btn {
-    background: #3a5a8a; border: none; color: #f5f1e9;
-    border-radius: 5px; padding: 0.3rem 0.6rem; cursor: pointer;
-    font-weight: bold; font-size: 0.9rem; margin-right: 5px;
+  
+  .view-btn {
+    background: var(--color-info);
   }
-  ul.list-items li button.view-btn:hover {
+  
+  .view-btn:hover {
     background: #4a6a9a;
   }
-  ul.list-items li button.assign-btn {
-    background: #7a5a3a; border: none; color: #f5f1e9;
-    border-radius: 5px; padding: 0.3rem 0.6rem; cursor: pointer;
-    font-weight: bold; font-size: 0.9rem; margin-right: 5px;
+  
+  .assign-btn {
+    background: var(--color-primary);
   }
-  ul.list-items li button.assign-btn:hover {
-    background: #8a6a4a;
+  
+  .assign-btn:hover {
+    background: var(--color-primary-light);
+  }
+  
+  .btn-group {
+    display: flex;
+    gap: 0.3rem;
+    flex-wrap: wrap;
   }
 
+  /* Dice Roller */
   .dice-buttons {
-    display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center;
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 0.5rem; 
     margin-top: 1rem;
   }
+  
   .dice-buttons button {
-    background: #6b4c2a; border: none; color: #f5f1e9;
-    padding: 0.7rem 1.2rem; border-radius: 5px;
-    font-weight: bold; font-size: 1.1rem; cursor: pointer;
-    flex: 1 1 30%;
-    max-width: 100px;
-    transition: background-color 0.3s ease;
+    background: var(--color-primary); 
+    border: none; 
+    color: var(--color-text);
+    padding: 0.8rem; 
+    border-radius: var(--border-radius);
+    font-weight: bold; 
+    font-size: 1.1rem; 
+    cursor: pointer;
+    transition: var(--transition);
   }
+  
   .dice-buttons button:hover {
-    background: #8c6b3a;
+    background: var(--color-primary-light);
   }
+  
   #dice-result {
-    margin-top: 1rem; font-size: 1.3rem; font-weight: bold;
-    text-align: center; padding: 1rem;
-    background: #4b2e0e; border-radius: 10px;
-    box-shadow: 0 0 10px #8c6b3a inset;
+    margin-top: 1.5rem; 
+    font-size: 1.3rem; 
+    font-weight: bold;
+    text-align: center; 
+    padding: 1.2rem;
+    background: var(--color-primary-dark); 
+    border-radius: 10px;
+    box-shadow: inset 0 0 10px var(--color-primary-light);
   }
 
-  /* Modal para atribuição de itens e feitiços */
+  /* Modal Styles */
   .modal {
-    display: none; position: fixed; z-index: 100;
-    left: 0; top: 0; width: 100%; height: 100%;
+    display: none; 
+    position: fixed; 
+    z-index: 1000;
+    left: 0; 
+    top: 0; 
+    width: 100%; 
+    height: 100%;
     background-color: rgba(0,0,0,0.7);
+    overflow: auto;
+    padding: 1rem;
   }
+  
   .modal-content {
-    background: #3a220a; margin: 10% auto; padding: 20px;
-    border: 1px solid #6b4c2a; width: 80%; max-width: 500px;
-    border-radius: 10px; box-shadow: 0 0 20px #8c6b3a;
+    background: var(--color-secondary); 
+    margin: 2rem auto; 
+    padding: 1.5rem;
+    border: 1px solid var(--color-primary); 
+    width: 100%; 
+    max-width: 800px;
+    border-radius: 10px; 
+    box-shadow: 0 0 20px var(--color-primary-light);
+    position: relative;
   }
+  
   .close-modal {
-    color: #aaa; float: right; font-size: 28px;
-    font-weight: bold; cursor: pointer;
+    color: #aaa; 
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+    font-size: 28px;
+    font-weight: bold; 
+    cursor: pointer;
   }
+  
   .close-modal:hover {
     color: #fff;
   }
+  
   .assign-grid {
-    display: grid; grid-template-columns: 1fr 1fr;
-    gap: 10px; margin: 15px 0;
+    display: grid; 
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem; 
+    margin: 1rem 0;
   }
+  
   .assign-item {
-    background: #4b2e0e; padding: 10px; border-radius: 5px;
-    display: flex; justify-content: space-between; align-items: center;
+    background: var(--color-primary-dark); 
+    padding: 0.8rem; 
+    border-radius: var(--border-radius);
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+  
+  .assign-item label {
+    margin-left: 0.5rem;
+    flex: 1;
+    cursor: pointer;
   }
 
-  /* Modal para edição de personagem */
-  #edit-character-modal .modal-content {
-    max-width: 600px;
+  /* Character Cards for Better Organization */
+  .character-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
   }
-  #edit-character-form .field-pair {
-    display: flex; gap: 0.5rem; margin-bottom: 0.5rem;
+  
+  .character-card {
+    background: var(--color-primary-dark);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    box-shadow: var(--shadow);
   }
-  #edit-character-form .field-pair input,
-  #edit-character-form .field-pair select {
-    flex: 1; padding: 0.4rem 0.6rem; border-radius: 5px;
-    border: none; font-size: 1rem;
+  
+  .character-card h3 {
+    margin-top: 0;
+    color: var(--color-accent);
+    border-bottom: 1px solid var(--color-primary);
+    padding-bottom: 0.5rem;
   }
-  #edit-character-form .field-pair input.name-field {
-    max-width: 40%;
+  
+  .character-card .card-content {
+    margin-bottom: 1rem;
+  }
+  
+  .character-card .card-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  /* Filter and Search */
+  .filter-container {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  
+  .search-box {
+    flex: 1;
+    min-width: 250px;
+    position: relative;
+  }
+  
+  .search-box input {
+    width: 100%;
+    padding: 0.6rem 1rem 0.6rem 2.5rem;
+    border-radius: var(--border-radius);
+    border: 2px solid var(--color-primary);
+    background-color: rgba(255,248,231,0.85);
+  }
+  
+  .search-box::before {
+    content: "🔍";
+    position: absolute;
+    left: 0.8rem;
+    top: 0.5rem;
+    font-size: 1.2rem;
+  }
+  
+  .filter-select {
+    padding: 0.6rem 1rem;
+    border-radius: var(--border-radius);
+    border: 2px solid var(--color-primary);
+    background-color: rgba(255,248,231,0.85);
+    min-width: 150px;
   }
 
-  /* Modal para atribuição de ferramentas e habilidades */
-  #assign-tools-modal .modal-content,
-  #assign-magic-abilities-modal .modal-content {
-    max-width: 600px;
-  }
-
-  /* Modal para criação de perícias */
-  #create-skill-modal .modal-content {
-    max-width: 700px;
-  }
-  #create-skill-form textarea {
-    width: 100%; min-height: 100px; resize: vertical;
-  }
-
-  /* Scrollbar para listas */
-  ul.list-items::-webkit-scrollbar {
-    width: 8px;
-  }
-  ul.list-items::-webkit-scrollbar-thumb {
-    background: #6b4c2a; border-radius: 4px;
-  }
-  ul.list-items::-webkit-scrollbar-track {
-    background: #3a220a;
-  }
-
-  /* Responsividade */
-  @media (min-width: 600px) {
-    nav.tabs button {
-      flex: 1 1 auto;
-      max-width: none;
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    header {
+      flex-direction: column;
+      gap: 0.5rem;
+      padding: 0.8rem;
     }
+    
+    nav.tabs {
+      top: 112px;
+    }
+    
+    nav.tabs button {
+      min-width: 100px;
+      padding: 0.8rem 0.5rem;
+      font-size: 0.9rem;
+    }
+    
+    .field-pair {
+      flex-direction: column;
+    }
+    
+    .field-pair input.name-field {
+      max-width: 100%;
+    }
+    
+    .assign-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .modal-content {
+      margin: 1rem auto;
+      padding: 1rem;
+    }
+    
+    .list-items li {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .list-items li .character-actions {
+      width: 100%;
+      justify-content: center;
+    }
+    
+    .character-cards {
+      grid-template-columns: 1fr;
+    }
+    
+    .filter-container {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    
+    .search-box {
+      min-width: 100%;
+    }
+  }
+
+  @media (max-width: 480px) {
+    nav.tabs button {
+      flex: 1 1 50%;
+      min-width: 80px;
+      font-size: 0.8rem;
+      padding: 0.6rem 0.3rem;
+    }
+    
+    main.container {
+      padding: 1rem;
+      margin: 0.5rem;
+    }
+    
+    .btn-group {
+      flex-direction: column;
+      width: 100%;
+    }
+    
+    .btn-group .btn {
+      width: 100%;
+      text-align: center;
+    }
+  }
+
+  /* Scrollbar Styling */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-primary); 
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: var(--color-secondary);
   }
 </style>
 </head>
@@ -254,6 +573,13 @@
       <button type="button" class="add-field-btn" data-form="form-campaign">+ Adicionar campo</button>
       <button type="submit" class="submit-btn">Criar Campanha</button>
     </form>
+    
+    <div class="filter-container">
+      <div class="search-box">
+        <input type="text" id="campaign-search" placeholder="Buscar campanhas..." />
+      </div>
+    </div>
+    
     <ul id="list-campaigns" class="list-items" aria-live="polite" aria-relevant="additions removals"></ul>
   </section>
 
@@ -267,7 +593,7 @@
       </div>
       <div class="field-pair">
         <input type="text" name="field-name" class="name-field" placeholder="Nome do campo" value="Campanha" readonly />
-        <select name="field-value">
+        <select name="field-value" id="character-campaign">
           <option value="">Nenhuma campanha</option>
         </select>
       </div>
@@ -287,7 +613,7 @@
         <input type="text" name="field-name" class="name-field" placeholder="Nome do campo" value="Nível" readonly />
         <input type="number" name="field-value" placeholder="Nível (opcional)" min="1" />
       </div>
-      <div class="field-pair">
+	<div class="field-pair">
         <input type="text" name="field-name" class="name-field" placeholder="Nome do campo" value="Força" readonly />
         <input type="number" name="field-value" placeholder="Força (opcional)" min="1" />
       </div>
@@ -310,6 +636,17 @@
       <button type="button" class="add-field-btn" data-form="form-character">+ Adicionar campo</button>
       <button type="submit" class="submit-btn">Criar Personagem</button>
     </form>
+    
+    <div class="filter-container">
+      <div class="search-box">
+        <input type="text" id="character-search" placeholder="Buscar personagens..." />
+      </div>
+      <select id="character-campaign-filter" class="filter-select">
+        <option value="">Todas as campanhas</option>
+      </select>
+    </div>
+    
+    <div id="character-cards" class="character-cards"></div>
     <ul id="list-characters" class="list-items" aria-live="polite" aria-relevant="additions removals"></ul>
   </section>
 
@@ -324,6 +661,13 @@
       <button type="button" class="add-field-btn" data-form="form-monster">+ Adicionar campo</button>
       <button type="submit" class="submit-btn">Criar Monstro</button>
     </form>
+    
+    <div class="filter-container">
+      <div class="search-box">
+        <input type="text" id="monster-search" placeholder="Buscar monstros..." />
+      </div>
+    </div>
+    
     <ul id="list-monsters" class="list-items" aria-live="polite" aria-relevant="additions removals"></ul>
   </section>
 
@@ -346,6 +690,19 @@
       <button type="button" class="add-field-btn" data-form="form-item">+ Adicionar campo</button>
       <button type="submit" class="submit-btn">Criar Item</button>
     </form>
+    
+    <div class="filter-container">
+      <div class="search-box">
+        <input type="text" id="item-search" placeholder="Buscar itens..." />
+      </div>
+      <select id="item-type-filter" class="filter-select">
+        <option value="">Todos os tipos</option>
+        <option value="item">Itens Comuns</option>
+        <option value="tool">Ferramentas</option>
+        <option value="magic">Habilidades Mágicas</option>
+      </select>
+    </div>
+    
     <ul id="list-items" class="list-items" aria-live="polite" aria-relevant="additions removals"></ul>
   </section>
 
@@ -360,6 +717,13 @@
       <button type="button" class="add-field-btn" data-form="form-spell">+ Adicionar campo</button>
       <button type="submit" class="submit-btn">Criar Feitiço</button>
     </form>
+    
+    <div class="filter-container">
+      <div class="search-box">
+        <input type="text" id="spell-search" placeholder="Buscar feitiços..." />
+      </div>
+    </div>
+    
     <ul id="list-spells" class="list-items" aria-live="polite" aria-relevant="additions removals"></ul>
   </section>
 
@@ -367,6 +731,13 @@
   <section id="skills" class="tab-content" role="tabpanel" aria-labelledby="tab-skills">
     <h2>Perícias</h2>
     <button type="button" class="add-field-btn" id="create-skill-btn">+ Criar Perícia</button>
+    
+    <div class="filter-container">
+      <div class="search-box">
+        <input type="text" id="skill-search" placeholder="Buscar perícias..." />
+      </div>
+    </div>
+    
     <ul id="list-skills" class="list-items" aria-live="polite" aria-relevant="additions removals"></ul>
   </section>
 
@@ -377,10 +748,27 @@
       <button data-dice="4" aria-label="Rolar D4">D4</button>
       <button data-dice="6" aria-label="Rolar D6">D6</button>
       <button data-dice="8" aria-label="Rolar D8">D8</button>
+      <button data-dice="10" aria-label="Rolar D10">D10</button>
+      <button data-dice="12" aria-label="Rolar D12">D12</button>
       <button data-dice="20" aria-label="Rolar D20">D20</button>
       <button data-dice="100" aria-label="Rolar D100">D100</button>
     </div>
+    
+    <div class="field-pair" style="margin-top: 1.5rem;">
+      <input type="text" class="name-field" value="Quantidade" readonly />
+      <input type="number" id="dice-quantity" value="1" min="1" max="10" />
+    </div>
+    
+    <div class="field-pair">
+      <input type="text" class="name-field" value="Modificador" readonly />
+      <input type="number" id="dice-modifier" value="0" />
+    </div>
+    
+    <button id="roll-custom-dice" class="submit-btn">Rolar Dados Personalizados</button>
+    
     <div id="dice-result" aria-live="polite" aria-atomic="true"></div>
+    
+    <div id="dice-history" style="margin-top: 1.5rem;"></div>
   </section>
 
 </main>
@@ -390,6 +778,13 @@
   <div class="modal-content">
     <span class="close-modal">&times;</span>
     <h2 id="modal-title">Atribuir a <span id="character-name-modal"></span></h2>
+    
+    <div class="filter-container">
+      <div class="search-box">
+        <input type="text" id="assign-search" placeholder="Buscar itens/feitiços..." />
+      </div>
+    </div>
+    
     <div class="assign-grid">
       <div>
         <h3>Itens Disponíveis</h3>
@@ -400,7 +795,7 @@
         <div id="available-spells"></div>
       </div>
     </div>
-    <button id="confirm-assign" class="submit-btn">Confirmar</button>
+    <button id="confirm-assign" class="submit-btn">Confirmar Atribuição</button>
   </div>
 </div>
 
@@ -409,8 +804,15 @@
   <div class="modal-content">
     <span class="close-modal">&times;</span>
     <h2>Atribuir Ferramentas a <span id="character-name-tools-modal"></span></h2>
+    
+    <div class="filter-container">
+      <div class="search-box">
+        <input type="text" id="tools-search" placeholder="Buscar ferramentas..." />
+      </div>
+    </div>
+    
     <div id="available-tools"></div>
-    <button id="confirm-tools-assign" class="submit-btn">Confirmar</button>
+    <button id="confirm-tools-assign" class="submit-btn">Confirmar Atribuição</button>
   </div>
 </div>
 
@@ -419,8 +821,15 @@
   <div class="modal-content">
     <span class="close-modal">&times;</span>
     <h2>Atribuir Habilidades Mágicas a <span id="character-name-magic-modal"></span></h2>
+    
+    <div class="filter-container">
+      <div class="search-box">
+        <input type="text" id="magic-search" placeholder="Buscar habilidades..." />
+      </div>
+    </div>
+    
     <div id="available-magic-abilities"></div>
-    <button id="confirm-magic-assign" class="submit-btn">Confirmar</button>
+    <button id="confirm-magic-assign" class="submit-btn">Confirmar Atribuição</button>
   </div>
 </div>
 
@@ -429,8 +838,15 @@
   <div class="modal-content">
     <span class="close-modal">&times;</span>
     <h2>Atribuir Perícias a <span id="character-name-skills-modal"></span></h2>
+    
+    <div class="filter-container">
+      <div class="search-box">
+        <input type="text" id="skills-assign-search" placeholder="Buscar perícias..." />
+      </div>
+    </div>
+    
     <div id="available-skills"></div>
-    <button id="confirm-skills-assign" class="submit-btn">Confirmar</button>
+    <button id="confirm-skills-assign" class="submit-btn">Confirmar Atribuição</button>
   </div>
 </div>
 
@@ -458,6 +874,13 @@
   <div class="modal-content">
     <span class="close-modal">&times;</span>
     <h2>Desatribuir de <span id="character-name-unassign-modal"></span></h2>
+    
+    <div class="filter-container">
+      <div class="search-box">
+        <input type="text" id="unassign-search" placeholder="Buscar itens/feitiços..." />
+      </div>
+    </div>
+    
     <div class="assign-grid">
       <div>
         <h3>Itens Atribuídos</h3>
@@ -477,6 +900,13 @@
   <div class="modal-content">
     <span class="close-modal">&times;</span>
     <h2>Desatribuir Ferramentas de <span id="character-name-unassign-tools-modal"></span></h2>
+    
+    <div class="filter-container">
+      <div class="search-box">
+        <input type="text" id="tools-unassign-search" placeholder="Buscar ferramentas..." />
+      </div>
+    </div>
+    
     <div id="assigned-tools"></div>
     <button id="confirm-unassign-tools" class="submit-btn">Confirmar Desatribuição</button>
   </div>
@@ -487,6 +917,13 @@
   <div class="modal-content">
     <span class="close-modal">&times;</span>
     <h2>Desatribuir Habilidades Mágicas de <span id="character-name-unassign-magic-modal"></span></h2>
+    
+    <div class="filter-container">
+      <div class="search-box">
+        <input type="text" id="magic-unassign-search" placeholder="Buscar habilidades..." />
+      </div>
+    </div>
+    
     <div id="assigned-magic-abilities"></div>
     <button id="confirm-unassign-magic" class="submit-btn">Confirmar Desatribuição</button>
   </div>
@@ -497,6 +934,13 @@
   <div class="modal-content">
     <span class="close-modal">&times;</span>
     <h2>Desatribuir Perícias de <span id="character-name-unassign-skills-modal"></span></h2>
+    
+    <div class="filter-container">
+      <div class="search-box">
+        <input type="text" id="skills-unassign-search" placeholder="Buscar perícias..." />
+      </div>
+    </div>
+    
     <div id="assigned-skills"></div>
     <button id="confirm-unassign-skills" class="submit-btn">Confirmar Desatribuição</button>
   </div>
@@ -505,7 +949,7 @@
 <!-- Modal para edição de personagem -->
 <div id="edit-character-modal" class="modal">
   <div class="modal-content">
-    <span class="close-edit-modal">&times;</span>
+    <span class="close-modal">&times;</span>
     <h2>Editar Personagem: <span id="edit-character-name"></span></h2>
     <form id="edit-character-form">
       <!-- Os campos serão adicionados dinamicamente via JavaScript -->
@@ -514,31 +958,41 @@
   </div>
 </div>
 
+<!-- Modal para visualização rápida -->
+<div id="quick-view-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <h2 id="quick-view-title">Detalhes</h2>
+    <div id="quick-view-content"></div>
+  </div>
+</div>
+
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
-import {
-  getAuth,
-  onAuthStateChanged,
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { 
+  getAuth, 
+  onAuthStateChanged, 
   signOut,
-  signInWithEmailAndPassword
-} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
-import {
-  getFirestore,
-  collection,
+  signInWithEmailAndPassword 
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { 
+  getFirestore, 
+  collection, 
+  addDoc, 
+  doc, 
   setDoc,
-  addDoc,
-  doc,
-  onSnapshot,
-  deleteDoc,
-  getDocs,
-  query,
-  where,
-  getDoc,
+  onSnapshot, 
+  deleteDoc, 
+  getDocs, 
   updateDoc,
   arrayUnion,
-  arrayRemove
-} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+  arrayRemove,
+  query,
+  where,
+  getDoc
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+// Configuração do Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyAgYVod9B99WIc_QysFx73htOf9O8XtuE8",
   authDomain: "zatur-rpg.firebaseapp.com",
@@ -548,11 +1002,13 @@ const firebaseConfig = {
   appId: "1:797058283992:web:7132e71691a225c1255aad"
 };
 
+// Inicializar Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Variáveis globais para controle de atribuição
+// Variáveis globais para controle de estado
+let currentUser = null;
 let currentCharacterId = null;
 let selectedItems = [];
 let selectedSpells = [];
@@ -560,1367 +1016,791 @@ let selectedTools = [];
 let selectedMagicAbilities = [];
 let selectedSkills = [];
 let currentEditCharacterId = null;
-
-// Variáveis para desatribuição
 let itemsToRemove = [];
 let spellsToRemove = [];
 let toolsToRemove = [];
 let magicAbilitiesToRemove = [];
 let skillsToRemove = [];
 
-async function loginPrompt() {
-  let email = prompt("Email do mestre:");
-  let password = prompt("Senha:");
-  try {
-    await signInWithEmailAndPassword(auth, email, password);
-  } catch (e) {
-    alert("Erro no login: " + e.message);
-    loginPrompt();
+// Elementos DOM
+const modals = document.querySelectorAll('.modal');
+const closeModalBtns = document.querySelectorAll('.close-modal');
+const tabButtons = document.querySelectorAll('.tab-btn');
+const tabContents = document.querySelectorAll('.tab-content');
+const addFieldButtons = document.querySelectorAll('.add-field-btn');
+const diceButtons = document.querySelectorAll('.dice-buttons button');
+const diceResult = document.getElementById('dice-result');
+const logoutBtn = document.getElementById('logout-btn');
+
+// Inicialização
+document.addEventListener('DOMContentLoaded', () => {
+  initAuth();
+  initEventListeners();
+  initTabs();
+});
+
+// Sistema de Autenticação
+function initAuth() {
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      currentUser = user;
+      console.log("Usuário autenticado:", user.email);
+      loadAllData();
+    } else {
+      showLoginPrompt();
+    }
+  });
+}
+
+function showLoginPrompt() {
+  const email = prompt("Email do mestre:");
+  const password = prompt("Senha:");
+  
+  if (email && password) {
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        currentUser = userCredential.user;
+      })
+      .catch((error) => {
+        alert("Erro no login: " + error.message);
+        showLoginPrompt();
+      });
   }
 }
 
-onAuthStateChanged(auth, user => {
-  if (!user) {
-    loginPrompt();
-  } else {
-    init();
-  }
-});
-
-// --- CONTROLE DE ABAS (com foco acessibilidade) ---
-const tabs = document.querySelectorAll("nav.tabs button");
-const tabContents = document.querySelectorAll("section.tab-content");
-
-tabs.forEach(tab => {
-  tab.addEventListener("click", () => {
-    tabs.forEach(t => {
-      t.classList.remove("active");
-      t.setAttribute("aria-selected", "false");
+// Configuração de Event Listeners
+function initEventListeners() {
+  // Logout
+  logoutBtn.addEventListener('click', () => {
+    signOut(auth).then(() => {
+      alert("Deslogado com sucesso!");
+      showLoginPrompt();
     });
-    tab.classList.add("active");
-    tab.setAttribute("aria-selected", "true");
-
-    tabContents.forEach(tc => {
-      tc.classList.remove("active");
-    });
-    const target = tab.dataset.tab;
-    document.getElementById(target).classList.add("active");
   });
-});
 
-// --- ADICIONAR CAMPOS DINÂMICOS ---
-function addField(formId) {
+  // Fechar modais
+  closeModalBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const modal = btn.closest('.modal');
+      modal.style.display = 'none';
+    });
+  });
+
+  // Fechar modal ao clicar fora
+  window.addEventListener('click', (e) => {
+    modals.forEach(modal => {
+      if (e.target === modal) {
+        modal.style.display = 'none';
+      }
+    });
+  });
+
+  // Adicionar campos dinâmicos aos formulários
+  addFieldButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const formId = btn.dataset.form;
+      addDynamicField(formId);
+    });
+  });
+
+  // Rolagem de dados
+  diceButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const sides = parseInt(btn.dataset.dice);
+      rollDice(sides);
+    });
+  });
+
+  // Rolagem de dados personalizada
+  document.getElementById('roll-custom-dice')?.addEventListener('click', () => {
+    const quantity = parseInt(document.getElementById('dice-quantity').value) || 1;
+    const modifier = parseInt(document.getElementById('dice-modifier').value) || 0;
+    const sides = 20; // Valor padrão para dados personalizados
+    
+    if (quantity > 0) {
+      rollCustomDice(quantity, sides, modifier);
+    }
+  });
+
+  // Submissão de formulários
+  setupFormSubmissions();
+}
+
+// Sistema de Abas
+function initTabs() {
+  tabButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const targetTab = button.dataset.tab;
+      
+      // Atualizar botões
+      tabButtons.forEach(btn => btn.classList.remove('active'));
+      button.classList.add('active');
+      
+      // Atualizar conteúdo
+      tabContents.forEach(content => content.classList.remove('active'));
+      document.getElementById(targetTab).classList.add('active');
+    });
+  });
+}
+
+// Adicionar campos dinâmicos aos formulários
+function addDynamicField(formId) {
   const form = document.getElementById(formId);
-  const div = document.createElement("div");
-  div.className = "field-pair";
-
-  const inputName = document.createElement("input");
-  inputName.type = "text";
-  inputName.name = "field-name";
-  inputName.placeholder = "Nome do campo";
-  inputName.className = "name-field";
-  inputName.required = true;
-
-  const inputValue = document.createElement("input");
-  inputValue.type = "text";
-  inputValue.name = "field-value";
-  inputValue.placeholder = "Informação";
-  inputValue.required = true;
-
-  div.appendChild(inputName);
-  div.appendChild(inputValue);
-
-  const addBtn = form.querySelector("button.add-field-btn");
-  form.insertBefore(div, addBtn);
+  const fieldPair = document.createElement('div');
+  fieldPair.className = 'field-pair';
+  
+  fieldPair.innerHTML = `
+    <input type="text" name="field-name" class="name-field" placeholder="Nome do campo">
+    <input type="text" name="field-value" placeholder="Valor do campo">
+  `;
+  
+  const addButton = form.querySelector('.add-field-btn');
+  form.insertBefore(fieldPair, addButton);
 }
 
-document.querySelectorAll("button.add-field-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    addField(btn.dataset.form);
-  });
-});
+// Rolagem de dados
+function rollDice(sides) {
+  const result = Math.floor(Math.random() * sides) + 1;
+  diceResult.textContent = `Resultado: ${result} (d${sides})`;
+  addToDiceHistory(`d${sides}`, result, `Rolagem de d${sides}: ${result}`);
+}
 
-// --- PEGAR DADOS DO FORMULÁRIO DINÂMICO ---
-function getFormData(form) {
-  const names = form.querySelectorAll("input[name='field-name'], textarea[name='field-name']");
-  const values = form.querySelectorAll("input[name='field-value'], select[name='field-value'], textarea[name='field-value']");
-  const data = {};
-  for (let i = 0; i < names.length; i++) {
-    const key = names[i].value.trim();
-    let val = values[i].value.trim();
-    if (val === "") val = null;
-    if (key) data[key] = val;
+// Rolagem de dados personalizada
+function rollCustomDice(quantity, sides, modifier) {
+  let total = 0;
+  let rolls = [];
+  
+  for (let i = 0; i < quantity; i++) {
+    const roll = Math.floor(Math.random() * sides) + 1;
+    rolls.push(roll);
+    total += roll;
   }
+  
+  total += modifier;
+  
+  let resultText = `Rolagens: ${rolls.join(', ')}`;
+  if (modifier !== 0) {
+    const modifierSign = modifier >= 0 ? '+' : '-';
+    resultText += ` ${modifierSign} ${Math.abs(modifier)} = ${total}`;
+  } else {
+    resultText += ` = ${total}`;
+  }
+  
+  diceResult.textContent = resultText;
+  addToDiceHistory(`${quantity}d${sides}${modifier >= 0 ? '+' + modifier : modifier}`, total, resultText);
+}
+
+// Adicionar ao histórico de rolagens
+function addToDiceHistory(dice, result, details) {
+  const historyElement = document.getElementById('dice-history');
+  if (!historyElement) return;
+  
+  const historyItem = document.createElement('div');
+  historyItem.className = 'dice-history-item';
+  historyItem.innerHTML = `
+    <strong>${dice}</strong>: ${result} 
+    <small>(${new Date().toLocaleTimeString()})</small>
+    <div>${details}</div>
+  `;
+  
+  historyItem.style.marginBottom = '0.5rem';
+  historyItem.style.padding = '0.5rem';
+  historyItem.style.background = 'rgba(107, 76, 42, 0.3)';
+  historyItem.style.borderRadius = '4px';
+  
+  // Manter apenas as últimas 5 rolagens no histórico
+  if (historyElement.children.length >= 5) {
+    historyElement.removeChild(historyElement.lastChild);
+  }
+  
+  historyElement.insertBefore(historyItem, historyElement.firstChild);
+}
+
+// Configurar submissão de formulários
+function setupFormSubmissions() {
+  // Formulário de campanhas
+  document.getElementById('form-campaign').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = getFormData('form-campaign');
+    if (!data.Nome) {
+      alert('O campo "Nome" é obrigatório para criar uma campanha');
+      return;
+    }
+    await createDocument('campaigns', data);
+    e.target.reset();
+  });
+
+  // Formulário de personagens
+  document.getElementById('form-character').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = getFormData('form-character');
+    if (!data.Nome) {
+      alert('O campo "Nome" é obrigatório para criar um personagem');
+      return;
+    }
+    
+    // Adicionar campos calculados
+    if (data.Vigor) data.PV = 100 * parseInt(data.Vigor);
+    if (data.Mana) data.PE = 20 * parseInt(data.Mana);
+    if (data.Agilidade && data.Força) data.Defesa = 20 * parseInt(data.Agilidade) * parseInt(data.Força);
+    if (data.Agilidade) data.Deslocamento = 30 * parseInt(data.Agilidade);
+    
+    // Arrays vazios para itens e habilidades
+    data.itens = [];
+    data.feiticos = [];
+    data.ferramentas = [];
+    data.habilidades_magicas = [];
+    data.pericias = [];
+    
+    await createDocument('characters', data);
+    e.target.reset();
+  });
+
+  // Formulário de monstros
+  document.getElementById('form-monster').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = getFormData('form-monster');
+    if (!data.Nome) {
+      alert('O campo "Nome" é obrigatório para criar um monstro');
+      return;
+    }
+    await createDocument('monsters', data);
+    e.target.reset();
+  });
+
+  // Formulário de itens
+  document.getElementById('form-item').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = getFormData('form-item');
+    if (!data.Nome) {
+      alert('O campo "Nome" é obrigatório para criar um item');
+      return;
+    }
+    await createDocument('items', data);
+    e.target.reset();
+  });
+
+  // Formulário de feitiços
+  document.getElementById('form-spell').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = getFormData('form-spell');
+    if (!data.Nome) {
+      alert('O campo "Nome" é obrigatório para criar um feitiço');
+      return;
+    }
+    await createDocument('spells', data);
+    e.target.reset();
+  });
+
+  // Formulário de perícias
+  document.getElementById('create-skill-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = getFormData('create-skill-form');
+    if (!data.Nome || !data.Descrição) {
+      alert('Os campos "Nome" e "Descrição" são obrigatórios para criar uma perícia');
+      return;
+    }
+    await createDocument('skills', data);
+    e.target.reset();
+    document.getElementById('create-skill-modal').style.display = 'none';
+  });
+}
+
+// Obter dados do formulário
+function getFormData(formId) {
+  const form = document.getElementById(formId);
+  const data = {};
+  const nameInputs = form.querySelectorAll('input[name="field-name"], textarea[name="field-name"]');
+  const valueInputs = form.querySelectorAll('input[name="field-value"], select[name="field-value"], textarea[name="field-value"]');
+  
+  for (let i = 0; i < nameInputs.length; i++) {
+    const key = nameInputs[i].value.trim();
+    const value = valueInputs[i].value.trim();
+    
+    if (key && value) {
+      data[key] = value;
+    }
+  }
+  
   return data;
 }
 
-// --- LIMPAR FORMULÁRIO (mantém o primeiro campo nome fixo) ---
-function clearForm(form) {
-  // Remove todos os field-pair exceto os campos padrão
-  const pairs = form.querySelectorAll(".field-pair");
-  pairs.forEach((pair, i) => {
-    // Mantém os primeiros 11 campos (campos padrão)
-    if (i >= 11) pair.remove();
-    else {
-      // Limpa valor do campo-value (não o nome)
-      const valInput = pair.querySelector("input[name='field-value'], select[name='field-value'], textarea[name='field-value']");
-      if (valInput) valInput.value = "";
-    }
-  });
-}
-
-// --- ATUALIZAR SELECT DE CAMPANHAS NO FORMULÁRIO DE PERSONAGEM ---
-const characterForm = document.getElementById("form-character");
-const campaignSelect = characterForm.querySelector("select[name='field-value']");
-
-async function updateCampaignSelect() {
-  campaignSelect.innerHTML = '<option value="">Nenhuma campanha</option>';
-  const campaignsSnap = await getDocs(collection(db, "campaigns"));
-  campaignsSnap.forEach(docSnap => {
-    const opt = document.createElement("option");
-    opt.value = docSnap.id;
-    opt.textContent = docSnap.data().Nome || docSnap.data().nome || "Campanha";
-    campaignSelect.appendChild(opt);
-  });
-}
-
-// --- FUNÇÃO PARA CRIAR DOCUMENTO NO FIRESTORE ---
-async function createDoc(collectionName, data, customId = null) {
+// Operações CRUD com Firebase
+async function createDocument(collectionName, data) {
   try {
-    if (customId) {
-      // Usar ID personalizado (para personagens)
-      await setDoc(doc(db, collectionName, customId), data);
-      return customId;
-    } else {
-      // Usar ID automático do Firestore
-      const docRef = await addDoc(collection(db, collectionName), data);
-      return docRef.id;
-    }
+    const docRef = await addDoc(collection(db, collectionName), data);
+    console.log("Documento criado com ID: ", docRef.id);
+    return docRef.id;
   } catch (e) {
-    alert("Erro ao salvar: " + e.message);
-    return null;
+    console.error("Erro ao adicionar documento: ", e);
+    alert("Erro ao criar documento: " + e.message);
   }
 }
 
-// --- FUNÇÃO PARA EXCLUIR DOCUMENTO ---
-async function deleteDocById(collectionName, id) {
-  try {
-    await deleteDoc(doc(db, collectionName, id));
-  } catch (e) {
-    alert("Erro ao excluir: " + e.message);
-  }
-}
-
-// --- FUNÇÃO PARA ATUALIZAR DOCUMENTO ---
-async function updateDocById(collectionName, id, data) {
+async function updateDocument(collectionName, id, data) {
   try {
     await updateDoc(doc(db, collectionName, id), data);
-    return true;
+    console.log("Documento atualizado com ID: ", id);
   } catch (e) {
-    alert("Erro ao atualizar: " + e.message);
-    return false;
+    console.error("Erro ao atualizar documento: ", e);
+    alert("Erro ao atualizar documento: " + e.message);
   }
 }
 
-// --- FUNÇÃO PARA LISTAR DOCUMENTOS ---
-function listenCollection(collectionName, ulElement, renderItem) {
-  const colRef = collection(db, collectionName);
-  onSnapshot(colRef, snapshot => {
-    ulElement.innerHTML = "";
-    snapshot.forEach(docSnap => {
-      const data = docSnap.data();
-      const li = renderItem(docSnap.id, data);
-      ulElement.appendChild(li);
+async function deleteDocument(collectionName, id) {
+  try {
+    await deleteDoc(doc(db, collectionName, id));
+    console.log("Documento excluído com ID: ", id);
+  } catch (e) {
+    console.error("Erro ao excluir documento: ", e);
+    alert("Erro ao excluir documento: " + e.message);
+  }
+}
+
+// Carregar todos os dados do Firebase
+function loadAllData() {
+  loadCollection('campaigns', 'list-campaigns', renderCampaignItem);
+  loadCollection('characters', 'list-characters', renderCharacterItem);
+  loadCollection('monsters', 'list-monsters', renderMonsterItem);
+  loadCollection('items', 'list-items', renderItemItem);
+  loadCollection('spells', 'list-spells', renderSpellItem);
+  loadCollection('skills', 'list-skills', renderSkillItem);
+  
+  // Atualizar selects de campanhas
+  updateCampaignSelects();
+}
+
+// Carregar coleção do Firebase
+function loadCollection(collectionName, listId, renderFunction) {
+  const listElement = document.getElementById(listId);
+  if (!listElement) return;
+  
+  onSnapshot(collection(db, collectionName), (snapshot) => {
+    listElement.innerHTML = '';
+    
+    snapshot.forEach((doc) => {
+      const item = renderFunction(doc.id, doc.data());
+      listElement.appendChild(item);
+    });
+    
+    // Para personagens, também atualizar a visualização em cards
+    if (collectionName === 'characters') {
+      updateCharacterCards(snapshot);
+    }
+  });
+}
+
+// Renderizar itens das coleções
+function renderCampaignItem(id, data) {
+  const li = document.createElement('li');
+  li.innerHTML = `
+    <span>${data.Nome || id}</span>
+    <div class="btn-group">
+      <button class="btn edit-btn btn-sm">Editar</button>
+      <button class="btn del-btn btn-sm">Excluir</button>
+    </div>
+  `;
+  
+  li.querySelector('.del-btn').addEventListener('click', () => {
+    if (confirm(`Excluir a campanha "${data.Nome || id}"?`)) {
+      deleteDocument('campaigns', id);
+    }
+  });
+  
+  return li;
+}
+
+function renderCharacterItem(id, data) {
+  const li = document.createElement('li');
+  li.innerHTML = `
+    <div class="character-info">
+      <strong>${data.Nome || id}</strong>
+      <div>Nível: ${data.Nível || '1'}, Classe: ${data.Classe || 'Nenhuma'}</div>
+      <div>Campanha: ${data.Campanha || 'Nenhuma'}</div>
+    </div>
+    <div class="character-actions">
+      <button class="btn view-btn btn-sm">Ver Ficha</button>
+      <button class="btn assign-btn btn-sm">Atribuir</button>
+      <button class="btn edit-btn btn-sm">Editar</button>
+      <button class="btn del-btn btn-sm">Excluir</button>
+    </div>
+  `;
+  
+  // Adicionar event listeners
+  li.querySelector('.del-btn').addEventListener('click', () => {
+    if (confirm(`Excluir o personagem "${data.Nome || id}"?`)) {
+      deleteDocument('characters', id);
+    }
+  });
+  
+  li.querySelector('.assign-btn').addEventListener('click', () => {
+    openAssignModal(id, data.Nome || id);
+  });
+  
+  li.querySelector('.view-btn').addEventListener('click', () => {
+    window.open(`ficha_personagem.html?id=${id}`, '_blank');
+  });
+  
+  li.querySelector('.edit-btn').addEventListener('click', () => {
+    openEditModal(id, data);
+  });
+  
+  return li;
+}
+
+function renderMonsterItem(id, data) {
+  const li = document.createElement('li');
+  li.innerHTML = `
+    <span>${data.Nome || id}</span>
+    <div class="btn-group">
+      <button class="btn edit-btn btn-sm">Editar</button>
+      <button class="btn del-btn btn-sm">Excluir</button>
+    </div>
+  `;
+  
+  li.querySelector('.del-btn').addEventListener('click', () => {
+    if (confirm(`Excluir o monstro "${data.Nome || id}"?`)) {
+      deleteDocument('monsters', id);
+    }
+  });
+  
+  return li;
+}
+
+function renderItemItem(id, data) {
+  const li = document.createElement('li');
+  li.innerHTML = `
+    <span>${data.Nome || id} (${getItemTypeName(data.Tipo)})</span>
+    <div class="btn-group">
+      <button class="btn edit-btn btn-sm">Editar</button>
+      <button class="btn del-btn btn-sm">Excluir</button>
+    </div>
+  `;
+  
+  li.querySelector('.del-btn').addEventListener('click', () => {
+    if (confirm(`Excluir o item "${data.Nome || id}"?`)) {
+      deleteDocument('items', id);
+    }
+  });
+  
+  return li;
+}
+
+function renderSpellItem(id, data) {
+  const li = document.createElement('li');
+  li.innerHTML = `
+    <span>${data.Nome || id}</span>
+    <div class="btn-group">
+      <button class="btn edit-btn btn-sm">Editar</button>
+      <button class="btn del-btn btn-sm">Excluir</button>
+    </div>
+  `;
+  
+  li.querySelector('.del-btn').addEventListener('click', () => {
+    if (confirm(`Excluir o feitiço "${data.Nome || id}"?`)) {
+      deleteDocument('spells', id);
+    }
+  });
+  
+  return li;
+}
+
+function renderSkillItem(id, data) {
+  const li = document.createElement('li');
+  li.innerHTML = `
+    <div>
+      <strong>${data.Nome || id}</strong>
+      <div>${data.Descrição || 'Sem descrição'}</div>
+    </div>
+    <div class="btn-group">
+      <button class="btn del-btn btn-sm">Excluir</button>
+    </div>
+  `;
+  
+  li.querySelector('.del-btn').addEventListener('click', () => {
+    if (confirm(`Excluir a perícia "${data.Nome || id}"?`)) {
+      deleteDocument('skills', id);
+    }
+  });
+  
+  return li;
+}
+
+// Atualizar selects de campanhas
+async function updateCampaignSelects() {
+  const campaignSelects = document.querySelectorAll('select[name="field-value"]');
+  const campaigns = await getDocs(collection(db, 'campaigns'));
+  
+  campaignSelects.forEach(select => {
+    // Limpar opções exceto a primeira
+    while (select.options.length > 1) {
+      select.remove(1);
+    }
+    
+    // Adicionar campanhas
+    campaigns.forEach(doc => {
+      const option = document.createElement('option');
+      option.value = doc.id;
+      option.textContent = doc.data().Nome || doc.id;
+      select.appendChild(option);
     });
   });
 }
 
-// --- RENDERIZADORES ---
-function renderItemWithDelete(id, data, collectionName) {
-  const li = document.createElement("li");
-  // Exibir nome ou campo "Nome" или "nome" или id
-  const displayName = data.Nome || data.nome || data.Name || data.name || id;
-  li.textContent = displayName;
-
-  const btnDel = document.createElement("button");
-  btnDel.textContent = "Excluir";
-  btnDel.className = "del-btn";
-  btnDel.addEventListener("click", async () => {
-    if (confirm(`Excluir "${displayName}"?`)) {
-      await deleteDocById(collectionName, id);
-    }
+// Atualizar cards de personagens
+function updateCharacterCards(snapshot) {
+  const cardsContainer = document.getElementById('character-cards');
+  if (!cardsContainer) return;
+  
+  cardsContainer.innerHTML = '';
+  
+  snapshot.forEach((doc) => {
+    const data = doc.data();
+    const card = document.createElement('div');
+    card.className = 'character-card';
+    card.innerHTML = `
+      <h3>${data.Nome || doc.id}</h3>
+      <div class="card-content">
+        <p><strong>Nível:</strong> ${data.Nível || '1'}</p>
+        <p><strong>Classe:</strong> ${data.Classe || 'Nenhuma'}</p>
+        <p><strong>Campanha:</strong> ${data.Campanha || 'Nenhuma'}</p>
+        <p><strong>PV:</strong> ${data.PV || '0'}</p>
+        <p><strong>PE:</strong> ${data.PE || '0'}</p>
+      </div>
+      <div class="card-actions">
+        <button class="btn view-btn btn-sm">Ver Ficha</button>
+        <button class="btn assign-btn btn-sm">Atribuir</button>
+        <button class="btn edit-btn btn-sm">Editar</button>
+      </div>
+    `;
+    
+    // Adicionar event listeners
+    card.querySelector('.view-btn').addEventListener('click', () => {
+      window.open(`ficha_personagem.html?id=${doc.id}`, '_blank');
+    });
+    
+    card.querySelector('.assign-btn').addEventListener('click', () => {
+      openAssignModal(doc.id, data.Nome || doc.id);
+    });
+    
+    card.querySelector('.edit-btn').addEventListener('click', () => {
+      openEditModal(doc.id, data);
+    });
+    
+    cardsContainer.appendChild(card);
   });
-  li.appendChild(btnDel);
-  return li;
 }
 
-// --- MODAIS ---
-const modals = document.querySelectorAll('.modal');
-const closeModalBtns = document.querySelectorAll('.close-modal');
-
-// Fechar modais
-closeModalBtns.forEach(btn => {
-  btn.addEventListener('click', () => {
-    btn.closest('.modal').style.display = 'none';
-  });
-});
-
-// Fechar modal clicando fora dele
-window.addEventListener('click', (e) => {
-  modals.forEach(modal => {
-    if (e.target === modal) {
-      modal.style.display = 'none';
-    }
-  });
-});
-
-// --- MODAL PARA ATRIBUIR ITENS E FEITIÇOS ---
-const assignModal = document.getElementById("assign-modal");
-const characterNameModal = document.getElementById("character-name-modal");
-const availableItemsDiv = document.getElementById("available-items");
-const availableSpellsDiv = document.getElementById("available-spells");
-const confirmAssignBtn = document.getElementById("confirm-assign");
-
-// Carregar itens e feitiços disponíveis no modal
-async function loadItemsAndSpells() {
-  // Limpar seleções anteriores
-  selectedItems = [];
-  selectedSpells = [];
+// Auxiliares
+function getItemTypeName(type) {
+  const types = {
+    'item': 'Item Comum',
+    'tool': 'Ferramenta',
+    'magic': 'Habilidade Mágica'
+  };
   
-  // Carregar itens
-  availableItemsDiv.innerHTML = "";
-  const itemsSnap = await getDocs(collection(db, "items"));
-  itemsSnap.forEach(docSnap => {
-    const itemData = docSnap.data();
-    // Mostrar apenas itens comuns (não ferramentas ou habilidades mágicas)
-    if (itemData.Tipo === "item" || !itemData.Tipo) {
-      const itemDiv = document.createElement("div");
-      itemDiv.className = "assign-item";
+  return types[type] || 'Desconhecido';
+}
+
+// Sistema de Modais
+function openAssignModal(characterId, characterName) {
+  currentCharacterId = characterId;
+  document.getElementById('character-name-modal').textContent = characterName;
+  document.getElementById('assign-modal').style.display = 'block';
+  
+  // Carregar itens e feitiços disponíveis
+  loadAvailableItems();
+  loadAvailableSpells();
+}
+
+function openEditModal(characterId, characterData) {
+  currentEditCharacterId = characterId;
+  document.getElementById('edit-character-name').textContent = characterData.Nome || characterId;
+  document.getElementById('edit-character-modal').style.display = 'block';
+  
+  // Preencher formulário de edição
+  populateEditForm(characterData);
+}
+
+// Carregar itens disponíveis
+async function loadAvailableItems() {
+  const availableItemsDiv = document.getElementById('available-items');
+  availableItemsDiv.innerHTML = '';
+  
+  const items = await getDocs(collection(db, 'items'));
+  
+  items.forEach(doc => {
+    const itemData = doc.data();
+    if (itemData.Tipo === 'item' || !itemData.Tipo) {
+      const itemDiv = document.createElement('div');
+      itemDiv.className = 'assign-item';
+      itemDiv.innerHTML = `
+        <input type="checkbox" id="item-${doc.id}" value="${doc.id}">
+        <label for="item-${doc.id}">${itemData.Nome || doc.id}</label>
+      `;
       
-      const checkbox = document.createElement("input");
-      checkbox.type = "checkbox";
-      checkbox.value = docSnap.id;
-      checkbox.id = `item-${docSnap.id}`;
-      checkbox.addEventListener("change", (e) => {
+      itemDiv.querySelector('input').addEventListener('change', (e) => {
         if (e.target.checked) {
-          selectedItems.push(docSnap.id);
+          selectedItems.push(doc.id);
         } else {
-          selectedItems = selectedItems.filter(id => id !== docSnap.id);
+          selectedItems = selectedItems.filter(id => id !== doc.id);
         }
       });
       
-      const label = document.createElement("label");
-      label.htmlFor = `item-${docSnap.id}`;
-      label.textContent = itemData.Nome || docSnap.id;
-      
-      itemDiv.appendChild(checkbox);
-      itemDiv.appendChild(label);
       availableItemsDiv.appendChild(itemDiv);
     }
   });
+}
+
+// Carregar feitiços disponíveis
+async function loadAvailableSpells() {
+  const availableSpellsDiv = document.getElementById('available-spells');
+  availableSpellsDiv.innerHTML = '';
   
-  // Carregar feitiços
-  availableSpellsDiv.innerHTML = "";
-  const spellsSnap = await getDocs(collection(db, "spells"));
-  spellsSnap.forEach(docSnap => {
-    const spellData = docSnap.data();
-    const spellDiv = document.createElement("div");
-    spellDiv.className = "assign-item";
-    
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.value = docSnap.id;
-    checkbox.id = `spell-${docSnap.id}`;
-    checkbox.addEventListener("change", (e) => {
-      if (e.target.checked) {
-        selectedSpells.push(docSnap.id);
-      } else {
-        selectedSpells = selectedSpells.filter(id => id !== docSnap.id);
-      }
-    });
-    
-    const label = document.createElement("label");
-    label.htmlFor = `spell-${docSnap.id}`;
-    label.textContent = spellData.Nome || docSnap.id;
+  const spells = await getDocs(collection(db, 'spells'));
+  
+  spells.forEach(doc => {
+    const spellData = doc.data();
+    const spellDiv = document.createElement('div');
+    spellDiv.className = 'assign-item';
+    spellDiv.innerHTML = `
+      <input type="checkbox" id="spell-${doc.id}" value="${doc.id}">
+      <label for="spell-${doc.id}">${spellData.Nome || doc.id}</label>
+      `;
       
-    spellDiv.appendChild(checkbox);
-    spellDiv.appendChild(label);
-    availableSpellsDiv.appendChild(spellDiv);
-  });
-}
-
-// Abrir modal para atribuição
-function openAssignModal(characterId, characterName) {
-  currentCharacterId = characterId;
-  characterNameModal.textContent = characterName;
-  assignModal.style.display = "block";
-  loadItemsAndSpells();
-}
-
-// Confirmar atribuição de itens e feitiços
-confirmAssignBtn.addEventListener("click", async () => {
-  if (!currentCharacterId) return;
-  
-  try {
-    const characterRef = doc(db, "characters", currentCharacterId);
-    
-    // Atualizar arrays de itens e feitiços do personagem
-    await updateDoc(characterRef, {
-      itens: arrayUnion(...selectedItems),
-      feiticos: arrayUnion(...selectedSpells)
-    });
-    
-    alert("Itens e feitiços atribuídos com sucesso!");
-    assignModal.style.display = "none";
-  } catch (e) {
-    alert("Erro ao atribuir itens/feitiços: " + e.message);
-  }
-});
-
-// --- MODAL PARA DESATRIBUIR ITENS E FEITIÇOS ---
-const unassignModal = document.getElementById("unassign-modal");
-const characterNameUnassignModal = document.getElementById("character-name-unassign-modal");
-const assignedItemsDiv = document.getElementById("assigned-items");
-const assignedSpellsDiv = document.getElementById("assigned-spells");
-const confirmUnassignBtn = document.getElementById("confirm-unassign");
-
-// Carregar itens e feitiços atribuídos
-async function loadAssignedItemsAndSpells() {
-  // Limpar seleções anteriores
-  itemsToRemove = [];
-  spellsToRemove = [];
-  
-  try {
-    // Carregar dados do personagem
-    const charRef = doc(db, "characters", currentCharacterId);
-    const charSnap = await getDoc(charRef);
-    
-    if (!charSnap.exists()) {
-      alert("Personagem não encontrado!");
-      return;
-    }
-    
-    const charData = charSnap.data();
-    
-    // Carregar itens atribuídos
-    assignedItemsDiv.innerHTML = "";
-    if (charData.itens && Array.isArray(charData.itens) && charData.itens.length > 0) {
-      for (const itemId of charData.itens) {
-        try {
-          const itemRef = doc(db, "items", itemId);
-          const itemSnap = await getDoc(itemRef);
-          
-          if (itemSnap.exists()) {
-            const itemData = itemSnap.data();
-            const itemDiv = document.createElement("div");
-            itemDiv.className = "assign-item";
-            
-            const checkbox = document.createElement("input");
-            checkbox.type = "checkbox";
-            checkbox.value = itemId;
-            checkbox.id = `remove-item-${itemId}`;
-            checkbox.addEventListener("change", (e) => {
-              if (e.target.checked) {
-                itemsToRemove.push(itemId);
-              } else {
-                itemsToRemove = itemsToRemove.filter(id => id !== itemId);
-              }
-            });
-            
-            const label = document.createElement("label");
-            label.htmlFor = `remove-item-${itemId}`;
-            label.textContent = itemData.Nome || itemId;
-            
-            itemDiv.appendChild(checkbox);
-            itemDiv.appendChild(label);
-            assignedItemsDiv.appendChild(itemDiv);
-          }
-        } catch (error) {
-          console.error(`Erro ao carregar item ${itemId}:`, error);
-        }
-      }
-    } else {
-      assignedItemsDiv.innerHTML = "<div class='assign-item'>Nenhum item atribuído</div>";
-    }
-    
-    // Carregar feitiços atribuídos
-    assignedSpellsDiv.innerHTML = "";
-    if (charData.feiticos && Array.isArray(charData.feiticos) && charData.feiticos.length > 0) {
-      for (const spellId of charData.feiticos) {
-        try {
-          const spellRef = doc(db, "spells", spellId);
-          const spellSnap = await getDoc(spellRef);
-          
-          if (spellSnap.exists()) {
-            const spellData = spellSnap.data();
-            const spellDiv = document.createElement("div");
-            spellDiv.className = "assign-item";
-            
-            const checkbox = document.createElement("input");
-            checkbox.type = "checkbox";
-            checkbox.value = spellId;
-            checkbox.id = `remove-spell-${spellId}`;
-            checkbox.addEventListener("change", (e) => {
-              if (e.target.checked) {
-                spellsToRemove.push(spellId);
-              } else {
-                spellsToRemove = spellsToRemove.filter(id => id !== spellId);
-              }
-            });
-            
-            const label = document.createElement("label");
-            label.htmlFor = `remove-spell-${spellId}`;
-            label.textContent = spellData.Nome || spellId;
-            
-            spellDiv.appendChild(checkbox);
-            spellDiv.appendChild(label);
-            assignedSpellsDiv.appendChild(spellDiv);
-          }
-        } catch (error) {
-          console.error(`Erro ao carregar feitiço ${spellId}:`, error);
-        }
-      }
-    } else {
-      assignedSpellsDiv.innerHTML = "<div class='assign-item'>Nenhum feitiço atribuído</div>";
-    }
-  } catch (error) {
-    console.error("Erro ao carregar itens e feitiços atribuídos:", error);
-    alert("Erro ao carregar dados do personagem.");
-  }
-}
-
-// Abrir modal para desatribuição
-function openUnassignModal(characterId, characterName) {
-  currentCharacterId = characterId;
-  characterNameUnassignModal.textContent = characterName;
-  unassignModal.style.display = "block";
-  loadAssignedItemsAndSpells();
-}
-
-// Confirmar desatribuição de itens e feitiços
-confirmUnassignBtn.addEventListener("click", async () => {
-  if (!currentCharacterId) return;
-  
-  try {
-    const characterRef = doc(db, "characters", currentCharacterId);
-    
-    // Remover itens e feitiços selecionados
-    if (itemsToRemove.length > 0) {
-      await updateDoc(characterRef, {
-        itens: arrayRemove(...itemsToRemove)
-      });
-    }
-    
-    if (spellsToRemove.length > 0) {
-      await updateDoc(characterRef, {
-        feiticos: arrayRemove(...spellsToRemove)
-      });
-    }
-    
-    alert("Itens e feitiços removidos com sucesso!");
-    unassignModal.style.display = "none";
-  } catch (e) {
-    alert("Erro ao remover itens/feitiços: " + e.message);
-  }
-});
-
-// --- MODAL PARA ATRIBUIR FERRAMENTAS ---
-const assignToolsModal = document.getElementById("assign-tools-modal");
-const characterNameToolsModal = document.getElementById("character-name-tools-modal");
-const availableToolsDiv = document.getElementById("available-tools");
-const confirmToolsAssignBtn = document.getElementById("confirm-tools-assign");
-
-// Carregar ferramentas disponíveis
-async function loadTools() {
-  selectedTools = [];
-  availableToolsDiv.innerHTML = "";
-  
-  const itemsSnap = await getDocs(collection(db, "items"));
-  itemsSnap.forEach(docSnap => {
-    const itemData = docSnap.data();
-    // Mostrar apenas ferramentas
-    if (itemData.Tipo === "tool") {
-      const toolDiv = document.createElement("div");
-      toolDiv.className = "assign-item";
-      
-      const checkbox = document.createElement("input");
-      checkbox.type = "checkbox";
-      checkbox.value = docSnap.id;
-      checkbox.id = `tool-${docSnap.id}`;
-      checkbox.addEventListener("change", (e) => {
+      spellDiv.querySelector('input').addEventListener('change', (e) => {
         if (e.target.checked) {
-          selectedTools.push(docSnap.id);
+          selectedSpells.push(doc.id);
         } else {
-          selectedTools = selectedTools.filter(id => id !== docSnap.id);
+          selectedSpells = selectedSpells.filter(id => id !== doc.id);
         }
       });
       
-      const label = document.createElement("label");
-      label.htmlFor = `tool-${docSnap.id}`;
-      label.textContent = itemData.Nome || docSnap.id;
-      
-      toolDiv.appendChild(checkbox);
-      toolDiv.appendChild(label);
-      availableToolsDiv.appendChild(toolDiv);
-    }
-  });
-}
+      availableSpellsDiv.appendChild(spellDiv);
+    });
+  }
 
-// Abrir modal para atribuição de ferramentas
-function openAssignToolsModal(characterId, characterName) {
-  currentCharacterId = characterId;
-  characterNameToolsModal.textContent = characterName;
-  assignToolsModal.style.display = "block";
-  loadTools();
-}
-
-// Confirmar atribuição de ferramentas
-confirmToolsAssignBtn.addEventListener("click", async () => {
-  if (!currentCharacterId) return;
-  
-  try {
-    const characterRef = doc(db, "characters", currentCharacterId);
+  // Preencher formulário de edição
+  function populateEditForm(characterData) {
+    const form = document.getElementById('edit-character-form');
+    form.innerHTML = '';
     
-    // Atualizar array de ferramentas do personagem
-    await updateDoc(characterRef, {
-      ferramentas: arrayUnion(...selectedTools)
+    for (const [key, value] of Object.entries(characterData)) {
+      // Pular arrays (itens, feitiços, etc.)
+      if (Array.isArray(value)) continue;
+      
+      const fieldPair = document.createElement('div');
+      fieldPair.className = 'field-pair';
+      
+      fieldPair.innerHTML = `
+        <input type="text" name="field-name" class="name-field" value="${key}" readonly>
+        <input type="text" name="field-value" value="${value || ''}">
+      `;
+      
+      form.appendChild(fieldPair);
+    }
+    
+    // Botão para adicionar novos campos
+    const addButton = document.createElement('button');
+    addButton.type = 'button';
+    addButton.className = 'add-field-btn';
+    addButton.textContent = '+ Adicionar campo';
+    addButton.addEventListener('click', () => {
+      addDynamicField('edit-character-form');
     });
     
-    alert("Ferramentas atribuídas com sucesso!");
-    assignToolsModal.style.display = "none";
-  } catch (e) {
-    alert("Erro ao atribuir ferramentas: " + e.message);
+    form.appendChild(addButton);
   }
-});
 
-// --- MODAL PARA DESATRIBUIR FERRAMENTAS ---
-const unassignToolsModal = document.getElementById("unassign-tools-modal");
-const characterNameUnassignToolsModal = document.getElementById("character-name-unassign-tools-modal");
-const assignedToolsDiv = document.getElementById("assigned-tools");
-const confirmUnassignToolsBtn = document.getElementById("confirm-unassign-tools");
+  // Confirmar edição de personagem
+  document.getElementById('confirm-edit').addEventListener('click', async () => {
+    const data = getFormData('edit-character-form');
+    await updateDocument('characters', currentEditCharacterId, data);
+    document.getElementById('edit-character-modal').style.display = 'none';
+  });
 
-// Carregar ferramentas atribuídas
-async function loadAssignedTools() {
-  toolsToRemove = [];
-  assignedToolsDiv.innerHTML = "";
-  
-  try {
-    // Carregar dados do personagem
-    const charRef = doc(db, "characters", currentCharacterId);
-    const charSnap = await getDoc(charRef);
+  // Confirmar atribuição de itens e feitiços
+  document.getElementById('confirm-assign').addEventListener('click', async () => {
+    if (!currentCharacterId) return;
     
-    if (!charSnap.exists()) {
-      alert("Personagem não encontrado!");
-      return;
-    }
-    
-    const charData = charSnap.data();
-    
-    // Carregar ferramentas atribuídas
-    if (charData.ferramentas && Array.isArray(charData.ferramentas) && charData.ferramentas.length > 0) {
-      for (const toolId of charData.ferramentas) {
-        try {
-          const toolRef = doc(db, "items", toolId);
-          const toolSnap = await getDoc(toolRef);
-          
-          if (toolSnap.exists()) {
-            const toolData = toolSnap.data();
-            const toolDiv = document.createElement("div");
-            toolDiv.className = "assign-item";
-            
-            const checkbox = document.createElement("input");
-            checkbox.type = "checkbox";
-            checkbox.value = toolId;
-            checkbox.id = `remove-tool-${toolId}`;
-            checkbox.addEventListener("change", (e) => {
-              if (e.target.checked) {
-                toolsToRemove.push(toolId);
-              } else {
-                toolsToRemove = toolsToRemove.filter(id => id !== toolId);
-              }
-            });
-            
-            const label = document.createElement("label");
-            label.htmlFor = `remove-tool-${toolId}`;
-            label.textContent = toolData.Nome || toolId;
-            
-            toolDiv.appendChild(checkbox);
-            toolDiv.appendChild(label);
-            assignedToolsDiv.appendChild(toolDiv);
-          }
-        } catch (error) {
-          console.error(`Erro ao carregar ferramenta ${toolId}:`, error);
-        }
+    try {
+      const characterRef = doc(db, 'characters', currentCharacterId);
+      
+      // Atualizar arrays
+      const updates = {};
+      if (selectedItems.length > 0) updates.itens = arrayUnion(...selectedItems);
+      if (selectedSpells.length > 0) updates.feiticos = arrayUnion(...selectedSpells);
+      
+      if (Object.keys(updates).length > 0) {
+        await updateDoc(characterRef, updates);
+        alert('Itens e feitiços atribuídos com sucesso!');
       }
-    } else {
-      assignedToolsDiv.innerHTML = "<div class='assign-item'>Nenhuma ferramenta atribuída</div>";
-    }
-  } catch (error) {
-    console.error("Erro ao carregar ferramentas atribuídas:", error);
-    alert("Erro ao carregar dados do personagem.");
-  }
-}
-
-// Abrir modal para desatribuição de ferramentas
-function openUnassignToolsModal(characterId, characterName) {
-  currentCharacterId = characterId;
-  characterNameUnassignToolsModal.textContent = characterName;
-  unassignToolsModal.style.display = "block";
-  loadAssignedTools();
-}
-
-// Confirmar desatribuição de ferramentas
-confirmUnassignToolsBtn.addEventListener("click", async () => {
-  if (!currentCharacterId) return;
-  
-  try {
-    const characterRef = doc(db, "characters", currentCharacterId);
-    
-    // Remover ferramentas selecionadas
-    if (toolsToRemove.length > 0) {
-      await updateDoc(characterRef, {
-        ferramentas: arrayRemove(...toolsToRemove)
-      });
-    }
-    
-    alert("Ferramentas removidas com sucesso!");
-    unassignToolsModal.style.display = "none";
-  } catch (e) {
-    alert("Erro ao remover ferramentas: " + e.message);
-  }
-});
-
-// --- MODAL PARA ATRIBUIR HABILIDADES MÁGICAS ---
-const assignMagicModal = document.getElementById("assign-magic-abilities-modal");
-const characterNameMagicModal = document.getElementById("character-name-magic-modal");
-const availableMagicDiv = document.getElementById("available-magic-abilities");
-const confirmMagicAssignBtn = document.getElementById("confirm-magic-assign");
-
-// Carregar habilidades mágicas disponíveis
-async function loadMagicAbilities() {
-  selectedMagicAbilities = [];
-  availableMagicDiv.innerHTML = "";
-  
-  const itemsSnap = await getDocs(collection(db, "items"));
-  itemsSnap.forEach(docSnap => {
-    const itemData = docSnap.data();
-    // Mostrar apenas habilidades mágicas
-    if (itemData.Tipo === "magic") {
-      const magicDiv = document.createElement("div");
-      magicDiv.className = "assign-item";
       
-      const checkbox = document.createElement("input");
-      checkbox.type = "checkbox";
-      checkbox.value = docSnap.id;
-      checkbox.id = `magic-${docSnap.id}`;
-      checkbox.addEventListener("change", (e) => {
-        if (e.target.checked) {
-          selectedMagicAbilities.push(docSnap.id);
-        } else {
-          selectedMagicAbilities = selectedMagicAbilities.filter(id => id !== docSnap.id);
-        }
-      });
-      
-      const label = document.createElement("label");
-      label.htmlFor = `magic-${docSnap.id}`;
-      label.textContent = itemData.Nome || docSnap.id;
-      
-      magicDiv.appendChild(checkbox);
-      magicDiv.appendChild(label);
-      availableMagicDiv.appendChild(magicDiv);
+      document.getElementById('assign-modal').style.display = 'none';
+      selectedItems = [];
+      selectedSpells = [];
+    } catch (error) {
+      console.error('Erro ao atribuir itens/feitiços:', error);
+      alert('Erro ao atribuir itens/feitiços: ' + error.message);
     }
   });
-}
 
-// Abrir modal para atribuição de habilidades mágicas
-function openAssignMagicModal(characterId, characterName) {
-  currentCharacterId = characterId;
-  characterNameMagicModal.textContent = characterName;
-  assignMagicModal.style.display = "block";
-  loadMagicAbilities();
-}
+  // Botão para criar perícia
+  document.getElementById('create-skill-btn').addEventListener('click', () => {
+    document.getElementById('create-skill-modal').style.display = 'block';
+  });
 
-// Confirmar atribuição de habilidades mágicas
-confirmMagicAssignBtn.addEventListener("click", async () => {
-  if (!currentCharacterId) return;
-  
-  try {
-    const characterRef = doc(db, "characters", currentCharacterId);
+  // Inicializar sistema de filtros e busca
+  function initSearchAndFilters() {
+    // Busca de personagens
+    const characterSearch = document.getElementById('character-search');
+    if (characterSearch) {
+      characterSearch.addEventListener('input', filterCharacters);
+    }
     
-    // Atualizar array de habilidades mágicas do personagem
-    await updateDoc(characterRef, {
-      habilidades_magicas: arrayUnion(...selectedMagicAbilities)
+    // Filtro de campanhas para personagens
+    const campaignFilter = document.getElementById('character-campaign-filter');
+    if (campaignFilter) {
+      campaignFilter.addEventListener('change', filterCharacters);
+    }
+  }
+
+  function filterCharacters() {
+    const searchTerm = document.getElementById('character-search').value.toLowerCase();
+    const campaignFilter = document.getElementById('character-campaign-filter').value;
+    
+    const characterCards = document.querySelectorAll('.character-card');
+    const characterItems = document.querySelectorAll('#list-characters li');
+    
+    // Filtrar cards
+    characterCards.forEach(card => {
+      const characterName = card.querySelector('h3').textContent.toLowerCase();
+      const characterCampaign = card.querySelector('p:nth-child(3)').textContent.replace('Campanha: ', '');
+      
+      const matchesSearch = characterName.includes(searchTerm);
+      const matchesCampaign = !campaignFilter || characterCampaign === campaignFilter;
+      
+      card.style.display = (matchesSearch && matchesCampaign) ? 'block' : 'none';
     });
     
-    alert("Habilidades mágicas atribuídas com sucesso!");
-    assignMagicModal.style.display = "none";
-  } catch (e) {
-    alert("Erro ao atribuir habilidades mágicas: " + e.message);
-  }
-});
-
-// --- MODAL PARA DESATRIBUIR HABILIDADES MÁGICAS ---
-const unassignMagicModal = document.getElementById("unassign-magic-abilities-modal");
-const characterNameUnassignMagicModal = document.getElementById("character-name-unassign-magic-modal");
-const assignedMagicDiv = document.getElementById("assigned-magic-abilities");
-const confirmUnassignMagicBtn = document.getElementById("confirm-unassign-magic");
-
-// Carregar habilidades mágicas atribuídas
-async function loadAssignedMagicAbilities() {
-  magicAbilitiesToRemove = [];
-  assignedMagicDiv.innerHTML = "";
-  
-  try {
-    // Carregar dados do personagem
-    const charRef = doc(db, "characters", currentCharacterId);
-    const charSnap = await getDoc(charRef);
-    
-    if (!charSnap.exists()) {
-      alert("Personagem não encontrado!");
-      return;
-    }
-    
-    const charData = charSnap.data();
-    
-    // Carregar habilidades mágicas atribuídas
-    if (charData.habilidades_magicas && Array.isArray(charData.habilidades_magicas) && charData.habilidades_magicas.length > 0) {
-      for (const magicId of charData.habilidades_magicas) {
-        try {
-          const magicRef = doc(db, "items", magicId);
-          const magicSnap = await getDoc(magicRef);
-          
-          if (magicSnap.exists()) {
-            const magicData = magicSnap.data();
-            const magicDiv = document.createElement("div");
-            magicDiv.className = "assign-item";
-            
-            const checkbox = document.createElement("input");
-            checkbox.type = "checkbox";
-            checkbox.value = magicId;
-            checkbox.id = `remove-magic-${magicId}`;
-            checkbox.addEventListener("change", (e) => {
-              if (e.target.checked) {
-                magicAbilitiesToRemove.push(magicId);
-              } else {
-                magicAbilitiesToRemove = magicAbilitiesToRemove.filter(id => id !== magicId);
-              }
-            });
-            
-            const label = document.createElement("label");
-            label.htmlFor = `remove-magic-${magicId}`;
-            label.textContent = magicData.Nome || magicId;
-            
-            magicDiv.appendChild(checkbox);
-            magicDiv.appendChild(label);
-            assignedMagicDiv.appendChild(magicDiv);
-          }
-        } catch (error) {
-          console.error(`Erro ao carregar habilidade mágica ${magicId}:`, error);
-        }
-      }
-    } else {
-      assignedMagicDiv.innerHTML = "<div class='assign-item'>Nenhuma habilidade mágica atribuída</div>";
-    }
-  } catch (error) {
-    console.error("Erro ao carregar habilidades mágicas atribuídas:", error);
-    alert("Erro ao carregar dados do personagem.");
-  }
-}
-
-// Abrir modal para desatribuição de habilidades mágicas
-function openUnassignMagicModal(characterId, characterName) {
-  currentCharacterId = characterId;
-  characterNameUnassignMagicModal.textContent = characterName;
-  unassignMagicModal.style.display = "block";
-  loadAssignedMagicAbilities();
-}
-
-// Confirmar desatribuição de habilidades mágicas
-confirmUnassignMagicBtn.addEventListener("click", async () => {
-  if (!currentCharacterId) return;
-  
-  try {
-    const characterRef = doc(db, "characters", currentCharacterId);
-    
-    // Remover habilidades mágicas selecionadas
-    if (magicAbilitiesToRemove.length > 0) {
-      await updateDoc(characterRef, {
-        habilidades_magicas: arrayRemove(...magicAbilitiesToRemove)
-      });
-    }
-    
-    alert("Habilidades mágicas removidas com sucesso!");
-    unassignMagicModal.style.display = "none";
-  } catch (e) {
-    alert("Erro ao remover habilidades mágicas: " + e.message);
-  }
-});
-
-// --- MODAL PARA ATRIBUIR PERÍCIAS ---
-const assignSkillsModal = document.getElementById("assign-skills-modal");
-const characterNameSkillsModal = document.getElementById("character-name-skills-modal");
-const availableSkillsDiv = document.getElementById("available-skills");
-const confirmSkillsAssignBtn = document.getElementById("confirm-skills-assign");
-
-// Carregar perícias disponíveis
-async function loadSkills() {
-  selectedSkills = [];
-  availableSkillsDiv.innerHTML = "";
-  
-  const skillsSnap = await getDocs(collection(db, "skills"));
-  skillsSnap.forEach(docSnap => {
-    const skillData = docSnap.data();
-    const skillDiv = document.createElement("div");
-    skillDiv.className = "assign-item";
-    
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.value = docSnap.id;
-    checkbox.id = `skill-${docSnap.id}`;
-    checkbox.addEventListener("change", (e) => {
-      if (e.target.checked) {
-        selectedSkills.push(docSnap.id);
-      } else {
-        selectedSkills = selectedSkills.filter(id => id !== docSnap.id);
-      }
-    });
-    
-    const label = document.createElement("label");
-    label.htmlFor = `skill-${docSnap.id}`;
-    label.textContent = skillData.Nome || docSnap.id;
-    
-    skillDiv.appendChild(checkbox);
-    skillDiv.appendChild(label);
-    availableSkillsDiv.appendChild(skillDiv);
-  });
-}
-
-// Abrir modal para atribuição de perícias
-function openAssignSkillsModal(characterId, characterName) {
-  currentCharacterId = characterId;
-  characterNameSkillsModal.textContent = characterName;
-  assignSkillsModal.style.display = "block";
-  loadSkills();
-}
-
-// Confirmar atribuição de perícias
-confirmSkillsAssignBtn.addEventListener("click", async () => {
-  if (!currentCharacterId) return;
-  
-  try {
-    const characterRef = doc(db, "characters", currentCharacterId);
-    
-    // Atualizar array de perícias do personagem
-    await updateDoc(characterRef, {
-      pericias: arrayUnion(...selectedSkills)
-    });
-    
-    alert("Perícias atribuídas com sucesso!");
-    assignSkillsModal.style.display = "none";
-  } catch (e) {
-    alert("Erro ao atribuir perícias: " + e.message);
-  }
-});
-
-// --- MODAL PARA DESATRIBUIR PERÍCIAS ---
-const unassignSkillsModal = document.getElementById("unassign-skills-modal");
-const characterNameUnassignSkillsModal = document.getElementById("character-name-unassign-skills-modal");
-const assignedSkillsDiv = document.getElementById("assigned-skills");
-const confirmUnassignSkillsBtn = document.getElementById("confirm-unassign-skills");
-
-// Carregar perícias atribuídas
-async function loadAssignedSkills() {
-  skillsToRemove = [];
-  assignedSkillsDiv.innerHTML = "";
-  
-  try {
-    // Carregar dados do personagem
-    const charRef = doc(db, "characters", currentCharacterId);
-    const charSnap = await getDoc(charRef);
-    
-    if (!charSnap.exists()) {
-      alert("Personagem não encontrado!");
-      return;
-    }
-    
-    const charData = charSnap.data();
-    
-    // Carregar perícias atribuídas
-    if (charData.pericias && Array.isArray(charData.pericias) && charData.pericias.length > 0) {
-      for (const skillId of charData.pericias) {
-        try {
-          const skillRef = doc(db, "skills", skillId);
-          const skillSnap = await getDoc(skillRef);
-          
-          if (skillSnap.exists()) {
-            const skillData = skillSnap.data();
-            const skillDiv = document.createElement("div");
-            skillDiv.className = "assign-item";
-            
-            const checkbox = document.createElement("input");
-            checkbox.type = "checkbox";
-            checkbox.value = skillId;
-            checkbox.id = `remove-skill-${skillId}`;
-            checkbox.addEventListener("change", (e) => {
-              if (e.target.checked) {
-                skillsToRemove.push(skillId);
-              } else {
-                skillsToRemove = skillsToRemove.filter(id => id !== skillId);
-              }
-            });
-            
-            const label = document.createElement("label");
-            label.htmlFor = `remove-skill-${skillId}`;
-            label.textContent = skillData.Nome || skillId;
-            
-            skillDiv.appendChild(checkbox);
-            skillDiv.appendChild(label);
-            assignedSkillsDiv.appendChild(skillDiv);
-          }
-        } catch (error) {
-          console.error(`Erro ao carregar perícia ${skillId}:`, error);
-        }
-      }
-    } else {
-      assignedSkillsDiv.innerHTML = "<div class='assign-item'>Nenhuma perícia atribuída</div>";
-    }
-  } catch (error) {
-    console.error("Erro ao carregar perícias atribuídas:", error);
-    alert("Erro ao carregar dados do personagem.");
-  }
-}
-
-// Abrir modal para desatribuição de perícias
-function openUnassignSkillsModal(characterId, characterName) {
-  currentCharacterId = characterId;
-  characterNameUnassignSkillsModal.textContent = characterName;
-  unassignSkillsModal.style.display = "block";
-  loadAssignedSkills();
-}
-
-// Confirmar desatribuição de perícias
-confirmUnassignSkillsBtn.addEventListener("click", async () => {
-  if (!currentCharacterId) return;
-  
-  try {
-    const characterRef = doc(db, "characters", currentCharacterId);
-    
-    // Remover perícias selecionadas
-    if (skillsToRemove.length > 0) {
-      await updateDoc(characterRef, {
-        pericias: arrayRemove(...skillsToRemove)
-      });
-    }
-    
-    alert("Perícias removidas com sucesso!");
-    unassignSkillsModal.style.display = "none";
-  } catch (e) {
-    alert("Erro ao remover perícias: " + e.message);
-  }
-});
-
-// --- MODAL PARA CRIAR PERÍCIAS ---
-const createSkillModal = document.getElementById("create-skill-modal");
-const createSkillForm = document.getElementById("create-skill-form");
-const createSkillBtn = document.getElementById("create-skill-btn");
-
-// Abrir modal para criar perícia
-createSkillBtn.addEventListener("click", () => {
-  createSkillModal.style.display = "block";
-});
-
-// Criar nova perícia
-createSkillForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const data = getFormData(createSkillForm);
-  if (!data.Nome || !data.Descrição) {
-    return alert("Nome e descrição são obrigatórios para criar uma perícia");
-  }
-  
-  try {
-    await createDoc("skills", data);
-    alert("Perícia criada com sucesso!");
-    createSkillModal.style.display = "none";
-    createSkillForm.reset();
-  } catch (error) {
-    alert("Erro ao criar perícia: " + error.message);
-  }
-});
-
-// --- MODAL PARA EDIÇÃO DE PERSONAGEM ---
-const editModal = document.getElementById("edit-character-modal");
-const closeEditModalBtn = document.querySelector(".close-edit-modal");
-const editCharacterName = document.getElementById("edit-character-name");
-const editCharacterForm = document.getElementById("edit-character-form");
-const confirmEditBtn = document.getElementById("confirm-edit");
-
-// Fechar modal de edição
-closeEditModalBtn.addEventListener("click", () => {
-  editModal.style.display = "none";
-});
-
-// Abrir modal para edição
-async function openEditModal(characterId, characterData) {
-  currentEditCharacterId = characterId;
-  editCharacterName.textContent = characterData.Nome || characterId;
-  editModal.style.display = "block";
-  
-  // Limpar formulário de edição
-  editCharacterForm.innerHTML = "";
-  
-  // Adicionar campos para edição
-  for (const [key, value] of Object.entries(characterData)) {
-    if (key === "itens" || key === "feiticos" || key === "ferramentas" || key === "habilidades_magicas" || key === "pericias") continue;
-    
-    const div = document.createElement("div");
-    div.className = "field-pair";
-    
-    const nameInput = document.createElement("input");
-    nameInput.type = "text";
-    nameInput.name = "field-name";
-    nameInput.value = key;
-    nameInput.className = "name-field";
-    nameInput.readOnly = true;
-    
-    let valueInput;
-    if (key === "Campanha") {
-      valueInput = document.createElement("select");
-      valueInput.name = "field-value";
+    // Filtrar itens da lista
+    characterItems.forEach(item => {
+      const characterName = item.querySelector('.character-info strong').textContent.toLowerCase();
+      const characterCampaign = item.querySelector('.character-info div:nth-child(3)').textContent.replace('Campanha: ', '');
       
-      // Adicionar opção vazia
-      const emptyOption = document.createElement("option");
-      emptyOption.value = "";
-      emptyOption.textContent = "Nenhuma campanha";
-      valueInput.appendChild(emptyOption);
+      const matchesSearch = characterName.includes(searchTerm);
+      const matchesCampaign = !campaignFilter || characterCampaign === campaignFilter;
       
-      // Carregar campanhas
-      const campaignsSnap = await getDocs(collection(db, "campaigns"));
-      campaignsSnap.forEach(docSnap => {
-        const option = document.createElement("option");
-        option.value = docSnap.id;
-        option.textContent = docSnap.data().Nome || docSnap.data().nome || "Campanha";
-        if (docSnap.id === value) option.selected = true;
-        valueInput.appendChild(option);
-      });
-    } else {
-      valueInput = document.createElement("input");
-      valueInput.type = typeof value === "number" ? "number" : "text";
-      valueInput.name = "field-value";
-      valueInput.value = value || "";
-    }
-    
-    div.appendChild(nameInput);
-    div.appendChild(valueInput);
-    editCharacterForm.appendChild(div);
+      item.style.display = (matchesSearch && matchesCampaign) ? 'flex' : 'none';
+    });
   }
-  
-  // Adicionar botão para adicionar novos campos
-  const addFieldBtn = document.createElement("button");
-  addFieldBtn.type = "button";
-  addFieldBtn.textContent = "+ Adicionar campo";
-  addFieldBtn.className = "add-field-btn";
-  addFieldBtn.addEventListener("click", () => {
-    const div = document.createElement("div");
-    div.className = "field-pair";
-    
-    const nameInput = document.createElement("input");
-    nameInput.type = "text";
-    nameInput.name = "field-name";
-    nameInput.placeholder = "Nome do campo";
-    nameInput.className = "name-field";
-    
-    const valueInput = document.createElement("input");
-    valueInput.type = "text";
-    valueInput.name = "field-value";
-    valueInput.placeholder = "Valor";
-    
-    div.appendChild(nameInput);
-    div.appendChild(valueInput);
-    editCharacterForm.insertBefore(div, addFieldBtn);
-  });
-  
-  editCharacterForm.appendChild(addFieldBtn);
-}
 
-// Confirmar edição do personagem
-confirmEditBtn.addEventListener("click", async () => {
-  if (!currentEditCharacterId) return;
-  
-  try {
-    const data = getFormData(editCharacterForm);
-    
-    // Atualizar personagem no Firestore
-    await updateDocById("characters", currentEditCharacterId, data);
-    
-    alert("Personagem atualizado com sucesso!");
-    editModal.style.display = "none";
-  } catch (e) {
-    alert("Erro ao atualizar personagem: " + e.message);
+  // Inicializar quando o DOM estiver carregado
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSearchAndFilters);
+  } else {
+    initSearchAndFilters();
   }
-});
-
-// --- FORM SUBMITS ---
-
-// Campanhas
-const formCampaign = document.getElementById("form-campaign");
-const listCampaigns = document.getElementById("list-campaigns");
-formCampaign.addEventListener("submit", async e => {
-  e.preventDefault();
-  const data = getFormData(formCampaign);
-  if (!data.Nome) return alert("Campo 'Nome' é obrigatório");
-  await createDoc("campaigns", data);
-  clearForm(formCampaign);
-  updateCampaignSelect();
-});
-
-// Personagens - AGORA COM ID PERSONALIZADO
-const listCharacters = document.getElementById("list-characters");
-const formCharacter = document.getElementById("form-character");
-const characterNameInput = document.getElementById("character-name");
-formCharacter.addEventListener("submit", async e => {
-  e.preventDefault();
-  const data = getFormData(formCharacter);
-  if (!data.Nome) return alert("Campo 'Nome' é obrigatório");
-  
-  // Usar o nome do personagem como ID do documento
-  const characterId = data.Nome.toLowerCase().replace(/\s+/g, '_');
-  
-  // Calcular campos derivados se os valores base existirem
-  if (data.Vigor) {
-    data["Pontos de Vida"] = 100 * parseInt(data.Vigor);
-    data["Pontos de Vida Atuais"] = 100 * parseInt(data.Vigor); // Inicialmente iguais ao máximo
-  }
-  
-  if (data.Força && data.Agilidade) {
-    data["Pontos de Esforço"] = 30 * (parseInt(data.Força) + parseInt(data.Agilidade));
-    data["Pontos de Esforço Atuais"] = 30 * (parseInt(data.Força) + parseInt(data.Agilidade)); // Inicialmente iguais ao máximo
-  }
-  
-  if (data.Mana) {
-    data["Pontos de Mana"] = 200 * parseInt(data.Mana);
-    data["Pontos de Mana Atuais"] = 200 * parseInt(data.Mana); // Inicialmente iguais ao máximo
-  }
-  
-  // Adicionar arrays vazios para itens, feitiços, ferramentas, habilidades mágicas e perícias
-  data.itens = [];
-  data.feiticos = [];
-  data.ferramentas = [];
-  data.habilidades_magicas = [];
-  data.pericias = [];
-  
-  await createDoc("characters", data, characterId);
-  clearForm(formCharacter);
-});
-
-// Monstros
-const formMonster = document.getElementById("form-monster");
-const listMonsters = document.getElementById("list-monsters");
-formMonster.addEventListener("submit", async e => {
-  e.preventDefault();
-  const data = getFormData(formMonster);
-  if (!data.Nome) return alert("Campo 'Nome' é obrigatório");
-  await createDoc("monsters", data);
-  clearForm(formMonster);
-});
-
-// Itens
-const formItem = document.getElementById("form-item");
-const listItems = document.getElementById("list-items");
-formItem.addEventListener("submit", async e => {
-  e.preventDefault();
-  const data = getFormData(formItem);
-  if (!data.Nome) return alert("Campo 'Nome' é obrigatório");
-  await createDoc("items", data);
-  clearForm(formItem);
-});
-
-// Feitiços
-const formSpell = document.getElementById("form-spell");
-const listSpells = document.getElementById("list-spells");
-formSpell.addEventListener("submit", async e => {
-  e.preventDefault();
-  const data = getFormData(formSpell);
-  if (!data.Nome) return alert("Campo 'Nome' é obrigatório");
-  await createDoc("spells", data);
-  clearForm(formSpell);
-});
-
-// --- LISTENERS PARA ATUALIZAR LISTAS EM TEMPO REAL ---
-listenCollection("campaigns", listCampaigns, (id, data) => renderItemWithDelete(id, data, "campaigns"));
-
-listenCollection("characters", listCharacters, (id, data) => {
-  // Mostrar nome e campanha nome
-  const li = document.createElement("li");
-  const campId = data.Campanha;
-  let campName = campId;
-  if (campId) {
-    campName = campId; // mostra id se não achar nome
-  }
-  li.textContent = `${data.Nome || id} (Campanha: ${campName})`;
-
-  const btnDel = document.createElement("button");
-  btnDel.textContent = "Excluir";
-  btnDel.className = "del-btn";
-  btnDel.addEventListener("click", async () => {
-    if (confirm(`Excluir personagem "${data.Nome || id}"?`)) {
-      await deleteDocById("characters", id);
-    }
-  });
-
-  // Botão para visualizar ficha do personagem
-  const btnView = document.createElement("button");
-  btnView.textContent = "Ver Ficha";
-  btnView.className = "view-btn";
-  btnView.addEventListener("click", () => {
-    // Redirecionar para a página de ficha do personagem
-    window.open(`ficha_personagem.html?id=${id}`, '_blank');
-  });
-
-  // Botão para atribuir itens/feitiços
-  const btnAssign = document.createElement("button");
-  btnAssign.textContent = "Atribuir";
-  btnAssign.className = "assign-btn";
-  btnAssign.addEventListener("click", () => {
-    openAssignModal(id, data.Nome || id);
-  });
-
-  // Botão para desatribuir itens/feitiços
-  const btnUnassign = document.createElement("button");
-  btnUnassign.textContent = "Desatribuir";
-  btnUnassign.className = "assign-btn";
-  btnUnassign.style.backgroundColor = "#a03a3a";
-  btnUnassign.addEventListener("click", () => {
-    openUnassignModal(id, data.Nome || id);
-  });
-
-  // Botão para atribuir ferramentas
-  const btnAssignTools = document.createElement("button");
-  btnAssignTools.textContent = "Ferramentas";
-  btnAssignTools.className = "assign-btn";
-  btnAssignTools.style.backgroundColor = "#5a7a5a";
-  btnAssignTools.addEventListener("click", () => {
-    openAssignToolsModal(id, data.Nome || id);
-  });
-
-  // Botão para desatribuir ferramentas
-  const btnUnassignTools = document.createElement("button");
-  btnUnassignTools.textContent = "Desatribuir Ferramentas";
-  btnUnassignTools.className = "assign-btn";
-  btnUnassignTools.style.backgroundColor = "#7a3a3a";
-  btnUnassignTools.addEventListener("click", () => {
-    openUnassignToolsModal(id, data.Nome || id);
-  });
-
-  // Botão para atribuir habilidades mágicas
-  const btnAssignMagic = document.createElement("button");
-  btnAssignMagic.textContent = "Habilidades";
-  btnAssignMagic.className = "assign-btn";
-  btnAssignMagic.style.backgroundColor = "#7a5a9a";
-  btnAssignMagic.addEventListener("click", () => {
-    openAssignMagicModal(id, data.Nome || id);
-  });
-
-  // Botão para desatribuir habilidades mágicas
-  const btnUnassignMagic = document.createElement("button");
-  btnUnassignMagic.textContent = "Desatribuir Habilidades";
-  btnUnassignMagic.className = "assign-btn";
-  btnUnassignMagic.style.backgroundColor = "#5a3a7a";
-  btnUnassignMagic.addEventListener("click", () => {
-    openUnassignMagicModal(id, data.Nome || id);
-  });
-
-  // Botão para atribuir perícias
-  const btnAssignSkills = document.createElement("button");
-  btnAssignSkills.textContent = "Perícias";
-  btnAssignSkills.className = "assign-btn";
-  btnAssignSkills.style.backgroundColor = "#9a7a5a";
-  btnAssignSkills.addEventListener("click", () => {
-    openAssignSkillsModal(id, data.Nome || id);
-  });
-
-  // Botão para desatribuir perícias
-  const btnUnassignSkills = document.createElement("button");
-  btnUnassignSkills.textContent = "Desatribuir Perícias";
-  btnUnassignSkills.className = "assign-btn";
-  btnUnassignSkills.style.backgroundColor = "#7a5a3a";
-  btnUnassignSkills.addEventListener("click", () => {
-    openUnassignSkillsModal(id, data.Nome || id);
-  });
-
-  // Botão para editar personagem
-  const btnEdit = document.createElement("button");
-  btnEdit.textContent = "Editar";
-  btnEdit.className = "edit-btn";
-  btnEdit.addEventListener("click", () => {
-    openEditModal(id, data);
-  });
-
-  li.appendChild(btnView);
-  li.appendChild(btnAssign);
-  li.appendChild(btnUnassign);
-  li.appendChild(btnAssignTools);
-  li.appendChild(btnUnassignTools);
-  li.appendChild(btnAssignMagic);
-  li.appendChild(btnUnassignMagic);
-  li.appendChild(btnAssignSkills);
-  li.appendChild(btnUnassignSkills);
-  li.appendChild(btnEdit);
-  li.appendChild(btnDel);
-  return li;
-});
-
-listenCollection("monsters", listMonsters, (id, data) => renderItemWithDelete(id, data, "monsters"));
-listenCollection("items", listItems, (id, data) => renderItemWithDelete(id, data, "items"));
-listenCollection("spells", listSpells, (id, data) => renderItemWithDelete(id, data, "spells"));
-
-// Perícias
-const listSkills = document.getElementById("list-skills");
-listenCollection("skills", listSkills, (id, data) => {
-  const li = document.createElement("li");
-  li.innerHTML = `<strong>${data.Nome || id}</strong><br><small>${data.Descrição || "Sem descrição"}</small>`;
-  
-  const btnDel = document.createElement("button");
-  btnDel.textContent = "Excluir";
-  btnDel.className = "del-btn";
-  btnDel.addEventListener("click", async () => {
-    if (confirm(`Excluir perícia "${data.Nome || id}"?`)) {
-      await deleteDocById("skills", id);
-    }
-  });
-  
-  li.appendChild(btnDel);
-  return li;
-});
-
-// Atualiza select campanhas no personagem ao iniciar
-updateCampaignSelect();
-
-// --- ROLAGEM DE DADOS ---
-const diceButtons = document.querySelectorAll(".dice-buttons button");
-const diceResult = document.getElementById("dice-result");
-
-diceButtons.forEach(btn => {
-  btn.addEventListener("click", () => {
-    const sides = parseInt(btn.dataset.dice);
-    const roll = Math.floor(Math.random() * sides) + 1;
-    diceResult.textContent = `Você rolou um D${sides} e tirou: ${roll}`;
-  });
-});
-
-// Botão de logout
-document.getElementById("logout-btn").addEventListener("click", () => {
-  signOut(auth).then(() => {
-    alert("Deslogado com sucesso!");
-    loginPrompt();
-  }).catch((error) => {
-    alert("Erro ao fazer logout: " + error.message);
-  });
-});
-
-// Inicialização
-function init() {
-  console.log("Sistema inicializado");
-}
 </script>
 </body>
 </html>
