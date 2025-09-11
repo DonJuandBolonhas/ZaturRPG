@@ -522,6 +522,17 @@
       </div>
     </div>
 
+    <!-- Novo bloco para Zeuros -->
+    <div class="character-card">
+      <h2>Saldo de Zeuros</h2>
+      <div class="character-info">
+        <div class="info-item">
+          <span class="info-label">Zeuros:</span>
+          <span id="char-zeuros" style="font-weight:bold; font-family: monospace; font-size:1.3rem;">ℤ 0</span>
+        </div>
+      </div>
+    </div>
+
     <div class="points-display">
       <div class="point-item">
         <div class="point-value editable" id="hp-value" data-type="hp">0</div>
@@ -540,52 +551,41 @@
       </div>
     </div>
 
-    <div class="character-card">
-      <h2>História & Descrição</h2>
-      <div class="info-item">
-        <span class="info-label">História:</span>
-        <div id="char-history">-</div>
-      </div>
-      <div class="info-item">
-        <span class="info-label">Aparência:</span>
-        <div id="char-appearance">-</div>
-      </div>
-      <div class="info-item">
-        <span class="info-label">Personalidade:</span>
-        <div id="char-personality">-</div>
-      </div>
-    </div>
+    
   </section>
 
   <!-- Atributos -->
   <section id="attributes" class="tab-content" role="tabpanel" aria-labelledby="tab-attributes">
-    <div class="attributes-grid">
-      <div class="attribute-card" data-attr="Força">
-        <div class="attribute-name">Força</div>
-        <div class="attribute-value" id="attr-strength">0</div>
-      </div>
-      <div class="attribute-card" data-attr="Agilidade">
-        <div class="attribute-name">Agilidade</div>
-        <div class="attribute-value" id="attr-agility">0</div>
-      </div>
-      <div class="attribute-card" data-attr="Mana">
-        <div class="attribute-name">Mana</div>
-        <div class="attribute-value" id="attr-mana">0</div>
-      </div>
-      <div class="attribute-card" data-attr="Intelecto">
-        <div class="attribute-name">Intelecto</div>
-        <div class="attribute-value" id="attr-intellect">0</div>
-      </div>
-      <div class="attribute-card" data-attr="Vigor">
-        <div class="attribute-name">Vigor</div>
-        <div class="attribute-value" id="attr-vigor">0</div>
+    <div class="character-card">
+      <h2>Atributos do Personagem</h2>
+      <div class="attributes-grid">
+        <div class="attribute-card">
+          <div class="attribute-name">Força</div>
+          <div class="attribute-value" id="attr-strength">0</div>
+        </div>
+        <div class="attribute-card">
+          <div class="attribute-name">Agilidade</div>
+          <div class="attribute-value" id="attr-agility">0</div>
+        </div>
+        <div class="attribute-card">
+          <div class="attribute-name">Mana</div>
+          <div class="attribute-value" id="attr-mana">0</div>
+        </div>
+        <div class="attribute-card">
+          <div class="attribute-name">Intelecto</div>
+          <div class="attribute-value" id="attr-intellect">0</div>
+        </div>
+        <div class="attribute-card">
+          <div class="attribute-name">Vigor</div>
+          <div class="attribute-value" id="attr-vigor">0</div>
+        </div>
       </div>
     </div>
 
     <div class="character-card">
       <h2>Perícias</h2>
-      <ul id="skills-list" class="list-items">
-        <li>Carregando...</li>
+      <ul class="list-items" id="skills-list">
+        <li>Carregando perícias...</li>
       </ul>
     </div>
   </section>
@@ -594,21 +594,21 @@
   <section id="items" class="tab-content" role="tabpanel" aria-labelledby="tab-items">
     <div class="character-card">
       <h2>Inventário</h2>
-      <ul id="inventory-list" class="list-items">
+      <ul class="list-items" id="inventory-list">
         <li>Carregando itens...</li>
       </ul>
     </div>
 
     <div class="character-card">
       <h2>Ferramentas</h2>
-      <ul id="tools-list" class="list-items">
+      <ul class="list-items" id="tools-list">
         <li>Carregando ferramentas...</li>
       </ul>
     </div>
 
     <div class="character-card">
-      <h2>Equipamento</h2>
-      <ul id="equipment-list" class="list-items">
+      <h2>Equipamentos</h2>
+      <ul class="list-items" id="equipment-list">
         <li>Carregando equipamentos...</li>
       </ul>
     </div>
@@ -618,15 +618,15 @@
   <section id="spells" class="tab-content" role="tabpanel" aria-labelledby="tab-spells">
     <div class="character-card">
       <h2>Feitiços Conhecidos</h2>
-      <ul id="spells-list" class="list-items">
+      <ul class="list-items" id="spells-list">
         <li>Carregando feitiços...</li>
       </ul>
     </div>
 
     <div class="character-card">
       <h2>Habilidades Mágicas</h2>
-      <ul id="magic-abilities-list" class="list-items">
-        <li>Carregando habilidades...</li>
+      <ul class="list-items" id="magic-abilities-list">
+        <li>Carregando habilidades mágicas...</li>
       </ul>
     </div>
   </section>
@@ -635,21 +635,17 @@
   <section id="dice" class="tab-content" role="tabpanel" aria-labelledby="tab-dice">
     <div class="character-card">
       <h2>Rolagem de Dados</h2>
-      <p>Use os dados abaixo para fazer suas rolagens durante o jogo.</p>
-      
-      <div class="dice-buttons" role="group" aria-label="Botões para rolar dados">
-        <button data-dice="4" aria-label="Rolar D4">D4</button>
-        <button data-dice="6" aria-label="Rolar D6">D6</button>
-        <button data-dice="8" aria-label="Rolar D8">D8</button>
-        <button data-dice="10" aria-label="Rolar D10">D10</button>
-        <button data-dice="12" aria-label="Rolar D12">D12</button>
-        <button data-dice="20" aria-label="Rolar D20">D20</button>
-        <button data-dice="100" aria-label="Rolar D100">D100</button>
+      <div class="dice-buttons">
+        <button data-dice="4">D4</button>
+        <button data-dice="6">D6</button>
+        <button data-dice="8">D8</button>
+        <button data-dice="10">D10</button>
+        <button data-dice="12">D12</button>
+        <button data-dice="20">D20</button>
+        <button data-dice="100">D100</button>
       </div>
-      
-      <div id="dice-result" aria-live="polite" aria-atomic="true">Role os dados para ver o resultado</div>
+      <div id="dice-result">Role os dados...</div>
     </div>
-
     <div class="character-card">
       <h2>Rolagens de Atributos</h2>
       <p>Clique em um atributo para rolar nD20 (onde n é o valor do atributo)</p>
@@ -686,8 +682,8 @@
     <h2 id="modal-title">Editar Pontos</h2>
     <div class="modal-form">
       <label for="points-input">Novo valor:</label>
-      <input type="number" id="points-input" min="0" />
-      <div id="points-max-info">Máximo: <span id="points-max-value">0</span></div>
+      <input type="number" id="points-input" min="0" value="0">
+      <div>Valor máximo: <span id="points-max-value">0</span></div>
       <button id="save-points">Salvar</button>
     </div>
   </div>
@@ -914,9 +910,7 @@ const charClass = document.getElementById("char-class");
 const charClan = document.getElementById("char-clan");
 const charLevel = document.getElementById("char-level");
 const charCampaign = document.getElementById("char-campaign");
-const charHistory = document.getElementById("char-history");
-const charAppearance = document.getElementById("char-appearance");
-const charPersonality = document.getElementById("char-personality");
+const charZeuros = document.getElementById("char-zeuros");
 
 // Pontos
 const hpValue = document.getElementById("hp-value");
@@ -990,9 +984,9 @@ async function loadCharacter() {
     charCampaign.textContent = "Nenhuma campanha";
   }
   
-  charHistory.textContent = characterData.História || characterData.Historia || "-";
-  charAppearance.textContent = characterData.Aparência || characterData.Aparencia || "-";
-  charPersonality.textContent = characterData.Personalidade || "-";
+  // Atualizar saldo de Zeuros
+  const zeurosSaldo = characterData.Zeuro || 0;
+  charZeuros.textContent = `ℤ ${zeurosSaldo}`;
   
   // Calcular valores máximos
   maxHp = characterData.Vigor ? 100 * parseInt(characterData.Vigor) : 0;
