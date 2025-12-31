@@ -1,1246 +1,510 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Zatur RPG - Jogador</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap');
-  
-  :root {
-    --color-primary: #6b4c2a;
-    --color-primary-dark: #4b2e0e;
-    --color-primary-light: #8c6b3a;
-    --color-secondary: #3a220a;
-    --color-accent: #d4af37;
-    --color-text: #f5f1e9;
-    --color-background: #3a220a;
-    --color-success: #4a7a4a;
-    --color-danger: #a03a3a;
-    --color-warning: #9a7a5a;
-    --color-info: #3a5a8a;
-    --border-radius: 8px;
-    --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-    --transition: all 0.3s ease;
-  }
-  
-  * {
-    box-sizing: border-box;
-  }
-  
-  body {
-    margin: 0; 
-    font-family: 'MedievalSharp', cursive, serif;
-    background: linear-gradient(135deg, var(--color-secondary) 25%, var(--color-primary-dark) 75%);
-    color: var(--color-text);
-    min-height: 100vh; 
-    display: flex; 
-    flex-direction: column;
-    line-height: 1.6;
-  }
-  
-  header {
-    background: var(--color-primary-dark); 
-    padding: 1rem 1.5rem;
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center;
-    box-shadow: var(--shadow);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  
-  header h1 { 
-    margin: 0; 
-    font-size: 1.5rem; 
-  }
-  
-  #character-name-header {
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: var(--color-accent);
-  }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Zatur RPG - Ficha do Jogador</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=MedievalSharp&family=Lora:ital,wght@0,400;1,500&display=swap');
 
-  /* Navigation Tabs */
-  nav.tabs {
-    display: flex; 
-    flex-wrap: wrap; 
-    background: var(--color-secondary);
-    box-shadow: inset 0 -3px 5px var(--color-primary);
-    position: sticky;
-    top: 68px;
-    z-index: 90;
-  }
-  
-  nav.tabs button {
-    flex: 1 1 auto;
-    background: none; 
-    border: none; 
-    color: var(--color-text);
-    padding: 1rem; 
-    font-weight: bold; 
-    font-size: 1rem;
-    cursor: pointer; 
-    transition: var(--transition);
-    min-width: 120px;
-  }
-  
-  nav.tabs button.active,
-  nav.tabs button:hover {
-    background: var(--color-primary); 
-    color: #fff;
-    box-shadow: 0 0 10px var(--color-primary-light);
-  }
+        :root {
+            --gold: #d4af37; --gold-bright: #ffdf00; --parchment: #f4e4bc;
+            --dark-leather: #1a0f06; --shadow: rgba(0, 0, 0, 0.8);
+            --red: #8b0000; --blue: #1e4d8c;
+        }
 
-  /* Main Content */
-  main.container {
-    flex: 1; 
-    max-width: 1000px; 
-    margin: 1rem auto 2rem;
-    background: rgba(30,20,10,0.9); 
-    border-radius: 10px;
-    padding: 1.5rem; 
-    box-shadow: var(--shadow);
-  }
+        body { margin: 0; font-family: 'Lora', serif; background: #0a0502; color: var(--parchment); min-height: 100vh; }
 
-  section.tab-content { 
-    display: none; 
-  }
-  
-  section.tab-content.active { 
-    display: block; 
-  }
+        /* HEADER */
+        header {
+            background: linear-gradient(to bottom, #2c1a0a, #1a0f06);
+            padding: 15px; text-align: center; border-bottom: 3px solid var(--gold);
+        }
+        header h1 { font-family: 'Cinzel', serif; margin: 0; color: var(--gold); letter-spacing: 2px; }
+        .currency-bar { font-family:'MedievalSharp'; color:var(--gold-bright); margin-top:5px; font-size: 1.1rem; }
 
-  .character-card {
-    background: rgba(75, 46, 14, 0.7);
-    border-radius: var(--border-radius);
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    border: 2px solid var(--color-primary);
-    box-shadow: var(--shadow);
-  }
-  
-  .character-card h2 {
-    margin-top: 0;
-    color: var(--color-accent);
-    border-bottom: 2px solid var(--color-primary);
-    padding-bottom: 0.5rem;
-  }
-  
-  .character-info {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1rem;
-  }
-  
-  .info-item {
-    margin-bottom: 0.5rem;
-  }
-  
-  .info-label {
-    font-weight: bold;
-    color: var(--color-accent);
-  }
-  
-  .attributes-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 1rem;
-    margin-top: 1rem;
-  }
-  
-  .attribute-card {
-    background: rgba(75, 46, 14, 0.7);
-    border-radius: var(--border-radius);
-    padding: 1rem;
-    text-align: center;
-    border: 1px solid var(--color-primary);
-    cursor: pointer;
-    transition: var(--transition);
-  }
-  
-  .attribute-card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 10px var(--color-accent);
-  }
-  
-  .attribute-name {
-    font-weight: bold;
-    color: var(--color-accent);
-    margin-bottom: 0.5rem;
-  }
-  
-  .attribute-value {
-    font-size: 1.8rem;
-    font-weight: bold;
-    color: var(--color-text);
-  }
-  
-  ul.list-items {
-    list-style: none; 
-    padding-left: 0; 
-    max-height: 300px; 
-    overflow-y: auto;
-    margin-top: 0.5rem;
-    display: grid;
-    gap: 0.5rem;
-  }
-  
-  ul.list-items li {
-    background: var(--color-primary-dark); 
-    padding: 0.8rem 1rem;
-    border-radius: var(--border-radius); 
-    display: flex; 
-    justify-content: space-between;
-    align-items: center; 
-    font-size: 1rem;
-  }
-  
-  .dice-buttons {
-    display: grid; 
-    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-    gap: 0.5rem; 
-    margin-top: 1rem;
-  }
-  
-  .dice-buttons button {
-    background: var(--color-primary); 
-    border: none; 
-    color: var(--color-text);
-    padding: 0.8rem; 
-    border-radius: var(--border-radius);
-    font-weight: bold; 
-    font-size: 1.1rem; 
-    cursor: pointer;
-    transition: var(--transition);
-  }
-  
-  .dice-buttons button:hover {
-    background: var(--color-primary-light);
-  }
-  
-  #dice-result {
-    margin-top: 1.5rem; 
-    font-size: 1.3rem; 
-    font-weight: bold;
-    text-align: center; 
-    padding: 1.2rem;
-    background: var(--color-primary-dark); 
-    border-radius: 10px;
-    box-shadow: inset 0 0 10px var(--color-primary-light);
-  }
-  
-  .points-display {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-    margin: 1.5rem 0;
-  }
-  
-  .point-item {
-    text-align: center;
-    background: rgba(75, 46, 14, 0.7);
-    padding: 1rem;
-    border-radius: var(--border-radius);
-    border: 1px solid var(--color-primary);
-    position: relative;
-  }
-  
-  .point-value {
-    font-size: 2rem;
-    font-weight: bold;
-    color: var(--color-accent);
-    cursor: pointer;
-    transition: var(--transition);
-  }
-  
-  .point-value.editable:hover {
-    color: var(--color-primary-light);
-    text-shadow: 0 0 5px var(--color-accent);
-  }
-  
-  .point-max {
-    font-size: 0.9rem;
-    color: #ccc;
-  }
-  
-  .point-label {
-    font-weight: bold;
-    margin-top: 0.5rem;
-    color: var(--color-accent);
-  }
-  
-  .loading {
-    text-align: center;
-    font-size: 1.2rem;
-    padding: 2rem;
-    color: var(--color-accent);
-  }
+        /* TABS */
+        nav.tabs { display: flex; background: #120b04; border-bottom: 1px solid var(--gold); overflow-x: auto; position: sticky; top: 0; z-index: 100; }
+        nav.tabs button { 
+            flex: 1; padding: 15px; background: none; border: none; color: #888; 
+            font-family: 'Cinzel'; cursor: pointer; transition: 0.3s; white-space: nowrap; 
+        }
+        nav.tabs button.active { color: var(--gold); border-bottom: 3px solid var(--gold); background: rgba(212,175,55,0.1); }
 
-  /* Modal para edição de pontos */
-  .modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.7);
-    overflow: auto;
-    padding: 1rem;
-  }
-  
-  .modal-content {
-    background: var(--color-secondary);
-    margin: 10% auto;
-    padding: 1.5rem;
-    border: 1px solid var(--color-primary);
-    width: 100%;
-    max-width: 400px;
-    border-radius: var(--border-radius);
-    box-shadow: 0 0 20px var(--color-primary-light);
-    position: relative;
-  }
-  
-  .close-modal {
-    color: #aaa;
-    position: absolute;
-    top: 1rem;
-    right: 1.5rem;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-  }
-  
-  .close-modal:hover {
-    color: #fff;
-  }
-  
-  .modal-form {
-    margin-top: 15px;
-  }
-  
-  .modal-form label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-    color: var(--color-accent);
-  }
-  
-  .modal-form input {
-    width: 100%;
-    padding: 0.8rem;
-    border-radius: var(--border-radius);
-    border: 2px solid var(--color-primary);
-    background-color: rgba(255,248,231,0.85);
-    font-family: 'MedievalSharp', cursive;
-    font-size: 1rem;
-    margin-bottom: 15px;
-  }
-  
-  .modal-form button {
-    background: var(--color-primary);
-    border: none;
-    color: var(--color-text);
-    padding: 0.8rem 1.2rem;
-    border-radius: var(--border-radius);
-    cursor: pointer;
-    font-weight: bold;
-    width: 100%;
-    font-size: 1.1rem;
-    transition: var(--transition);
-  }
-  
-  .modal-form button:hover {
-    background: var(--color-primary-light);
-  }
+        /* LAYOUT */
+        .container { max-width: 900px; margin: 20px auto; padding: 0 15px; padding-bottom: 80px; }
+        .tab-content { display: none; animation: fadeIn 0.4s ease; }
+        .tab-content.active { display: block; }
+        .card { background: rgba(30, 20, 10, 0.9); border: 1px solid var(--gold); padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 4px 10px var(--shadow); }
 
-  /* Estilo para itens com descrição */
-  .item-with-description {
-    cursor: pointer;
-    transition: var(--transition);
-  }
-  
-  .item-with-description:hover {
-    background-color: rgba(90, 62, 10, 0.7);
-  }
-  
-  .item-description {
-    display: none;
-    margin-top: 0.5rem;
-    padding: 0.8rem;
-    background: rgba(58, 34, 10, 0.8);
-    border-radius: var(--border-radius);
-    font-size: 0.9rem;
-    font-style: italic;
-    border-left: 3px solid var(--color-accent);
-  }
+        /* BARRAS DE STATUS */
+        .status-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .status-bar { height: 22px; background: #000; border: 1px solid #555; border-radius: 4px; overflow: hidden; position: relative; }
+        .bar-fill { height: 100%; transition: width 0.5s ease; }
+        .bar-label { position: absolute; width: 100%; top:0; left:0; text-align: center; font-size: 0.8rem; font-family: 'MedievalSharp'; color: white; line-height: 22px; text-shadow: 1px 1px 2px black; }
 
-  /* Scrollbar para listas */
-  ul.list-items::-webkit-scrollbar {
-    width: 10px;
-  }
-  
-  ul.list-items::-webkit-scrollbar-thumb {
-    background: var(--color-primary);
-    border-radius: 4px;
-  }
-  
-  ul.list-items::-webkit-scrollbar-track {
-    background: var(--color-secondary);
-  }
+        /* ATRIBUTOS */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; }
+        .stat-box { 
+            background: #2c1a0a; border: 1px solid #4b2e0e; padding: 10px; text-align: center; border-radius: 6px; 
+            cursor: pointer; transition: 0.2s; 
+        }
+        .stat-box:hover { border-color: var(--gold); background: #3d2612; transform: translateY(-2px); }
+        .stat-box label { display: block; font-size: 0.7rem; color: var(--gold); font-family: 'Cinzel'; margin-bottom: 5px; }
+        .stat-box span { font-size: 1.8rem; font-family: 'MedievalSharp'; display: block; }
 
-  /* Responsividade */
-  @media (max-width: 768px) {
-    header {
-      flex-direction: column;
-      gap: 0.5rem;
-      padding: 0.8rem;
-      text-align: center;
-    }
-    
-    nav.tabs {
-      top: 112px;
-    }
-    
-    nav.tabs button {
-      min-width: 100px;
-      padding: 0.8rem 0.5rem;
-      font-size: 0.9rem;
-    }
-    
-    .character-info {
-      grid-template-columns: 1fr;
-    }
-    
-    .points-display {
-      grid-template-columns: 1fr;
-    }
-    
-    .attributes-grid {
-      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    }
-    
-    .modal-content {
-      margin: 2rem auto;
-      padding: 1rem;
-    }
-  }
+        /* INFO COMBATE */
+        .combat-info { display: flex; justify-content: space-around; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 8px; margin-top: 15px; border: 1px dashed var(--gold); }
+        .combat-item { text-align: center; }
+        .combat-item small { display: block; font-size: 0.65rem; color: var(--gold); letter-spacing: 1px; }
+        .combat-item span { font-family: 'MedievalSharp'; font-size: 1.2rem; }
 
-  @media (max-width: 480px) {
-    nav.tabs button {
-      flex: 1 1 50%;
-      min-width: 80px;
-      font-size: 0.8rem;
-      padding: 0.6rem 0.3rem;
-    }
-    
-    main.container {
-      padding: 1rem;
-      margin: 0.5rem;
-    }
-    
-    .character-card {
-      padding: 1rem;
-    }
-    
-    .dice-buttons {
-      grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
-    }
-  }
+        /* LISTAS (PERICIAS / LOJA) */
+        .list-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        @media(min-width: 600px) { .list-grid { grid-template-columns: 1fr 1fr; } }
+        
+        .list-item { 
+            background: rgba(0,0,0,0.4); padding: 12px; border-left: 3px solid var(--gold); border-bottom: 1px solid #333;
+            cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: 0.2s;
+        }
+        .list-item:hover { background: rgba(212,175,55,0.15); padding-left: 15px; }
+        .list-item strong { color: var(--gold); font-family: 'Cinzel'; display: block; }
+        .list-item small { color: #aaa; font-size: 0.8rem; font-style: italic; }
 
-  /* Animações */
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-  
-  .tab-content.active {
-    animation: fadeIn 0.3s ease;
-  }
-  
-  .dice-roll-animation {
-    animation: pulse 0.5s ease;
-  }
-  
-  @keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
-  }
-</style>
+        /* INVENTARIO E LOJA GRID */
+        .inv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px; }
+        .inv-slot { 
+            background: #2c1a0a; border: 1px solid #4b2e0e; padding: 10px; text-align: center; 
+            cursor: pointer; border-radius: 4px; transition: 0.2s; position: relative;
+        }
+        .inv-slot:hover { border-color: var(--gold-bright); }
+        .inv-slot img { width: 40px; height: 40px; object-fit: contain; margin-bottom: 5px; filter: drop-shadow(0 0 5px rgba(0,0,0,0.5)); }
+        .inv-price { color: var(--gold-bright); font-size: 0.85rem; font-weight: bold; margin-top: 5px; }
+
+        /* MAPA */
+        #map-container { background: #000; border: 2px solid var(--gold); position: relative; overflow: hidden; border-radius: 8px; height: 60vh; cursor: grab; }
+        #map-container:active { cursor: grabbing; }
+        #mapCanvas { display: block; width: 100%; height: 100%; }
+        
+        /* UTILITARIOS */
+        #music-alert { 
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: var(--gold); color: black; padding: 12px 25px; border-radius: 50px;
+            font-weight: bold; cursor: pointer; z-index: 1000; display: none;
+            box-shadow: 0 0 20px rgba(212,175,55,0.6); animation: pulse 2s infinite;
+        }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-content { background: url('https://www.transparenttextures.com/patterns/aged-paper.png'), var(--parchment); color: #1a0f06; padding: 30px; border-radius: 4px; max-width: 400px; text-align: center; border: 5px double #1a0f06; position: relative; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.05); } 100% { transform: translateX(-50%) scale(1); } }
+    </style>
 </head>
 <body>
 
 <header>
-  <h1>Zatur RPG - Jogador</h1>
-  <div id="character-name-header">Carregando...</div>
+    <h1 id="header-name">Carregando...</h1>
+    <div class="currency-bar">
+        <span>ℤ <span id="zeuro-val">0</span></span> | 
+        <span>XP: <span id="xp-val">0</span></span>
+    </div>
 </header>
 
-<nav class="tabs" role="tablist" aria-label="Seções da ficha do personagem">
-  <button class="tab-btn active" data-tab="overview" role="tab" aria-selected="true" aria-controls="overview" id="tab-overview">Visão Geral</button>
-  <button class="tab-btn" data-tab="attributes" role="tab" aria-selected="false" aria-controls="attributes" id="tab-attributes">Atributos</button>
-  <button class="tab-btn" data-tab="items" role="tab" aria-selected="false" aria-controls="items" id="tab-items">Itens</button>
-  <button class="tab-btn" data-tab="spells" role="tab" aria-selected="false" aria-controls="spells" id="tab-spells">Feitiços</button>
-  <button class="tab-btn" data-tab="dice" role="tab" aria-selected="false" aria-controls="dice" id="tab-dice">Rolagem de Dados</button>
+<nav class="tabs">
+    <button class="tab-btn active" data-tab="tab-ficha">Ficha</button>
+    <button class="tab-btn" data-tab="tab-hab">Perícias</button>
+    <button class="tab-btn" data-tab="tab-inv">Mochila</button>
+    <button class="tab-btn" data-tab="tab-shop">Loja</button>
+    <button class="tab-btn" data-tab="tab-map">Mapa</button>
 </nav>
 
-<main class="container" role="main">
-  <div id="loading" class="loading">Carregando personagem...</div>
+<div id="music-alert" onclick="activateAudio()">⚡ NOVA MÚSICA DISPONÍVEL</div>
 
-  <!-- Visão Geral -->
-  <section id="overview" class="tab-content active" role="tabpanel" aria-labelledby="tab-overview">
-    <div class="character-card">
-      <h2>Informações Básicas</h2>
-      <div class="character-info">
-        <div class="info-item">
-          <span class="info-label">Nome:</span>
-          <span id="char-name">-</span>
-        </div>
-        <div class="info-item">
-          <span class="info-label">Origem:</span>
-          <span id="char-origin">-</span>
-        </div>
-        <div class="info-item">
-          <span class="info-label">Classe:</span>
-          <span id="char-class">-</span>
-        </div>
-        <div class="info-item">
-          <span class="info-label">Clã:</span>
-          <span id="char-clan">-</span>
-        </div>
-        <div class="info-item">
-          <span class="info-label">Nível:</span>
-          <span id="char-level">-</span>
-        </div>
-        <div class="info-item">
-          <span class="info-label">Campanha:</span>
-          <span id="char-campaign">-</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Novo bloco para Zeuros -->
-    <div class="character-card">
-      <h2>Saldo de Zeuros</h2>
-      <div class="character-info">
-        <div class="info-item">
-          <span class="info-label">Zeuros:</span>
-          <span id="char-zeuros" style="font-weight:bold; font-family: monospace; font-size:1.3rem;">ℤ 0</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="points-display">
-      <div class="point-item">
-        <div class="point-value editable" id="hp-value" data-type="hp">0</div>
-        <div class="point-max" id="hp-max">Máx: 0</div>
-        <div class="point-label">Pontos de Vida</div>
-      </div>
-      <div class="point-item">
-        <div class="point-value editable" id="effort-value" data-type="effort">0</div>
-        <div class="point-max" id="effort-max">Máx: 0</div>
-        <div class="point-label">Pontos de Esforço</div>
-      </div>
-      <div class="point-item">
-        <div class="point-value editable" id="mana-value" data-type="mana">0</div>
-        <div class="point-max" id="mana-max">Máx: 0</div>
-        <div class="point-label">Pontos de Mana</div>
-      </div>
-    </div>
-
+<main class="container">
     
-  </section>
+    <section id="tab-ficha" class="tab-content active">
+        <div class="card">
+            <div class="status-container">
+                <div>
+                    <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--gold)">
+                        <span>VIDA</span> <span>(VIG x 100)</span>
+                    </div>
+                    <div class="status-bar">
+                        <div id="bar-pv" class="bar-fill" style="background:var(--red); width: 0%"></div>
+                        <div class="bar-label" id="txt-pv">0/0</div>
+                    </div>
+                </div>
+                <div>
+                    <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--gold)">
+                        <span>MANA</span> <span>(MANA x 20)</span>
+                    </div>
+                    <div class="status-bar">
+                        <div id="bar-pe" class="bar-fill" style="background:var(--blue); width: 0%"></div>
+                        <div class="bar-label" id="txt-pe">0/0</div>
+                    </div>
+                </div>
+            </div>
 
-  <!-- Atributos -->
-  <section id="attributes" class="tab-content" role="tabpanel" aria-labelledby="tab-attributes">
-    <div class="character-card">
-      <h2>Atributos do Personagem</h2>
-      <div class="attributes-grid">
-        <div class="attribute-card">
-          <div class="attribute-name">Força</div>
-          <div class="attribute-value" id="attr-strength">0</div>
-        </div>
-        <div class="attribute-card">
-          <div class="attribute-name">Agilidade</div>
-          <div class="attribute-value" id="attr-agility">0</div>
-        </div>
-        <div class="attribute-card">
-          <div class="attribute-name">Mana</div>
-          <div class="attribute-value" id="attr-mana">0</div>
-        </div>
-        <div class="attribute-card">
-          <div class="attribute-name">Intelecto</div>
-          <div class="attribute-value" id="attr-intellect">0</div>
-        </div>
-        <div class="attribute-card">
-          <div class="attribute-name">Vigor</div>
-          <div class="attribute-value" id="attr-vigor">0</div>
-        </div>
-      </div>
-    </div>
+            <div class="stats-grid" id="stats-area"></div>
 
-    <div class="character-card">
-      <h2>Perícias</h2>
-      <ul class="list-items" id="skills-list">
-        <li>Carregando perícias...</li>
-      </ul>
-    </div>
-  </section>
-
-  <!-- Itens -->
-  <section id="items" class="tab-content" role="tabpanel" aria-labelledby="tab-items">
-    <div class="character-card">
-      <h2>Inventário</h2>
-      <ul class="list-items" id="inventory-list">
-        <li>Carregando itens...</li>
-      </ul>
-    </div>
-
-    <div class="character-card">
-      <h2>Ferramentas</h2>
-      <ul class="list-items" id="tools-list">
-        <li>Carregando ferramentas...</li>
-      </ul>
-    </div>
-
-    <div class="character-card">
-      <h2>Equipamentos</h2>
-      <ul class="list-items" id="equipment-list">
-        <li>Carregando equipamentos...</li>
-      </ul>
-    </div>
-  </section>
-
-  <!-- Feitiços -->
-  <section id="spells" class="tab-content" role="tabpanel" aria-labelledby="tab-spells">
-    <div class="character-card">
-      <h2>Feitiços Conhecidos</h2>
-      <ul class="list-items" id="spells-list">
-        <li>Carregando feitiços...</li>
-      </ul>
-    </div>
-
-    <div class="character-card">
-      <h2>Habilidades Mágicas</h2>
-      <ul class="list-items" id="magic-abilities-list">
-        <li>Carregando habilidades mágicas...</li>
-      </ul>
-    </div>
-  </section>
-
-  <!-- Rolagem de Dados -->
-  <section id="dice" class="tab-content" role="tabpanel" aria-labelledby="tab-dice">
-    <div class="character-card">
-      <h2>Rolagem de Dados</h2>
-      <div class="dice-buttons">
-        <button data-dice="4">D4</button>
-        <button data-dice="6">D6</button>
-        <button data-dice="8">D8</button>
-        <button data-dice="10">D10</button>
-        <button data-dice="12">D12</button>
-        <button data-dice="20">D20</button>
-        <button data-dice="100">D100</button>
-      </div>
-      <div id="dice-result">Role os dados...</div>
-    </div>
-    <div class="character-card">
-      <h2>Rolagens de Atributos</h2>
-      <p>Clique em um atributo para rolar nD20 (onde n é o valor do atributo)</p>
-      <div class="attributes-grid" role="group" aria-label="Botões para rolar testes de atributo">
-        <div class="attribute-card" data-attr="Força">
-          <div class="attribute-name">Força</div>
-          <div class="attribute-value" id="roll-strength">0</div>
+            <div class="combat-info">
+                <div class="combat-item"><small>DEFESA TOTAL</small><span id="val-def">0</span></div>
+                <div class="combat-item"><small>DESLOCAMENTO</small><span id="val-desl">0m</span></div>
+                <div class="combat-item"><small>CARGA (KG)</small><span id="val-carga">0/0</span></div>
+            </div>
         </div>
-        <div class="attribute-card" data-attr="Agilidade">
-          <div class="attribute-name">Agilidade</div>
-          <div class="attribute-value" id="roll-agility">0</div>
+
+        <div class="card">
+            <h3 style="font-family:Cinzel; margin:0 0 10px 0; color:var(--gold); border-bottom:1px solid #444; padding-bottom:5px;">Identidade</h3>
+            <p style="font-size: 0.9rem; margin: 5px 0;"><b>Classe:</b> <span id="char-classe">-</span> | <b>Origem:</b> <span id="char-origem">-</span> | <b>Clã:</b> <span id="char-cla">-</span></p>
+            <p id="char-hist" style="font-style:italic; font-size:0.85rem; color:#aaa; margin-top:10px; line-height:1.4;"></p>
         </div>
-        <div class="attribute-card" data-attr="Mana">
-          <div class="attribute-name">Mana</div>
-          <div class="attribute-value" id="roll-mana">0</div>
+    </section>
+
+    <section id="tab-hab" class="tab-content">
+        <div class="card">
+            <h2>🧠 Perícias e Habilidades</h2>
+            <div class="list-grid" id="hab-list">
+                <p style="color:#666; font-style:italic;">Carregando habilidades...</p>
+            </div>
         </div>
-        <div class="attribute-card" data-attr="Intelecto">
-          <div class="attribute-name">Intelecto</div>
-          <div class="attribute-value" id="roll-intellect">0</div>
+    </section>
+
+    <section id="tab-inv" class="tab-content">
+        <div class="card">
+            <h2>🎒 Sua Mochila</h2>
+            <div class="inv-grid" id="inv-list"></div>
         </div>
-        <div class="attribute-card" data-attr="Vigor">
-          <div class="attribute-name">Vigor</div>
-          <div class="attribute-value" id="roll-vigor">0</div>
+    </section>
+
+    <section id="tab-shop" class="tab-content">
+        <div class="card">
+            <h2>🏛️ Mercado de Zatur</h2>
+            <p style="font-size:0.8rem; color:#888; margin-bottom:15px;">Clique em um item para comprar. Seu ouro é descontado automaticamente.</p>
+            <div class="inv-grid" id="shop-list"></div>
         </div>
-      </div>
-    </div>
-  </section>
+    </section>
+
+    <section id="tab-map" class="tab-content">
+        <div id="map-container">
+            <canvas id="mapCanvas"></canvas>
+            <div style="position: absolute; top: 10px; right: 10px; display: flex; flex-direction: column; gap: 5px;">
+                <button onclick="adjustZoom(0.1)" style="width:40px; height:40px; background:rgba(0,0,0,0.6); color:white; border:1px solid var(--gold); cursor:pointer; font-size:1.2rem;">+</button>
+                <button onclick="adjustZoom(-0.1)" style="width:40px; height:40px; background:rgba(0,0,0,0.6); color:white; border:1px solid var(--gold); cursor:pointer; font-size:1.2rem;">-</button>
+            </div>
+        </div>
+        <p style="text-align:center; color:#666; font-size:0.8rem; margin-top:5px;">Arraste seu círculo dourado para se mover.</p>
+    </section>
+
 </main>
 
-<!-- Modal para edição de pontos -->
-<div id="points-modal" class="modal">
-  <div class="modal-content">
-    <span class="close-modal">&times;</span>
-    <h2 id="modal-title">Editar Pontos</h2>
-    <div class="modal-form">
-      <label for="points-input">Novo valor:</label>
-      <input type="number" id="points-input" min="0" value="0">
-      <div>Valor máximo: <span id="points-max-value">0</span></div>
-      <button id="save-points">Salvar</button>
+<div id="modal" class="modal" onclick="this.style.display='none'">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <h3 id="m-title" style="font-family:Cinzel; margin-top:0; color:var(--gold-bright)"></h3>
+        <hr style="border-color:#1a0f06; opacity:0.3">
+        <div id="m-desc"></div>
     </div>
-  </div>
 </div>
 
+<audio id="bg-audio" loop></audio>
+
 <script type="module">
-// Firebase imports
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import {
-  getFirestore,
-  doc,
-  getDoc,
-  collection,
-  query,
-  where,
-  getDocs,
-  onSnapshot,
-  updateDoc
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, onSnapshot, getDoc, updateDoc, collection, getDocs, arrayUnion } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// Config Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyAgYVod9B99WIc_QysFx73htOf9O8XtuE8",
-  authDomain: "zatur-rpg.firebaseapp.com",
-  projectId: "zatur-rpg",
-  storageBucket: "zatur-rpg.firebasestorage.app",
-  messagingSenderId: "797058283992",
-  appId: "1:797058283992:web:7132e71691a225c1255aad"
-};
+    const firebaseConfig = {
+        apiKey: "AIzaSyAgYVod9B99WIc_QysFx73htOf9O8XtuE8",
+        authDomain: "zatur-rpg.firebaseapp.com",
+        projectId: "zatur-rpg",
+        storageBucket: "zatur-rpg.firebasestorage.app",
+        messagingSenderId: "797058283992",
+        appId: "1:797058283992:web:7132e71691a225c1255aad"
+    };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const charId = new URLSearchParams(window.location.search).get("id");
+    const audio = document.getElementById('bg-audio');
 
-// Pega o ID do personagem da query string ?id=...
-const urlParams = new URLSearchParams(window.location.search);
-const charId = urlParams.get("id");
+    let characterData = {};
 
-if (!charId) {
-  alert("ID do personagem não fornecido na URL.");
-  document.getElementById("loading").textContent = "ID do personagem não fornecido.";
-  throw new Error("ID do personagem não fornecido.");
-}
-
-// Variáveis globais
-let characterData = {};
-let maxHp = 0;
-let maxEffort = 0;
-let maxMana = 0;
-
-// --- CONTROLE DE ABAS ---
-const tabs = document.querySelectorAll("nav.tabs button");
-const tabContents = document.querySelectorAll("section.tab-content");
-
-tabs.forEach(tab => {
-  tab.addEventListener("click", () => {
-    tabs.forEach(t => {
-      t.classList.remove("active");
-      t.setAttribute("aria-selected", "false");
-    });
-    tab.classList.add("active");
-    tab.setAttribute("aria-selected", "true");
-
-    tabContents.forEach(tc => {
-      tc.classList.remove("active");
-    });
-    const target = tab.dataset.tab;
-    document.getElementById(target).classList.add("active");
-  });
-});
-
-// --- ROLAGEM DE DADOS ---
-const diceButtons = document.querySelectorAll(".dice-buttons button");
-const diceResult = document.getElementById("dice-result");
-
-diceButtons.forEach(btn => {
-  btn.addEventListener("click", () => {
-    // Rolagem de dados normais
-    if (btn.dataset.dice) {
-      const sides = parseInt(btn.dataset.dice);
-      const roll = Math.floor(Math.random() * sides) + 1;
-      diceResult.textContent = `Você rolou um D${sides} e tirou: ${roll}`;
-      diceResult.classList.add("dice-roll-animation");
-      setTimeout(() => diceResult.classList.remove("dice-roll-animation"), 500);
-    }
-  });
-});
-
-// --- ROLAGEM DE ATRIBUTOS (nD20) ---
-const attributeCards = document.querySelectorAll(".attribute-card[data-attr]");
-
-attributeCards.forEach(card => {
-  card.addEventListener("click", () => {
-    const attrName = card.dataset.attr;
-    const attrValue = parseInt(card.querySelector(".attribute-value").textContent) || 0;
-    
-    if (attrValue <= 0) {
-      diceResult.textContent = `Atributo ${attrName} é muito baixo para rolar dados.`;
-      return;
-    }
-    
-    // Rolagem de nD20
-    let rolls = [];
-    let total = 0;
-    
-    for (let i = 0; i < attrValue; i++) {
-      const roll = Math.floor(Math.random() * 20) + 1;
-      rolls.push(roll);
-      total += roll;
-    }
-    
-    const rollsText = rolls.join(" + ");
-    diceResult.textContent = `${attrValue}D20 (${attrName}): ${rollsText} = ${total}`;
-    diceResult.classList.add("dice-roll-animation");
-    setTimeout(() => diceResult.classList.remove("dice-roll-animation"), 500);
-  });
-});
-
-// --- MODAL PARA EDIÇÃO DE PONTOS ---
-const pointsModal = document.getElementById("points-modal");
-const closeModalBtn = document.querySelector(".close-modal");
-const modalTitle = document.getElementById("modal-title");
-const pointsInput = document.getElementById("points-input");
-const pointsMaxValue = document.getElementById("points-max-value");
-const savePointsBtn = document.getElementById("save-points");
-let currentPointType = "";
-
-// Fechar modal
-closeModalBtn.addEventListener("click", () => {
-  pointsModal.style.display = "none";
-});
-
-// Fechar modal clicando fora dele
-window.addEventListener("click", (e) => {
-  if (e.target === pointsModal) {
-    pointsModal.style.display = "none";
-  }
-});
-
-// Abrir modal para edição de pontos
-document.querySelectorAll(".point-value.editable").forEach(element => {
-  element.addEventListener("click", () => {
-    currentPointType = element.dataset.type;
-    const currentValue = parseInt(element.textContent);
-    let maxValue = 0;
-    
-    switch(currentPointType) {
-      case "hp":
-        maxValue = maxHp;
-        modalTitle.textContent = "Editar Pontos de Vida";
-        break;
-      case "effort":
-        maxValue = maxEffort;
-        modalTitle.textContent = "Editar Pontos de Esforço";
-        break;
-      case "mana":
-        maxValue = maxMana;
-        modalTitle.textContent = "Editar Pontos de Mana";
-        break;
-    }
-    
-    pointsInput.value = currentValue;
-    pointsInput.max = maxValue;
-    pointsMaxValue.textContent = maxValue;
-    
-    pointsModal.style.display = "block";
-  });
-});
-
-// Salvar pontos
-savePointsBtn.addEventListener("click", async () => {
-  const newValue = parseInt(pointsInput.value);
-  const maxValue = parseInt(pointsInput.max);
-  
-  if (isNaN(newValue) || newValue < 0) {
-    alert("Por favor, insira um valor válido.");
-    return;
-  }
-  
-  if (newValue > maxValue) {
-    alert(`O valor não pode ser maior que ${maxValue}.`);
-    return;
-  }
-  
-  try {
-    // Atualizar no Firebase
-    const charRef = doc(db, "characters", charId);
-    let fieldName = "";
-    
-    switch(currentPointType) {
-      case "hp":
-        fieldName = "Pontos de Vida Atuais";
-        break;
-      case "effort":
-        fieldName = "Pontos de Esforço Atuais";
-        break;
-      case "mana":
-        fieldName = "Pontos de Mana Atuais";
-        break;
-    }
-    
-    await updateDoc(charRef, {
-      [fieldName]: newValue
-    });
-    
-    // Atualizar localmente
-    document.getElementById(`${currentPointType}-value`).textContent = newValue;
-    
-    pointsModal.style.display = "none";
-    alert("Pontos atualizados com sucesso!");
-  } catch (error) {
-    console.error("Erro ao atualizar pontos:", error);
-    alert("Erro ao atualizar pontos. Tente novamente.");
-  }
-});
-
-// --- CARREGAR DADOS DO PERSONAGEM ---
-const loadingDiv = document.getElementById("loading");
-const charNameHeader = document.getElementById("character-name-header");
-
-// Elementos da visão geral
-const charName = document.getElementById("char-name");
-const charOrigin = document.getElementById("char-origin");
-const charClass = document.getElementById("char-class");
-const charClan = document.getElementById("char-clan");
-const charLevel = document.getElementById("char-level");
-const charCampaign = document.getElementById("char-campaign");
-const charZeuros = document.getElementById("char-zeuros");
-
-// Pontos
-const hpValue = document.getElementById("hp-value");
-const effortValue = document.getElementById("effort-value");
-const manaValue = document.getElementById("mana-value");
-const hpMax = document.getElementById("hp-max");
-const effortMax = document.getElementById("effort-max");
-const manaMax = document.getElementById("mana-max");
-
-// Atributos
-const attrStrength = document.getElementById("attr-strength");
-const attrAgility = document.getElementById("attr-agility");
-const attrMana = document.getElementById("attr-mana");
-const attrIntellect = document.getElementById("attr-intellect");
-const attrVigor = document.getElementById("attr-vigor");
-
-// Atributos para rolagem
-const rollStrength = document.getElementById("roll-strength");
-const rollAgility = document.getElementById("roll-agility");
-const rollMana = document.getElementById("roll-mana");
-const rollIntellect = document.getElementById("roll-intellect");
-const rollVigor = document.getElementById("roll-vigor");
-
-// Listas
-const skillsList = document.getElementById("skills-list");
-const inventoryList = document.getElementById("inventory-list");
-const toolsList = document.getElementById("tools-list");
-const equipmentList = document.getElementById("equipment-list");
-const spellsList = document.getElementById("spells-list");
-const magicAbilitiesList = document.getElementById("magic-abilities-list");
-
-// Função para carregar dados do personagem
-async function loadCharacter() {
-  const charRef = doc(db, "characters", charId);
-  const charSnap = await getDoc(charRef);
-  
-  if (!charSnap.exists()) {
-    alert("Personagem não encontrado.");
-    loadingDiv.textContent = "Personagem não encontrado.";
-    return;
-  }
-  
-  characterData = charSnap.data();
-  
-  // Preencher cabeçalho
-  charNameHeader.textContent = characterData.Nome || "Personagem Sem Nome";
-  
-  // Preencher visão geral
-  charName.textContent = characterData.Nome || "-";
-  charOrigin.textContent = characterData.Origem || "-";
-  charClass.textContent = characterData.Classe || "-";
-  charClan.textContent = characterData.Clã || "-";
-  charLevel.textContent = characterData.Nível || characterData.Nivel || 1;
-  
-  // Carregar nome da campanha se existir
-  if (characterData.Campanha) {
-    try {
-      const campaignRef = doc(db, "campaigns", characterData.Campanha);
-      const campaignSnap = await getDoc(campaignRef);
-      if (campaignSnap.exists()) {
-        const campaignData = campaignSnap.data();
-        charCampaign.textContent = campaignData.Nome || campaignData.name || "Campanha";
-      } else {
-        charCampaign.textContent = "Campanha não encontrada";
-      }
-    } catch (error) {
-      console.error("Erro ao carregar campanha:", error);
-      charCampaign.textContent = characterData.Campanha;
-    }
-  } else {
-    charCampaign.textContent = "Nenhuma campanha";
-  }
-  
-  // Atualizar saldo de Zeuros
-  const zeurosSaldo = characterData.Zeuro || 0;
-  charZeuros.textContent = `ℤ ${zeurosSaldo}`;
-  
-  // Calcular valores máximos
-  maxHp = characterData.Vigor ? 100 * parseInt(characterData.Vigor) : 0;
-  maxEffort = (characterData.Força && characterData.Agilidade) ? 
-              30 * (parseInt(characterData.Força) + parseInt(characterData.Agilidade)) : 0;
-  maxMana = characterData.Mana ? 200 * parseInt(characterData.Mana) : 0;
-  
-  // Preencher pontos (usar valores atuais se existirem, senão usar máximos)
-  const currentHp = characterData["Pontos de Vida Atuais"] || maxHp;
-  const currentEffort = characterData["Pontos de Esforço Atuais"] || maxEffort;
-  const currentMana = characterData["Pontos de Mana Atuais"] || maxMana;
-  
-  hpValue.textContent = currentHp;
-  effortValue.textContent = currentEffort;
-  manaValue.textContent = currentMana;
-  
-  hpMax.textContent = `Máx: ${maxHp}`;
-  effortMax.textContent = `Máx: ${maxEffort}`;
-  manaMax.textContent = `Máx: ${maxMana}`;
-  
-  // Preencher atributos
-  attrStrength.textContent = characterData.Força || characterData.Forca || 0;
-  attrAgility.textContent = characterData.Agilidade || 0;
-  attrMana.textContent = characterData.Mana || 0;
-  attrIntellect.textContent = characterData.Intelecto || 0;
-  attrVigor.textContent = characterData.Vigor || 0;
-  
-  // Preencher atributos para rolagem
-  rollStrength.textContent = characterData.Força || characterData.Forca || 0;
-  rollAgility.textContent = characterData.Agilidade || 0;
-  rollMana.textContent = characterData.Mana || 0;
-  rollIntellect.textContent = characterData.Intelecto || 0;
-  rollVigor.textContent = characterData.Vigor || 0;
-
-  // Carregar perícias
-  loadSkills();
-  
-  // Carregar itens, ferramentas e equipamentos
-  loadItems();
-  
-  // Carregar feitiços e habilidades mágicas
-  loadSpells();
-  
-  // Esconder loading e mostrar conteúdo
-  loadingDiv.style.display = "none";
-}
-
-// Função para carregar perícias
-async function loadSkills() {
-  skillsList.innerHTML = "";
-  
-  // Verificar se há perícias definidas
-  if (characterData.pericias && Array.isArray(characterData.pericias) && characterData.pericias.length > 0) {
-    // Carregar cada perícia pelo ID
-    for (const skillId of characterData.pericias) {
-      try {
-        const skillRef = doc(db, "skills", skillId);
-        const skillSnap = await getDoc(skillRef);
+    // --- FUNÇÃO DE ROLAGEM (D20 + BÔNUS) ---
+    window.rolar = (nome, bonus) => {
+        const dado = Math.floor(Math.random() * 20) + 1;
+        const total = dado + bonus;
+        let cor = "#1a0f06";
+        let msg = "Normal";
         
-        if (skillSnap.exists()) {
-          const skill = skillSnap.data();
-          const li = document.createElement("li");
-          li.className = "item-with-description";
-          
-          li.innerHTML = `
-            <div>${skill.Nome || "Perícia sem nome"}</div>
-            <div class="item-description">${skill.Descrição || "Sem descrição"}</div>
-          `;
-          
-          // Adicionar evento para mostrar/ocultar descrição
-          li.addEventListener("click", function() {
-            const description = this.querySelector(".item-description");
-            description.style.display = description.style.display === "block" ? "none" : "block";
-          });
-          
-          skillsList.appendChild(li);
-        }
-      } catch (error) {
-        console.error(`Erro ao carregar perícia ${skillId}:`, error);
-        const li = document.createElement("li");
-        li.textContent = `Erro ao carregar perícia: ${skillId}`;
-        skillsList.appendChild(li);
-      }
-    }
-  } else {
-    skillsList.innerHTML = "<li>Nenhuma perícia atribuída</li>";
-  }
-}
+        if(dado === 20) { msg = "CRÍTICO!"; cor = "#8b0000"; }
+        else if(dado === 1) { msg = "FALHA CRÍTICA!"; cor = "#555"; }
+        else if(total >= 15) { msg = "Sucesso"; cor = "#006400"; }
+        
+        document.getElementById('m-title').innerText = nome;
+        document.getElementById('m-desc').innerHTML = `
+            <div style="font-size:4rem; font-family:MedievalSharp; color:${cor};">${total}</div>
+            <p style="font-size:1.1rem">Dado (${dado}) + Bônus (${bonus})</p>
+            <p style="font-weight:bold; text-transform:uppercase; color:${cor}">${msg}</p>
+        `;
+        document.getElementById('modal').style.display = 'flex';
+    };
 
-// Função para carregar itens, ferramentas e equipamentos
-async function loadItems() {
-  try {
-    inventoryList.innerHTML = "";
-    toolsList.innerHTML = "";
-    equipmentList.innerHTML = "";
-    
-    // Carregar itens comuns
-    if (characterData.itens && Array.isArray(characterData.itens) && characterData.itens.length > 0) {
-      for (const itemId of characterData.itens) {
-        try {
-          const itemRef = doc(db, "items", itemId);
-          const itemSnap = await getDoc(itemRef);
-          
-          if (itemSnap.exists()) {
-            const item = itemSnap.data();
-            const li = document.createElement("li");
-            li.className = "item-with-description";
-            
-            li.innerHTML = `
-              <div>${item.Nome || "Item sem nome"}</div>
-              <div class="item-description">${item.Descrição || item.Tipo || "Sem descrição"}</div>
-            `;
-            
-            // Adicionar evento para mostrar/ocultar descrição
-            li.addEventListener("click", function() {
-              const description = this.querySelector(".item-description");
-              description.style.display = description.style.display === "block" ? "none" : "block";
-            });
-            
-            inventoryList.appendChild(li);
-          }
-        } catch (error) {
-          console.error(`Erro ao carregar item ${itemId}:`, error);
-        }
-      }
-    } else {
-      inventoryList.innerHTML = "<li>Nenhum item no inventário</li>";
-    }
-    
-    // Carregar ferramentas
-    if (characterData.ferramentas && Array.isArray(characterData.ferramentas) && characterData.ferramentas.length > 0) {
-      for (const toolId of characterData.ferramentas) {
-        try {
-          const toolRef = doc(db, "items", toolId);
-          const toolSnap = await getDoc(toolRef);
-          
-          if (toolSnap.exists()) {
-            const tool = toolSnap.data();
-            const li = document.createElement("li");
-            li.className = "item-with-description";
-            
-            li.innerHTML = `
-              <div>${tool.Nome || "Ferramenta sem nome"}</div>
-              <div class="item-description">${tool.Descrição || tool.Tipo || "Sem descrição"}</div>
-            `;
-            
-            // Adicionar evento para mostrar/ocultar descrição
-            li.addEventListener("click", function() {
-              const description = this.querySelector(".item-description");
-              description.style.display = description.style.display === "block" ? "none" : "block";
-            });
-            
-            toolsList.appendChild(li);
-          }
-        } catch (error) {
-          console.error(`Erro ao carregar ferramenta ${toolId}:`, error);
-        }
-      }
-    } else {
-      toolsList.innerHTML = "<li>Nenhuma ferramenta</li>";
-    }
-    
-    // Verificar se há equipamentos (não implementado ainda)
-    equipmentList.innerHTML = "<li>Nenhum equipamento</li>";
-    
-  } catch (error) {
-    console.error("Erro ao carregar itens:", error);
-    inventoryList.innerHTML = "<li>Erro ao carregar itens</li>";
-    toolsList.innerHTML = "<li>Erro ao carregar ferramentas</li>";
-    equipmentList.innerHTML = "<li>Erro ao carregar equipamentos</li>";
-  }
-}
+    // --- CARREGAMENTO DE DADOS ---
+    if (charId) {
+        // 1. DADOS DO PERSONAGEM (Tempo Real)
+        onSnapshot(doc(db, "characters", charId), (snap) => {
+            if (!snap.exists()) return;
+            const d = snap.data();
+            characterData = d; 
 
-// Função para carregar feitiços e habilidades mágicas
-async function loadSpells() {
-  try {
-    spellsList.innerHTML = "";
-    magicAbilitiesList.innerHTML = "";
-    
-    // Carregar feitiços
-    if (characterData.feiticos && Array.isArray(characterData.feiticos) && characterData.feiticos.length > 0) {
-      for (const spellId of characterData.feiticos) {
-        try {
-          const spellRef = doc(db, "spells", spellId);
-          const spellSnap = await getDoc(spellRef);
-          
-          if (spellSnap.exists()) {
-            const spell = spellSnap.data();
-            const li = document.createElement("li");
-            li.className = "item-with-description";
-            
-            li.innerHTML = `
-              <div>${spell.Nome || "Feitiço sem nome"}</div>
-              <div class="item-description">${spell.Descrição || "Sem descrição"}</div>
-            `;
-            
-            // Adicionar evento para mostrar/ocultar descrição
-            li.addEventListener("click", function() {
-              const description = this.querySelector(".item-description");
-              description.style.display = description.style.display === "block" ? "none" : "block";
-            });
-            
-            spellsList.appendChild(li);
-          }
-        } catch (error) {
-          console.error(`Erro ao carregar feitiço ${spellId}:`, error);
-        }
-      }
-    } else {
-      spellsList.innerHTML = "<li>Nenhum feitiço conhecido</li>";
-    }
-    
-    // Carregar habilidades mágicas
-    if (characterData.habilidades_magicas && Array.isArray(characterData.habilidades_magicas) && characterData.habilidades_magicas.length > 0) {
-      for (const magicId of characterData.habilidades_magicas) {
-        try {
-          const magicRef = doc(db, "items", magicId);
-          const magicSnap = await getDoc(magicRef);
-          
-          if (magicSnap.exists()) {
-            const magic = magicSnap.data();
-            const li = document.createElement("li");
-            li.className = "item-with-description";
-            
-            li.innerHTML = `
-              <div>${magic.Nome || "Habilidade sem nome"}</div>
-              <div class="item-description">${magic.Descrição || magic.Tipo || "Sem descrição"}</div>
-            `;
-            
-            // Adicionar evento para mostrar/ocultar descrição
-            li.addEventListener("click", function() {
-              const description = this.querySelector(".item-description");
-              description.style.display = description.style.display === "block" ? "none" : "block";
-            });
-            
-            magicAbilitiesList.appendChild(li);
-          }
-        } catch (error) {
-          console.error(`Erro ao carregar habilidade mágica ${magicId}:`, error);
-        }
-      }
-    } else {
-      magicAbilitiesList.innerHTML = "<li>Nenhuma habilidade mágica</li>";
-    }
-    
-  } catch (error) {
-    console.error("Erro ao carregar feitiços:", error);
-    spellsList.innerHTML = "<li>Erro ao carregar feitiços</li>";
-    magicAbilitiesList.innerHTML = "<li>Erro ao carregar habilidades</li>";
-  }
-}
+            // Header
+            document.getElementById('header-name').innerText = d.Nome;
+            document.getElementById('zeuro-val').innerText = d.Zeuro || 0;
+            document.getElementById('xp-val').innerText = d.XP || 0;
 
-// Inicializar a página
-loadCharacter();
+            // Identidade
+            document.getElementById('char-classe').innerText = d.Classe || "Desconhecido";
+            document.getElementById('char-origem').innerText = d.Origem || "Desconhecido";
+            document.getElementById('char-cla').innerText = d.Clã || "Nenhum";
+            document.getElementById('char-hist').innerText = d.Historia || "Sem registros...";
+
+            // Barras e Status
+            const maxPV = d.PV_Max || (d.Vigor * 100);
+            const maxPE = d.PE_Max || (d.Mana * 20);
+            updateBar('pv', d.PV, maxPV);
+            updateBar('pe', d.PE, maxPE);
+
+            // Estatísticas Calculadas
+            document.getElementById('val-def').innerText = (d.Força || 0) + (d.Agilidade || 0) + (d.Defesa_Equip || 0);
+            document.getElementById('val-desl').innerText = ((d.Agilidade || 0) + 5) + "m";
+            const pesoTotal = d.itens ? d.itens.length : 0; 
+            document.getElementById('val-carga').innerText = `${pesoTotal} / ${(d.Força + d.Vigor) * 2}`;
+
+            // Renderizar Atributos
+            const stats = ["Força", "Agilidade", "Mana", "Intelecto", "Vigor"];
+            document.getElementById('stats-area').innerHTML = stats.map(s => `
+                <div class="stat-box" onclick="window.rolar('${s}', ${d[s] || 0})">
+                    <label>${s.toUpperCase()}</label>
+                    <span>${d[s] || 0}</span>
+                </div>
+            `).join('');
+
+            // Renderizar Listas (CORRIGIDO PARA BUSCAR NAS COLEÇÕES CERTAS)
+            renderSkills(d.pericias || []);
+            renderInventory(d.itens || []);
+        });
+
+        // 2. DADOS DO MUNDO
+        onSnapshot(doc(db, "campaign_settings", "global"), (snap) => {
+            if (!snap.exists()) return;
+            const conf = snap.data();
+            
+            if (conf.musica_url && audio.src !== conf.musica_url) {
+                audio.src = conf.musica_url;
+                document.getElementById('music-alert').style.display = 'block';
+            }
+            
+            if (conf.mapa_url && mapImg.src !== conf.mapa_url) {
+                mapImg.src = conf.mapa_url;
+                mapImg.onload = () => { 
+                    canvas.width = mapImg.width; 
+                    canvas.height = mapImg.height; 
+                    renderMap(); 
+                };
+            }
+            tokens = conf.posicoes || {};
+            renderMap();
+        });
+
+        // Carrega a Loja (Items)
+        renderShop();
+    }
+
+    function updateBar(type, current, max) {
+        if(!max) max = 1;
+        const pct = Math.min(100, Math.max(0, (current / max) * 100));
+        document.getElementById(`bar-${type}`).style.width = `${pct}%`;
+        document.getElementById(`txt-${type}`).innerText = `${current}/${max}`;
+    }
+
+    // --- BUSCA PERÍCIAS NA COLEÇÃO "SKILLS" ---
+    async function renderSkills(listaIds) {
+        const container = document.getElementById('hab-list');
+        container.innerHTML = "";
+        
+        if(listaIds.length === 0) {
+            container.innerHTML = "<p>Nenhuma habilidade conhecida.</p>";
+            return;
+        }
+
+        for (const id of listaIds) {
+            let nome = id; 
+            let desc = "";
+            let bonus = 0;
+
+            // Busca na coleção SKILLS
+            try {
+                const itemSnap = await getDoc(doc(db, "skills", id));
+                if (itemSnap.exists()) {
+                    const data = itemSnap.data();
+                    nome = data.Nome;
+                    desc = data.Descricao;
+                }
+            } catch(e) { console.log("Skill não encontrada:", id); }
+
+            // Calcular Bônus Automático
+            const matches = nome.match(/\((.*?)\)/);
+            if (matches) {
+                const map = { "FOR": "Força", "AGI": "Agilidade", "MANA": "Mana", "INTC": "Intelecto", "VIG": "Vigor" };
+                const sigla = matches[1].toUpperCase();
+                if(map[sigla]) bonus = characterData[map[sigla]] || 0;
+            }
+
+            const div = document.createElement('div');
+            div.className = 'list-item';
+            div.innerHTML = `
+                <div>
+                    <strong>${nome}</strong>
+                    ${desc ? `<small>${desc}</small>` : ''}
+                </div>
+                <span style="font-family:MedievalSharp; font-size:1.2rem">+${bonus}</span>
+            `;
+            div.onclick = () => window.rolar(nome, bonus);
+            container.appendChild(div);
+        }
+    }
+
+    // --- BUSCA ITENS NA COLEÇÃO "ITEMS" ---
+    async function renderInventory(ids) {
+        const area = document.getElementById('inv-list');
+        area.innerHTML = "";
+        for (const id of ids) {
+            // Busca na coleção ITEMS
+            const itemSnap = await getDoc(doc(db, "items", id));
+            if (itemSnap.exists()) {
+                const data = itemSnap.data();
+                area.innerHTML += `
+                    <div class="inv-slot" onclick="alert('${data.Descricao || data.Nome}')">
+                        <img src="${data.Imagem || 'https://cdn-icons-png.flaticon.com/512/1251/1251784.png'}">
+                        <div>${data.Nome}</div>
+                    </div>`;
+            }
+        }
+    }
+
+    // --- LOJA (ITENS) ---
+    async function renderShop() {
+        const container = document.getElementById('shop-list');
+        container.innerHTML = "Carregando mercadorias...";
+        
+        const q = await getDocs(collection(db, "items"));
+        container.innerHTML = "";
+        
+        q.forEach(docSnap => {
+            const item = docSnap.data();
+            if(item.Preco && item.Preco > 0) {
+                const div = document.createElement('div');
+                div.className = 'inv-slot';
+                div.innerHTML = `
+                    <img src="${item.Imagem || 'https://cdn-icons-png.flaticon.com/512/1251/1251784.png'}">
+                    <div>${item.Nome}</div>
+                    <div class="inv-price">ℤ ${item.Preco}</div>
+                `;
+                div.onclick = () => comprarItem(docSnap.id, item.Nome, item.Preco);
+                container.appendChild(div);
+            }
+        });
+    }
+
+    async function comprarItem(id, nome, preco) {
+        if((characterData.Zeuro || 0) < preco) {
+            alert("Você não tem Zeuros suficientes!");
+            return;
+        }
+        if(confirm(`Comprar ${nome} por ℤ ${preco}?`)) {
+            try {
+                await updateDoc(doc(db, "characters", charId), {
+                    Zeuro: (characterData.Zeuro || 0) - preco,
+                    itens: arrayUnion(id)
+                });
+                alert("Compra realizada com sucesso!");
+            } catch(e) {
+                alert("Erro ao comprar: " + e.message);
+            }
+        }
+    }
+
+    // --- SISTEMA DE MAPA ---
+    const canvas = document.getElementById('mapCanvas');
+    const ctx = canvas.getContext('2d');
+    let mapImg = new Image();
+    let tokens = {};
+    let zoom = 1.0;
+    let isDragging = false;
+
+    function renderMap() {
+        if (!mapImg.src) return;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.drawImage(mapImg, 0, 0, canvas.width * zoom, canvas.height * zoom);
+
+        for (let id in tokens) {
+            const t = tokens[id];
+            ctx.beginPath();
+            ctx.arc(t.x * zoom, t.y * zoom, 25 * zoom, 0, Math.PI * 2);
+            ctx.fillStyle = (id === charId) ? "#d4af37" : "#800000"; 
+            ctx.fill();
+            ctx.strokeStyle = "white"; ctx.lineWidth = 3; ctx.stroke();
+            
+            ctx.fillStyle = "white"; 
+            ctx.font = `bold ${14 * zoom}px Arial`;
+            ctx.textAlign = "center"; 
+            ctx.fillText(t.nome || "Player", t.x * zoom, (t.y + 45) * zoom);
+        }
+    }
+
+    canvas.onmousedown = (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const mouseX = (e.clientX - rect.left) / (rect.width / canvas.width) / zoom;
+        const mouseY = (e.clientY - rect.top) / (rect.height / canvas.height) / zoom;
+        
+        if (tokens[charId]) {
+            const dist = Math.sqrt((mouseX - tokens[charId].x)**2 + (mouseY - tokens[charId].y)**2);
+            if (dist < 30) isDragging = true;
+        }
+    };
+
+    canvas.onmousemove = (e) => {
+        if (isDragging) {
+            const rect = canvas.getBoundingClientRect();
+            tokens[charId].x = (e.clientX - rect.left) / (rect.width / canvas.width) / zoom;
+            tokens[charId].y = (e.clientY - rect.top) / (rect.height / canvas.height) / zoom;
+            renderMap();
+        }
+    };
+
+    canvas.onmouseup = async () => {
+        if (isDragging) {
+            await updateDoc(doc(db, "campaign_settings", "global"), { 
+                [`posicoes.${charId}`]: tokens[charId] 
+            });
+        }
+        isDragging = false;
+    };
+
+    window.adjustZoom = (val) => { zoom += val; if(zoom < 0.2) zoom = 0.2; renderMap(); };
+    window.activateAudio = () => { audio.play(); document.getElementById('music-alert').style.display = 'none'; };
+
+    // --- NAVEGAÇÃO ---
+    document.querySelectorAll('.tab-btn').forEach(b => {
+        b.onclick = () => {
+            document.querySelectorAll('.tab-btn, .tab-content').forEach(e => e.classList.remove('active'));
+            b.classList.add('active');
+            document.getElementById(b.dataset.tab).classList.add('active');
+            if(b.dataset.tab === 'tab-map') setTimeout(renderMap, 100);
+        };
+    });
+
 </script>
 </body>
 </html>
