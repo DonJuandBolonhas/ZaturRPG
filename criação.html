@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zatur - Criação de Herói</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=MedievalSharp&family=Lora:ital@0;1&display=swap');
+
+        :root {
+            --gold: #d4af37; 
+            --gold-glow: #ffeebb;
+            --bg: #0b0704; 
+            --panel: rgba(20, 15, 10, 0.95);
+            --border: #4b2e0e;
+        }
+
+        body {
+            font-family: 'MedievalSharp', cursive;
+            background-color: var(--bg);
+            background-image: url('https://www.transparenttextures.com/patterns/black-linen.png');
+            color: #f0e6d2;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .creation-container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--panel);
+            border: 2px solid var(--gold);
+            border-radius: 8px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Header Decorativo */
+        .header {
+            background: linear-gradient(to bottom, #2c1a0a, #16100a);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid var(--gold);
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            color: var(--gold);
+            margin: 0;
+            font-size: 2rem;
+            text-shadow: 0 2px 4px black;
+            letter-spacing: 2px;
+        }
+
+        h2 { font-size: 1.1rem; color: #888; border-bottom: 1px solid #333; margin-bottom: 15px; padding-bottom: 5px; }
+
+        .content { padding: 30px; }
+
+        /* GRID LAYOUT */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        @media(min-width: 600px) {
+            .form-grid { grid-template-columns: 1fr 1fr; }
+            .full-width { grid-column: span 2; }
+        }
+
+        /* INPUTS */
+        label { display: block; color: var(--gold); margin-bottom: 5px; font-size: 0.9rem; text-transform: uppercase; }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            background: #000;
+            border: 1px solid var(--border);
+            color: white;
+            font-family: 'Lora', serif;
+            font-size: 1rem;
+            border-radius: 4px;
+            box-sizing: border-box;
+            transition: 0.3s;
+        }
+        input:focus, textarea:focus { border-color: var(--gold); outline: none; box-shadow: 0 0 10px rgba(212, 175, 55, 0.2); }
+
+        /* ATRIBUTOS COUNTER */
+        .attr-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.03);
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            border: 1px solid transparent;
+        }
+        .attr-row:hover { border-color: #333; }
+
+        .attr-controls { display: flex; align-items: center; gap: 10px; }
+        
+        .btn-circle {
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            border: 1px solid var(--gold);
+            background: #1a0f06;
+            color: var(--gold);
+            cursor: pointer;
+            font-weight: bold;
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.2s;
+        }
+        .btn-circle:hover { background: var(--gold); color: black; }
+
+        .attr-value { font-size: 1.4rem; width: 30px; text-align: center; }
+
+        /* BOTÃO SALVAR */
+        .btn-submit {
+            width: 100%;
+            padding: 15px;
+            margin-top: 20px;
+            background: linear-gradient(to right, #8a7018, #d4af37, #8a7018);
+            border: none;
+            color: #0b0704;
+            font-family: 'Cinzel';
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .btn-submit:hover { filter: brightness(1.2); transform: scale(1.01); }
+
+    </style>
+</head>
+<body>
+
+<div class="creation-container">
+    <div class="header">
+        <h1>Novo Aventureiro</h1>
+        <small style="color:#aaa">Preencha sua ficha para entrar em Zatur</small>
+    </div>
+
+    <div class="content">
+        <div class="form-grid">
+            
+            <div class="full-width">
+                <h2>📜 Identidade</h2>
+            </div>
+            
+            <div class="full-width">
+                <label>Nome do Personagem</label>
+                <input type="text" id="char-name" placeholder="Ex: Galahad, o Bravo">
+            </div>
+
+            <div>
+                <label>Link da Imagem (Avatar)</label>
+                <input type="text" id="char-img" placeholder="https://... (JPG/PNG)">
+            </div>
+            
+            <div>
+                <label>Origem / Antecedente</label>
+                <input type="text" id="char-origin" placeholder="Ex: Camponês, Nobre...">
+            </div>
+
+            <div>
+                <label>Classe</label>
+                <input type="text" id="char-class" placeholder="Ex: Guerreiro, Mago...">
+            </div>
+
+            <div>
+                <label>Clã / Raça</label>
+                <input type="text" id="char-clan" placeholder="Ex: Humano, Elfo...">
+            </div>
+
+            <div class="full-width">
+                <label>Breve História</label>
+                <textarea id="char-story" rows="3" placeholder="Como você chegou até aqui?"></textarea>
+            </div>
+
+            <div class="full-width" style="margin-top:20px;">
+                <div style="display:flex; justify-content:space-between; align-items:flex-end; border-bottom:1px solid #333; margin-bottom:10px;">
+                    <h2>⚔️ Atributos</h2>
+                    <span style="color:#666; font-size:0.9rem">Pontos Gastos: <span id="total-points" style="color:var(--gold)">0</span></span>
+                </div>
+            </div>
+
+            <div class="full-width" id="attributes-area">
+                </div>
+
+        </div>
+
+        <button class="btn-submit" id="btn-create">Forjar Destino</button>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAgYVod9B99WIc_QysFx73htOf9O8XtuE8",
+        authDomain: "zatur-rpg.firebaseapp.com",
+        projectId: "zatur-rpg",
+        storageBucket: "zatur-rpg.firebasestorage.app",
+        messagingSenderId: "797058283992",
+        appId: "1:797058283992:web:7132e71691a225c1255aad"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // CONFIGURAÇÃO DOS ATRIBUTOS
+    const attributes = [
+        { id: 'forca', label: 'Força' },
+        { id: 'agilidade', label: 'Agilidade' },
+        { id: 'intelecto', label: 'Intelecto' },
+        { id: 'vigor', label: 'Vigor' },
+        { id: 'mana', label: 'Mana (Attr)' }
+    ];
+
+    const values = { forca: 0, agilidade: 0, intelecto: 0, vigor: 0, mana: 0 };
+
+    function renderAttributes() {
+        const container = document.getElementById('attributes-area');
+        container.innerHTML = '';
+        let total = 0;
+
+        attributes.forEach(attr => {
+            total += values[attr.id];
+            const div = document.createElement('div');
+            div.className = 'attr-row';
+            div.innerHTML = `
+                <span style="color:#ddd; font-family:'Cinzel'">${attr.label}</span>
+                <div class="attr-controls">
+                    <button class="btn-circle" onclick="updateAttr('${attr.id}', -1)">-</button>
+                    <span class="attr-value">${values[attr.id]}</span>
+                    <button class="btn-circle" onclick="updateAttr('${attr.id}', 1)">+</button>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+        document.getElementById('total-points').innerText = total;
+    }
+
+    // Função global para o HTML acessar
+    window.updateAttr = (id, delta) => {
+        const newVal = values[id] + delta;
+        if(newVal >= 0 && newVal <= 20) { // Limite simples de 0 a 20
+            values[id] = newVal;
+            renderAttributes();
+        }
+    };
+
+    renderAttributes();
+
+    document.getElementById('btn-create').onclick = async () => {
+        const btn = document.getElementById('btn-create');
+        const nome = document.getElementById('char-name').value;
+        
+        if(!nome) return alert("O herói precisa de um nome!");
+
+        btn.innerText = "Forjando...";
+        btn.disabled = true;
+
+        try {
+            // Calcula status derivados automaticamente
+            const pvMax = Math.max(10, values.vigor * 100);
+            const peMax = Math.max(10, values.mana * 20);
+
+            const docRef = await addDoc(collection(db, "characters"), {
+                // Identidade
+                Nome: nome,
+                Imagem: document.getElementById('char-img').value,
+                Origem: document.getElementById('char-origin').value,
+                Classe: document.getElementById('char-class').value,
+                Clã: document.getElementById('char-clan').value,
+                Historia: document.getElementById('char-story').value,
+
+                // Atributos (Definidos pelo Player)
+                Força: values.forca,
+                Agilidade: values.agilidade,
+                Intelecto: values.intelecto,
+                Vigor: values.vigor,
+                Mana: values.mana,
+
+                // Derivados (Calculados)
+                PV: pvMax,
+                PV_Max: pvMax,
+                PE: peMax,
+                PE_Max: peMax,
+                Defesa_Equip: 0, // Padrão
+
+                // Controlados pelo Mestre (Iniciam zerados)
+                XP: 0,
+                Zeuro: 0,
+                itens: [],
+                pericias: []
+            });
+
+            // Sucesso!
+            alert(`Ave, ${nome}! Seu destino foi selado.\nID do Personagem: ${docRef.id}`);
+            
+            // Redireciona para a ficha visualizando o personagem criado
+            window.location.href = `ficha.html?id=${docRef.id}`;
+
+        } catch (e) {
+            console.error(e);
+            alert("Erro ao criar personagem: " + e.message);
+            btn.innerText = "Tentar Novamente";
+            btn.disabled = false;
+        }
+    };
+</script>
+
+</body>
+</html>
