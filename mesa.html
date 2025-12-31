@@ -45,6 +45,16 @@
         }
         #btn-enter:hover { background: var(--gold); color: #000; box-shadow: 0 0 40px var(--gold); }
 
+        /* === MISSÃO ATUAL (NOVO) === */
+        #mission-bar {
+            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+            z-index: 20; background: linear-gradient(90deg, transparent, rgba(0,0,0,0.9), transparent);
+            padding: 10px 40px; border-bottom: 2px solid var(--gold-dim);
+            text-align: center; pointer-events: none; width: 60%;
+        }
+        .mission-title { color: var(--gold); font-family: 'Cinzel'; font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; display: block; margin-bottom: 5px; }
+        .mission-text { color: #fff; font-family: 'MedievalSharp'; font-size: 1.4rem; text-shadow: 0 2px 4px #000; }
+
         /* === MAPA === */
         #map-layer { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; background: #080808; }
         
@@ -62,6 +72,7 @@
             background: var(--panel-bg); border-left: 3px solid var(--gold-dim);
             z-index: 10; display: flex; flex-direction: column;
             box-shadow: -10px 0 50px rgba(0,0,0,1);
+            transition: transform 0.3s ease;
         }
 
         /* CABEÇALHO DO PERSONAGEM */
@@ -185,8 +196,13 @@
 
 <div id="start-overlay">
     <h1 style="font-family:'Cinzel'; font-size:4rem; color:var(--gold); margin:0; text-shadow:0 0 20px black;">ZATUR</h1>
-    <p style="color:#aaa; font-family:'Roboto'; letter-spacing:1px; margin-bottom:40px;">Mesa de RPG Virtual v3.0</p>
+    <p style="color:#aaa; font-family:'Roboto'; letter-spacing:1px; margin-bottom:40px;">Mesa de RPG Virtual v3.1</p>
     <button id="btn-enter" onclick="enterGame()">Entrar na Sessão</button>
+</div>
+
+<div id="mission-bar">
+    <span class="mission-title">📜 Objetivo Atual</span>
+    <div id="mission-display" class="mission-text">Aguardando ordens...</div>
 </div>
 
 <audio id="bg-audio" loop></audio>
@@ -211,6 +227,9 @@
     <p class="section-label">Configuração da Cena</p>
     <input type="text" id="gm-map" class="gm-inp" placeholder="URL Imagem do Mapa">
     <input type="text" id="gm-music" class="gm-inp" placeholder="URL Música (MP3)">
+    
+    <input type="text" id="gm-mission-input" class="gm-inp" placeholder="Texto da Missão Atual">
+    
     <button class="btn-action btn-roll" onclick="syncWorld()">Sincronizar Mundo</button>
     
     <p class="section-label" style="margin-top:15px">Tokens</p>
@@ -300,7 +319,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, onSnapshot, getDoc, collection, updateDoc, addDoc, query, orderBy, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, onSnapshot, getDoc, collection, updateDoc, setDoc, addDoc, query, orderBy, limit, serverTimestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyAgYVod9B99WIc_QysFx73htOf9O8XtuE8",
@@ -321,25 +340,27 @@
     let audio = document.getElementById('bg-audio');
     let hasInteracted = false;
 
-    // === INICIALIZAÇÃO ===
+    // --- INICIALIZAÇÃO ---
     window.enterGame = () => {
         document.getElementById('start-overlay').style.display = 'none';
         hasInteracted = true;
         if(audio.src) audio.play().catch(e => console.log("Audio play failed", e));
-        if(!charId) alert("ID do personagem não encontrado na URL!");
-        else initSystem();
+        if(!charId) alert("ID do personagem não encontrado na URL! Modo Espectador/Mestre");
+        initSystem();
     };
 
     function initSystem() {
-        // Carregar Personagem
-        onSnapshot(doc(db, "characters", charId), (snap) => {
-            if(!snap.exists()) return;
-            playerData = snap.data();
-            updateHUD();
-            loadAssets(); // Recarrega itens e opções de combate
-        });
+        // Carregar Personagem (se houver ID)
+        if(charId) {
+            onSnapshot(doc(db, "characters", charId), (snap) => {
+                if(!snap.exists()) return;
+                playerData = snap.data();
+                updateHUD();
+                loadAssets();
+            });
+        }
 
-        // Carregar Inimigos
+        // Carregar Inimigos (Combate)
         onSnapshot(collection(db, "active_encounters"), (snap) => {
             const container = document.getElementById('list-enemies');
             container.innerHTML = "";
@@ -397,27 +418,44 @@
             container.scrollTop = container.scrollHeight;
         });
 
-        // Mapa Setup
+        // Configurações Globais (Mapa, Audio, Missão)
         onSnapshot(doc(db,"campaign_settings","global"), (s) => {
             if(!s.exists()) return;
             const data = s.data();
-            if(data.mapa_url && document.getElementById('gm-map').value !== data.mapa_url) {
-                mapImg = new Image(); mapImg.src = data.mapa_url; mapImg.onload = renderMap;
+            
+            // Missão Atual
+            if(data.missao_atual) {
+                document.getElementById('mission-display').innerText = data.missao_atual;
+                document.getElementById('gm-mission-input').value = data.missao_atual;
+            }
+
+            // Mapa
+            if(data.mapa_url && (!mapImg || mapImg.src !== data.mapa_url)) {
+                mapImg = new Image(); 
+                mapImg.crossOrigin = "anonymous";
+                mapImg.src = data.mapa_url; 
+                mapImg.onload = renderMap; 
                 document.getElementById('gm-map').value = data.mapa_url;
             }
+            
+            // Audio
             if(data.musica_url && audio.src !== data.musica_url) {
                 audio.src = data.musica_url;
                 document.getElementById('gm-music').value = data.musica_url;
                 if(hasInteracted) audio.play();
             }
+
+            // Tokens (Atualiza posições em tempo real)
             tokens = data.posicoes || {};
             renderMap();
         });
+        
         initCanvas();
     }
 
+    // --- INTERFACE ---
     function updateHUD() {
-        document.getElementById('hud-name').innerText = playerData.Nome;
+        document.getElementById('hud-name').innerText = playerData.Nome || "Desconhecido";
         document.getElementById('hud-details').innerText = `${playerData.Classe || ''} ${playerData.Raca || ''} - Nvl ${playerData.Nivel || 1}`;
         document.getElementById('bar-hp').style.width = ((playerData.PV / playerData.PV_Max) * 100) + "%";
         document.getElementById('txt-hp').innerText = `PV: ${playerData.PV}/${playerData.PV_Max}`;
@@ -426,24 +464,22 @@
         
         const grid = document.getElementById('grid-attrs');
         grid.innerHTML = "";
-        const attrs = ["Força", "Agilidade", "Intelecto", "Vigor", "Mana"];
+        const attrs = ["Força", "Agilidade", "Intelecto", "Vigor", "Presença"];
         attrs.forEach(a => {
             const val = playerData[a] || 0;
             grid.innerHTML += `<div class="attr-card" onclick="rollSimple('${a}', ${val})"><span class="attr-lbl">${a.substring(0,3)}</span><span class="attr-val">${val}</span></div>`;
         });
     }
 
-    // === CORREÇÃO PRINCIPAL AQUI ===
     async function loadAssets() {
         const skillsDiv = document.getElementById('list-skills');
         const invDiv = document.getElementById('list-inventory');
         skillsDiv.innerHTML = ""; invDiv.innerHTML = "";
-        combatOptions = []; // Zera a lista para recriar
+        combatOptions = [];
 
-        // 1. Perícias e Habilidades
+        // Perícias
         const allSkills = [...(playerData.pericias || []), ...(playerData.habilidades || [])];
         if(allSkills.length === 0) skillsDiv.innerHTML = "<small style='color:#555'>Vazio.</small>";
-        
         allSkills.forEach(s => {
             const match = s.match(/(.+)\s\(([\+\-]?\d+)\)/);
             const name = match ? match[1] : s;
@@ -452,40 +488,27 @@
             combatOptions.push({ name: name, type: 'Perícia', bonus: bonus });
         });
 
-        // 2. Itens e Magias
+        // Itens e Magias
         const extIds = [...(playerData.itens || []), ...(playerData.magias || [])];
-        
         for(const id of extIds) {
             let data = null;
-            let type = "Item"; // Default
-
-            // Tenta buscar como Item
+            let type = "Item";
             try {
                 let snap = await getDoc(doc(db, "items", id));
                 if(snap.exists()) { data = snap.data(); type = "Item"; }
                 else {
-                    // Tenta buscar como Magia
                     snap = await getDoc(doc(db, "spells", id));
                     if(snap.exists()) { data = snap.data(); type = "Magia"; }
                 }
             } catch(e) {}
 
             if(data) {
-                // Se encontrou no banco de dados
                 const desc = data.Descricao || "";
                 const stats = data.Dano ? `Dano: ${data.Dano}` : (data.Custo ? `Custo: ${data.Custo}` : "Item Geral");
-                
                 createListItem(invDiv, type === "Item"?"⚔️":"✨", data.Nome, stats, () => rollSimple(data.Nome, 0), desc);
-                
-                // === FIX: Adiciona ao combate SEMPRE se for Magia ou se for Item (mesmo sem dano definido) ===
                 combatOptions.push({ name: data.Nome, type: type, bonus: 0 });
-
             } else {
-                // Se NÃO encontrou no banco (é apenas um nome na ficha, ex: "Espada Curta")
-                // Adiciona mesmo assim!
                 createListItem(invDiv, "📦", id, "Inventário", () => rollSimple(id, 0));
-                
-                // === FIX: Adiciona strings soltas ao combate também ===
                 combatOptions.push({ name: id, type: 'Item', bonus: 0 });
             }
         }
@@ -501,21 +524,19 @@
             </div>
             ${description ? `<div class="list-body">${description}</div>` : ''}
         `;
+        // Hack para passar a função de rolagem
         div.querySelector('.btn-roll-mini').onclick = (e) => { e.stopPropagation(); onClickRoll(); };
         container.appendChild(div);
     }
     window.toggleDetails = (el) => { const b=el.nextElementSibling; if(b) b.classList.toggle('open'); }
 
-    // === LÓGICA DE ATAQUE ===
+    // --- COMBATE E DADOS ---
     window.openAttackModal = (enemyId, enemyName) => {
         currentTargetId = enemyId;
         document.getElementById('modal-attack').style.display = 'flex';
         document.getElementById('atk-target-label').innerText = `Alvo: ${enemyName}`;
-        
         const sel = document.getElementById('atk-option');
         sel.innerHTML = `<option value="Ataque Básico">👊 Ataque Básico (Força)</option>`;
-        
-        // Popula com a lista garantida
         combatOptions.forEach(opt => {
             sel.innerHTML += `<option value="${opt.name}">[${opt.type}] ${opt.name}</option>`;
         });
@@ -524,11 +545,7 @@
     window.confirmAttack = () => {
         const action = document.getElementById('atk-option').value;
         const mod = parseInt(document.querySelector('input[name="atk-mod"]:checked').value);
-        
         let attrBonus = playerData.Força || 0;
-        
-        // Se for perícia, usa o bônus dela. Se for item/magia, usa o atributo base (Força ou Intelecto)
-        // Você pode refinar isso futuramente (ex: Magia usa Intelecto)
         const opt = combatOptions.find(o => o.name === action);
         if(opt && opt.type === 'Perícia') attrBonus = opt.bonus;
         else if(opt && opt.type === 'Magia') attrBonus = playerData.Intelecto || 0;
@@ -537,7 +554,7 @@
         const total = d20 + mod + attrBonus;
         
         addDoc(collection(db, "logs"), {
-            charName: playerData.Nome, actionName: action,
+            charName: playerData.Nome || "Mestre", actionName: action,
             total: total, detail: `[${d20}] + Bônus(${attrBonus}) + Mod(${mod})`,
             isCrit: d20===20, isFumble: d20===1, type: 'roll', timestamp: serverTimestamp()
         });
@@ -550,7 +567,7 @@
         const d20 = Math.floor(Math.random()*20)+1;
         const total = d20 + bonus;
         addDoc(collection(db, "logs"), {
-            charName: playerData.Nome, actionName: name, total: total,
+            charName: playerData.Nome || "Mestre", actionName: name, total: total,
             detail: `[${d20}] + ${bonus}`, isCrit: d20===20, isFumble: d20===1, type: 'roll', timestamp: serverTimestamp()
         });
         showResultModal(total, name, d20===20, d20===1, false);
@@ -583,12 +600,12 @@
         closeModal('modal-result');
     };
 
-    // Utils
     window.sendChat = () => {
         const i = document.getElementById('inp-msg');
-        if(i.value.trim()) addDoc(collection(db,"logs"),{charName:playerData.Nome,message:i.value,type:'chat',timestamp:serverTimestamp()});
+        if(i.value.trim()) addDoc(collection(db,"logs"),{charName:playerData.Nome || "Mestre",message:i.value,type:'chat',timestamp:serverTimestamp()});
         i.value="";
     };
+
     window.closeModal = (id) => document.getElementById(id).style.display='none';
     window.setTab = (id,b) => {
         document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
@@ -596,41 +613,231 @@
         document.getElementById(id).classList.add('active'); b.classList.add('active');
     };
 
-    // Mapa e GM
-    let canvas, ctx, mapImg, tokens = {}, view = {x:0, y:0, zoom:1}, isDrag=false, lastPos={x:0,y:0}, placingToken=false;
+    // === CANVAS E LÓGICA DO MAPA ===
+    let canvas, ctx, mapImg;
+    let tokens = {}; // { id: {x, y, size, img, name} }
+    let view = {x:0, y:0, zoom:1};
+    let isMapDrag = false, isTokenDrag = false;
+    let dragTokenId = null;
+    let lastPos = {x:0,y:0};
+    let placingToken = false;
+
     function initCanvas() {
-        canvas = document.getElementById('gameCanvas'); ctx = canvas.getContext('2d');
-        resize(); window.onresize=resize;
-        canvas.onmousedown=e=>{ if(placingToken){placeTokenClick(e);return;} isDrag=true; lastPos={x:e.clientX,y:e.clientY}; };
-        canvas.onmousemove=e=>{ if(!isDrag)return; view.x+=e.clientX-lastPos.x; view.y+=e.clientY-lastPos.y; lastPos={x:e.clientX,y:e.clientY}; renderMap(); };
-        canvas.onmouseup=()=>isDrag=false; canvas.onwheel=e=>zoomMap(e.deltaY>0?-0.1:0.1);
+        canvas = document.getElementById('gameCanvas'); 
+        ctx = canvas.getContext('2d');
+        
+        resize();
+        window.onresize = resize;
+
+        canvas.onmousedown = e => {
+            if(placingToken){ placeTokenClick(e); return; }
+
+            // Converter mouse para coordenadas do mundo
+            const worldX = (e.clientX - view.x) / view.zoom;
+            const worldY = (e.clientY - view.y) / view.zoom;
+
+            let hitToken = null;
+            // Checar colisão com tokens (inverso para pegar o do topo)
+            const tokenKeys = Object.keys(tokens);
+            for(let i = tokenKeys.length - 1; i >= 0; i--) {
+                const id = tokenKeys[i];
+                const t = tokens[id];
+                const r = (t.size || 50) / 2;
+                if(Math.sqrt((worldX - t.x)**2 + (worldY - t.y)**2) <= r) {
+                    hitToken = id;
+                    break;
+                }
+            }
+
+            if(hitToken) {
+                isTokenDrag = true;
+                dragTokenId = hitToken;
+            } else {
+                isMapDrag = true;
+            }
+            lastPos = {x: e.clientX, y: e.clientY};
+        };
+
+        canvas.onmousemove = e => {
+            if(!isMapDrag && !isTokenDrag) return;
+
+            const dx = e.clientX - lastPos.x;
+            const dy = e.clientY - lastPos.y;
+            lastPos = {x: e.clientX, y: e.clientY};
+
+            if(isMapDrag) {
+                view.x += dx;
+                view.y += dy;
+                renderMap();
+            } else if(isTokenDrag && dragTokenId) {
+                tokens[dragTokenId].x += dx / view.zoom;
+                tokens[dragTokenId].y += dy / view.zoom;
+                renderMap();
+            }
+        };
+
+        canvas.onmouseup = () => {
+            if(isTokenDrag && dragTokenId) {
+                // Salvar nova posição no Firebase
+                saveTokens();
+            }
+            isMapDrag = false;
+            isTokenDrag = false;
+            dragTokenId = null;
+        };
+
+        // Zoom no scroll
+        canvas.onwheel = e => {
+            e.preventDefault();
+            const scaleAmount = -e.deltaY * 0.001;
+            zoomMap(scaleAmount);
+        };
     }
-    function resize(){ canvas.width=innerWidth; canvas.height=innerHeight; renderMap(); }
-    function renderMap(){
-        ctx.fillStyle="#080808"; ctx.fillRect(0,0,canvas.width,canvas.height);
-        ctx.save(); ctx.translate(view.x,view.y); ctx.scale(view.zoom,view.zoom);
-        if(mapImg) ctx.drawImage(mapImg,0,0);
-        for(let tid in tokens){
-            const t=tokens[tid]; const sz=parseInt(t.size)||40;
-            ctx.save(); ctx.beginPath(); ctx.arc(t.x,t.y,sz/2,0,Math.PI*2);
-            ctx.fillStyle="#000"; ctx.fill(); ctx.strokeStyle=(tid===charId)?"#d4af37":"#b91c1c"; ctx.lineWidth=3; ctx.stroke();
-            ctx.clip(); if(t.img){const i=new Image(); i.src=t.img; ctx.drawImage(i,t.x-sz/2,t.y-sz/2,sz,sz);}
+
+    function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        renderMap();
+    }
+
+    function renderMap() {
+        if(!ctx) return;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.save();
+        ctx.translate(view.x, view.y);
+        ctx.scale(view.zoom, view.zoom);
+
+        // Desenhar Mapa
+        if(mapImg) {
+            ctx.drawImage(mapImg, 0, 0);
+        } else {
+            // Placeholder se não tiver mapa
+            ctx.fillStyle = "#111";
+            ctx.fillRect(0,0, 2000, 1500);
+            ctx.strokeStyle = "#333";
+            ctx.lineWidth = 5;
+            ctx.strokeRect(0,0, 2000, 1500);
+        }
+
+        // Desenhar Tokens
+        for(let id in tokens) {
+            const t = tokens[id];
+            const size = t.size || 50;
+            const r = size / 2;
+
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(t.x, t.y, r, 0, Math.PI * 2);
+            ctx.closePath();
+            ctx.clip();
+
+            if(t.img) {
+                const img = new Image();
+                img.src = t.img;
+                ctx.drawImage(img, t.x - r, t.y - r, size, size);
+            } else {
+                ctx.fillStyle = "var(--gold)";
+                ctx.fill();
+                ctx.fillStyle = "black";
+                ctx.font = "bold 20px Arial";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText(t.name ? t.name[0].toUpperCase() : "?", t.x, t.y);
+            }
+            ctx.restore();
+
+            // Borda do Token
+            ctx.beginPath();
+            ctx.arc(t.x, t.y, r, 0, Math.PI * 2);
+            ctx.strokeStyle = "white";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // DESENHAR NOME ACIMA DO TOKEN
+            ctx.save();
+            ctx.fillStyle = "white";
+            ctx.font = "bold 14px Roboto";
+            ctx.textAlign = "center";
+            ctx.shadowColor = "black";
+            ctx.shadowBlur = 4;
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = "black";
+            
+            // Posição do texto (acima do token)
+            const textY = t.y - r - 10;
+            
+            // Traço preto (outline) para legibilidade
+            ctx.strokeText(t.name || "NPC", t.x, textY);
+            // Texto branco preenchido
+            ctx.fillText(t.name || "NPC", t.x, textY);
             ctx.restore();
         }
+
         ctx.restore();
     }
-    window.zoomMap=z=>{view.zoom=Math.max(0.2,view.zoom+z);renderMap();};
-    window.resetView=()=>{view={x:0,y:0,zoom:1};renderMap();};
-    window.setVolume=v=>audio.volume=v;
-    window.toggleMute=()=>{audio.muted=!audio.muted;};
-    window.toggleGM=()=>{const p=document.getElementById('gm-panel'); p.style.display=p.style.display==='block'?'none':'block';};
-    window.syncWorld=()=>{updateDoc(doc(db,"campaign_settings","global"),{mapa_url:document.getElementById('gm-map').value,musica_url:document.getElementById('gm-music').value});};
-    window.activateTokenPlacement=()=>{placingToken=true;document.body.style.cursor="crosshair";};
-    function placeTokenClick(e){
-        const tid="npc_"+Date.now();
-        updateDoc(doc(db,"campaign_settings","global"),{[`posicoes.${tid}`]:{x:(e.clientX-view.x)/view.zoom,y:(e.clientY-view.y)/view.zoom,nome:document.getElementById('tk-name').value||"NPC",img:document.getElementById('tk-img').value,size:40}});
-        placingToken=false;document.body.style.cursor="default";document.getElementById('gm-panel').style.display='none';
+
+    // --- FUNÇÕES DE CONTROLE (ZOOM, GM, AUDIO) ---
+    window.zoomMap = (amount) => {
+        view.zoom = Math.max(0.1, Math.min(5, view.zoom + amount));
+        renderMap();
+    };
+
+    window.resetView = () => {
+        view = {x: 0, y: 0, zoom: 1};
+        renderMap();
+    };
+
+    window.toggleMute = () => {
+        audio.muted = !audio.muted;
+        document.getElementById('mute-icon').innerText = audio.muted ? "🔇" : "🔊";
+    };
+    window.setVolume = (v) => audio.volume = v;
+
+    window.toggleGM = () => {
+        const p = document.getElementById('gm-panel');
+        p.style.display = p.style.display === 'block' ? 'none' : 'block';
+    };
+
+    window.syncWorld = async () => {
+        const mapUrl = document.getElementById('gm-map').value;
+        const musicUrl = document.getElementById('gm-music').value;
+        const missionText = document.getElementById('gm-mission-input').value;
+
+        await setDoc(doc(db, "campaign_settings", "global"), {
+            mapa_url: mapUrl,
+            musica_url: musicUrl,
+            missao_atual: missionText, // Salva a missão
+            posicoes: tokens // Preserva tokens atuais
+        }, { merge: true });
+        alert("Mundo Sincronizado!");
+    };
+
+    window.activateTokenPlacement = () => {
+        document.body.style.cursor = "crosshair";
+        placingToken = true;
+        toggleGM(); // Fecha painel
+    };
+
+    function placeTokenClick(e) {
+        const worldX = (e.clientX - view.x) / view.zoom;
+        const worldY = (e.clientY - view.y) / view.zoom;
+        const name = document.getElementById('tk-name').value || "NPC";
+        const img = document.getElementById('tk-img').value || "";
+        
+        const newId = "token_" + Date.now();
+        tokens[newId] = { x: worldX, y: worldY, size: 60, name: name, img: img };
+        
+        saveTokens();
+        placingToken = false;
+        document.body.style.cursor = "default";
+        renderMap();
     }
+
+    async function saveTokens() {
+        await updateDoc(doc(db, "campaign_settings", "global"), { posicoes: tokens });
+    }
+
 </script>
 </body>
 </html>
