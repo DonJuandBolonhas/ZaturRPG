@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zatur - Mesa Oficial</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=MedievalSharp&family=Roboto:wght@400;700&display=swap');
+
+        :root {
+            --gold: #d4af37; --bg-dark: rgba(15, 10, 5, 0.95); --danger: #8b0000;
+        }
+
+        body { margin: 0; overflow: hidden; background: #000; font-family: 'MedievalSharp', cursive; color: #eee; user-select: none; }
+
+        /* === TELA DE START (SOM) === */
+        #start-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.95); z-index: 9999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+        #btn-enter {
+            padding: 20px 50px; font-size: 2rem; background: var(--gold); border: 2px solid #8a7018;
+            font-family: 'Cinzel'; cursor: pointer; box-shadow: 0 0 20px var(--gold); transition: 0.3s;
+        }
+        #btn-enter:hover { transform: scale(1.1); background: #fff; }
+
+        /* === MAPA === */
+        #map-layer { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; background: #111; cursor: grab; }
+        #map-layer:active { cursor: grabbing; }
+
+        /* CONTROLES MAPA E SOM (Inferior Esquerdo) */
+        #bottom-controls {
+            position: absolute; bottom: 20px; left: 20px; z-index: 5;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .control-row { display: flex; gap: 10px; align-items: center; background: rgba(0,0,0,0.6); padding: 5px; border-radius: 5px; }
+        .map-btn { width: 40px; height: 40px; font-size: 1.5rem; cursor: pointer; background: #222; color: var(--gold); border: 1px solid #444; }
+        input[type=range] { accent-color: var(--gold); width: 80px; }
+
+        /* HUD LATERAL */
+        #ui-layer {
+            position: absolute; top: 0; right: 0; height: 100vh; width: 380px;
+            background: var(--bg-dark); border-left: 2px solid var(--gold);
+            z-index: 10; display: flex; flex-direction: column;
+            box-shadow: -5px 0 20px black; transition: transform 0.3s;
+        }
+        
+        /* HEADER (Vida/Mana) */
+        .char-mini-header { padding: 10px 15px; background: linear-gradient(to right, #2c1a0a, #000); border-bottom: 1px solid #333; text-align: center; }
+        .bars { display: flex; gap: 5px; margin-top: 5px; }
+        .bar { flex: 1; height: 8px; background: #333; border: 1px solid #555; position: relative; }
+        .fill { height: 100%; display: block; transition: width 0.5s; }
+
+        /* CARD DE MISSÃO */
+        .mission-card {
+            background: #1a1208; border-bottom: 2px solid var(--gold);
+            padding: 15px; display: flex; gap: 10px; align-items: flex-start;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+        }
+        .mission-icon { font-size: 1.8rem; padding-top: 2px; }
+        .mission-info h3 { margin: 0; color: var(--gold); font-family: 'Cinzel'; font-size: 1rem; line-height: 1.2; }
+        .mission-info p { margin: 5px 0 0 0; color: #ccc; font-size: 0.85rem; font-family: 'Roboto'; font-style: italic; line-height: 1.3; }
+
+        /* ABAS */
+        .nav-tabs { display: flex; background: #000; flex-shrink: 0; }
+        .nav-tabs button {
+            flex: 1; padding: 12px; background: none; border: none; color: #777;
+            font-family: 'Cinzel'; cursor: pointer; border-bottom: 3px solid transparent;
+        }
+        .nav-tabs button.active { color: var(--gold); border-bottom-color: var(--gold); background: rgba(212,175,55,0.1); }
+        
+        .tab-content { flex: 1; overflow-y: auto; padding: 15px; display: none; position: relative; }
+        .tab-content.active { display: flex; flex-direction: column; } 
+
+        /* ESTILOS GERAIS */
+        .action-row {
+            background: rgba(255,255,255,0.05); padding: 10px; margin-bottom: 5px;
+            border: 1px solid #333; display: flex; justify-content: space-between; align-items: center;
+            cursor: pointer; transition: 0.2s;
+        }
+        .action-row:hover { border-color: var(--gold); background: rgba(212,175,55,0.15); }
+        .section-title { color: var(--gold); border-bottom: 1px solid #444; margin-top: 15px; margin-bottom: 5px; font-family: 'Cinzel'; font-size: 1rem; }
+
+        /* COMBATE */
+        .enemy-card {
+            border: 1px solid var(--danger); background: rgba(50, 0, 0, 0.3);
+            padding: 10px; margin-bottom: 10px; display: flex; gap: 10px;
+        }
+        .enemy-img { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; border: 1px solid #ff4444; background: #000; }
+        .btn-attack { width: 100%; margin-top: 5px; padding: 5px; background: var(--danger); color: white; border: none; cursor: pointer; font-family: 'Cinzel'; }
+
+        /* CHAT E LOGS */
+        #log-container {
+            flex: 1; overflow-y: auto; padding-bottom: 10px; font-family: 'Roboto'; font-size: 0.9rem;
+            display: flex; flex-direction: column-reverse; 
+        }
+        .msg-line { padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.1); word-wrap: break-word; }
+        .msg-sys { color: #aaa; font-style: italic; }
+        .msg-chat { color: #eee; }
+        .msg-author { font-weight: bold; color: var(--gold); font-family: 'Cinzel'; margin-right: 5px; }
+        .msg-roll-res { float: right; font-weight: bold; color: white; background: #333; padding: 2px 6px; border-radius: 4px; }
+
+        .chat-input-area {
+            display: flex; gap: 5px; padding-top: 10px; border-top: 1px solid #333; margin-top: auto;
+        }
+        .chat-input {
+            flex: 1; background: #111; border: 1px solid #444; color: white; padding: 8px; border-radius: 4px;
+        }
+        .btn-send {
+            background: var(--gold); border: none; color: black; font-weight: bold; cursor: pointer; padding: 0 15px; border-radius: 4px;
+        }
+
+        /* GM TOOLS & MODALS */
+        #gm-toggle { position: absolute; top: 10px; left: 10px; z-index: 20; background: #222; border: 1px solid var(--gold); color: var(--gold); width: 40px; height: 40px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+        #gm-panel { position: absolute; top: 60px; left: 10px; z-index: 20; background: var(--bg-dark); border: 1px solid var(--gold); padding: 15px; width: 280px; display: none; overflow-y: auto; max-height: 80vh; }
+        .gm-inp { width: 100%; padding: 5px; margin-bottom: 5px; background: #111; color: white; border: 1px solid #444; box-sizing: border-box; }
+        .gm-title { color: var(--gold); margin-top: 15px; border-bottom: 1px dashed #444; margin-bottom: 10px; font-size: 0.9rem; text-transform: uppercase; }
+
+        .modal-overlay { position: fixed; top:0; left:0; width:100vw; height:100vh; background: rgba(0,0,0,0.85); z-index: 100; display: none; justify-content: center; align-items: center; }
+        .modal-box { background: #1a1510; border: 2px solid var(--gold); padding: 20px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 0 30px var(--gold); }
+        .result-number { font-size: 4rem; color: var(--gold); margin: 10px 0; }
+        .btn-apply-dmg { background: #8b0000; color: white; border: 1px solid red; padding: 10px; width: 100%; font-weight: bold; margin-top: 10px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div id="start-overlay">
+    <h1 style="color:var(--gold); font-family:'Cinzel'; margin-bottom:20px;">ZATUR RPG</h1>
+    <button id="btn-enter" onclick="startGame()">ENTRAR NA MESA</button>
+    <p style="color:#666; margin-top:10px;">Clique para sincronizar o Áudio</p>
+</div>
+
+<audio id="bg-music" loop></audio>
+
+<div id="map-layer">
+    <canvas id="gameCanvas"></canvas>
+    
+    <div id="bottom-controls">
+        <div class="control-row">
+            <button onclick="zoomMap(0.1)" class="map-btn">+</button>
+            <button onclick="zoomMap(-0.1)" class="map-btn">-</button>
+        </div>
+        <div class="control-row">
+            <button onclick="toggleMute()" class="map-btn" style="font-size:1.2rem" id="mute-icon">🔊</button>
+            <input type="range" min="0" max="1" step="0.05" value="0.5" oninput="setVolume(this.value)">
+        </div>
+    </div>
+</div>
+
+<div id="gm-toggle" onclick="toggleGM()">⚙️</div>
+<div id="gm-panel">
+    <div class="gm-title" style="margin-top:0">Configurar Missão</div>
+    <input type="text" id="gm-mission-title" class="gm-inp" placeholder="Título da Missão">
+    <textarea id="gm-mission-desc" class="gm-inp" rows="3" placeholder="Descrição curta..."></textarea>
+    <button onclick="updateMission()" style="width:100%; padding:5px; background:var(--gold); cursor:pointer">📜 Atualizar Missão</button>
+
+    <div class="gm-title">Mundo</div>
+    <label style="font-size:0.8rem; color:#aaa">URL Mapa:</label>
+    <input type="text" id="map-url" class="gm-inp">
+    <label style="font-size:0.8rem; color:#aaa">URL Música (MP3):</label>
+    <input type="text" id="music-url" class="gm-inp">
+    <button onclick="saveWorld()" style="width:100%; padding:5px; background:#444; color:white; border:1px solid #666; cursor:pointer">Sincronizar Mundo</button>
+    
+    <div class="gm-title">Novo Token</div>
+    <input type="text" id="token-name" class="gm-inp" placeholder="Nome (Ex: Goblin)">
+    <input type="text" id="token-img" class="gm-inp" placeholder="URL Imagem">
+    <button onclick="startPlacingToken()" style="width:100%; padding:5px; background:var(--gold); cursor:pointer">📍 Posicionar</button>
+</div>
+
+<aside id="ui-layer">
+    <div class="char-mini-header">
+        <h2 id="hud-name" style="margin:0; color:var(--gold); font-family:'Cinzel'">Carregando...</h2>
+        <div class="bars">
+            <div class="bar" title="Vida"><span id="hud-hp" class="fill" style="background:#8b0000; width:0%"></span></div>
+            <div class="bar" title="Mana"><span id="hud-mp" class="fill" style="background:#1e4d8c; width:0%"></span></div>
+        </div>
+    </div>
+
+    <div class="mission-card">
+        <div class="mission-icon">📜</div>
+        <div class="mission-info">
+            <h3 id="display-mission-title">Sem Missão Ativa</h3>
+            <p id="display-mission-desc">Aguarde instruções da guilda...</p>
+        </div>
+    </div>
+
+    <nav class="nav-tabs">
+        <button class="active" onclick="switchTab('tab-sheet', this)">Ficha</button>
+        <button onclick="switchTab('tab-combat', this)" style="color:#ff6666">Combate</button>
+        <button onclick="switchTab('tab-logs', this)">Chat</button>
+    </nav>
+
+    <div id="tab-sheet" class="tab-content active" style="display:block">
+        <div class="section-title">Atributos</div>
+        <div id="list-attributes"></div>
+        <div class="section-title">Perícias & Itens</div>
+        <div id="list-skills"><small style="color:#666">Carregando...</small></div>
+        <div id="list-items"></div>
+    </div>
+
+    <div id="tab-combat" class="tab-content" style="display:none">
+        <div class="section-title" style="text-align:center; color:#ff6666">Inimigos</div>
+        <div id="combat-list"></div>
+    </div>
+
+    <div id="tab-logs" class="tab-content" style="display:none; height:100%;">
+        <div id="log-container"></div>
+        <div class="chat-input-area">
+            <input type="text" id="chat-msg" class="chat-input" placeholder="Diga algo..." onkeypress="handleChatKey(event)">
+            <button class="btn-send" onclick="sendChat()">➤</button>
+        </div>
+    </div>
+</aside>
+
+<div id="attack-modal" class="modal-overlay">
+    <div class="modal-box">
+        <h2 id="atk-target-name" style="color:var(--danger)">Atacar</h2>
+        <select id="atk-select" style="width:100%; padding:10px; background:#222; color:white; margin-bottom:15px; border:1px solid #555;"></select>
+        <div style="display:flex; gap:10px; margin-bottom:20px; justify-content:center">
+            <label><input type="radio" name="mod" value="0" checked> Normal</label>
+            <label><input type="radio" name="mod" value="5"> Vant. (+5)</label>
+            <label><input type="radio" name="mod" value="-5"> Desv. (-5)</label>
+        </div>
+        <button onclick="rollAttack()" style="width:100%; padding:10px; background:var(--gold); border:none; font-weight:bold; cursor:pointer">ROLAR</button>
+        <button onclick="document.getElementById('attack-modal').style.display='none'" style="margin-top:10px; background:none; border:none; color:#888; cursor:pointer">Cancelar</button>
+    </div>
+</div>
+
+<div id="result-modal" class="modal-overlay">
+    <div class="modal-box">
+        <h2 style="margin:0; color:#aaa" id="res-title">Resultado</h2>
+        <div id="res-val" class="result-number">0</div>
+        <div id="res-detail" style="color:#888; font-size:0.9rem"></div>
+        <button id="btn-apply-dmg" class="btn-apply-dmg" onclick="applyDamage()">💥 APLICAR DANO</button>
+        <button onclick="document.getElementById('result-modal').style.display='none'" style="margin-top:10px; width:100%; padding:5px; background:#333; color:white; border:none; cursor:pointer">Fechar</button>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, onSnapshot, getDoc, collection, updateDoc, addDoc, query, orderBy, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAgYVod9B99WIc_QysFx73htOf9O8XtuE8",
+        authDomain: "zatur-rpg.firebaseapp.com",
+        projectId: "zatur-rpg",
+        storageBucket: "zatur-rpg.firebasestorage.app",
+        messagingSenderId: "797058283992",
+        appId: "1:797058283992:web:7132e71691a225c1255aad"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const charId = new URLSearchParams(window.location.search).get("id");
+
+    let playerData = {};
+    let currentTargetId = null;
+    let lastRollValue = 0;
+    let knownSkills = [];
+    
+    // Variáveis de SOM
+    let hasInteracted = false;
+    let currentMusicUrl = "";
+    const audio = document.getElementById('bg-music');
+
+    // === INICIALIZAÇÃO ===
+    async function init() {
+        if(!charId) return alert("ID do personagem faltando! Use ?id=SEU_ID na URL.");
+
+        // Carrega Jogador
+        onSnapshot(doc(db, "characters", charId), async (snap) => {
+            if(!snap.exists()) return;
+            playerData = snap.data();
+            updateHUD();
+            renderAttributes();
+            await loadAssets(playerData.pericias || [], playerData.itens || []);
+        });
+
+        // Carrega Monstros
+        onSnapshot(collection(db, "active_encounters"), (snap) => {
+            const el = document.getElementById('combat-list');
+            el.innerHTML = "";
+            if(snap.empty) el.innerHTML = "<p style='text-align:center; color:#555'>Nenhum inimigo.</p>";
+            snap.forEach(d => {
+                const m = d.data();
+                el.innerHTML += `
+                    <div class="enemy-card">
+                        <img src="${m.Imagem || 'https://via.placeholder.com/50'}" class="enemy-img">
+                        <div style="flex:1">
+                            <div style="display:flex; justify-content:space-between; color:#ffcccc; font-weight:bold">
+                                <span>${m.Nome}</span> <span>${m.PV}/${m.PV_Max}</span>
+                            </div>
+                            <button class="btn-attack" onclick="openAttackMenu('${d.id}', '${m.Nome}')">⚔️ ATACAR</button>
+                        </div>
+                    </div>`;
+            });
+        });
+
+        // Chat & Logs
+        onSnapshot(query(collection(db, "logs"), orderBy("timestamp", "desc"), limit(50)), (snap) => {
+            const el = document.getElementById('log-container');
+            el.innerHTML = "";
+            snap.forEach(d => {
+                const l = d.data();
+                const div = document.createElement('div');
+                div.className = 'msg-line';
+                if(l.type === 'chat') {
+                    div.innerHTML = `<span class="msg-author">${l.charName}:</span> <span class="msg-chat">${l.message}</span>`;
+                } else {
+                    div.innerHTML = `
+                        <span class="msg-author">${l.charName}</span> <span class="msg-sys">rolou ${l.actionName}</span>
+                        <span class="msg-roll-res">${l.total}</span>
+                        <div style="font-size:0.75rem; color:#666; margin-top:2px;">${l.detail}</div>
+                    `;
+                }
+                el.appendChild(div);
+            });
+        });
+
+        initMap();
+    }
+
+    // === START SYSTEM (AUDIO) ===
+    window.startGame = () => {
+        document.getElementById('start-overlay').style.display = 'none';
+        hasInteracted = true;
+        if(audio.src && currentMusicUrl) {
+            audio.play().catch(e => console.log("Erro auto-play:", e));
+        }
+    };
+    
+    window.setVolume = (val) => { audio.volume = val; };
+    window.toggleMute = () => { 
+        audio.muted = !audio.muted; 
+        document.getElementById('mute-icon').innerText = audio.muted ? '🔇' : '🔊';
+    };
+
+    // === MAPA & CONFIGS GLOBAIS ===
+    let canvas, ctx, mapImg, tokens = {}, view = {x:0, y:0, zoom:1}, drag = {on:false, type:null, tid:null, lx:0, ly:0}, placing=false;
+
+    function initMap() {
+        canvas = document.getElementById('gameCanvas'); ctx = canvas.getContext('2d');
+        window.onresize = () => { canvas.width=innerWidth; canvas.height=innerHeight; renderMap(); };
+        window.onresize();
+
+        // Escuta configurações Globais (Mapa, Tokens, Missão e SOM)
+        onSnapshot(doc(db,"campaign_settings","global"), s => {
+            if(!s.exists()) return;
+            const d = s.data();
+            
+            // 1. Missão
+            if(d.missao_titulo) document.getElementById('display-mission-title').innerText = d.missao_titulo;
+            if(d.missao_desc) document.getElementById('display-mission-desc').innerText = d.missao_desc;
+
+            // 2. Mapa
+            if(d.mapa_url && (!mapImg || mapImg.src!==d.mapa_url)) { 
+                mapImg=new Image(); mapImg.src=d.mapa_url; mapImg.onload=renderMap; 
+                document.getElementById('map-url').value = d.mapa_url; // Sync input GM
+            }
+            tokens = d.posicoes || {};
+            renderMap();
+
+            // 3. Som (NOVO)
+            if (d.musica_url && d.musica_url !== currentMusicUrl) {
+                currentMusicUrl = d.musica_url;
+                audio.src = currentMusicUrl;
+                document.getElementById('music-url').value = d.musica_url; // Sync input GM
+                if(hasInteracted) audio.play().catch(console.error);
+            } else if (!d.musica_url) {
+                audio.pause();
+            }
+        });
+
+        // Eventos de Mouse (Map Drag & Token Drag)
+        canvas.onmousedown = e => {
+            if(placing) { placeToken(e); return; }
+            const m = getMouse(e);
+            let clicked = null;
+            // Verifica clique reverso (para pegar o que está por cima)
+            for(let id in tokens) if((m.wx-tokens[id].x)**2 + (m.wy-tokens[id].y)**2 <= 225) clicked = id;
+            
+            if(clicked) drag = {on:true, type:'tok', tid:clicked, lx:m.wx, ly:m.wy};
+            else drag = {on:true, type:'map', lx:e.clientX, ly:e.clientY};
+        };
+
+        canvas.onmousemove = e => {
+            if(!drag.on) return;
+            if(drag.type === 'map') {
+                view.x += e.clientX - drag.lx; view.y += e.clientY - drag.ly;
+                drag.lx = e.clientX; drag.ly = e.clientY; renderMap();
+            } else {
+                const m = getMouse(e);
+                tokens[drag.tid].x = m.wx; tokens[drag.tid].y = m.wy;
+                renderMap();
+            }
+        };
+
+        canvas.onmouseup = async () => {
+            if(drag.on && drag.type==='tok') {
+                await updateDoc(doc(db,"campaign_settings","global"), { [`posicoes.${drag.tid}`]: tokens[drag.tid] });
+            }
+            drag.on = false;
+        };
+        canvas.onwheel = e => zoomMap(e.deltaY>0?-0.1:0.1);
+    }
+
+    function getMouse(e) { return { wx: (e.clientX-view.x)/view.zoom, wy: (e.clientY-view.y)/view.zoom }; }
+
+    function renderMap() {
+        if(!ctx) return;
+        ctx.fillStyle = "#111"; ctx.fillRect(0,0,canvas.width,canvas.height);
+        ctx.save(); ctx.translate(view.x, view.y); ctx.scale(view.zoom, view.zoom);
+        if(mapImg) ctx.drawImage(mapImg, 0, 0);
+        
+        for(let id in tokens) {
+            const t = tokens[id];
+            ctx.beginPath(); ctx.arc(t.x, t.y, 15, 0, Math.PI*2);
+            ctx.fillStyle="#000"; ctx.fill(); 
+            ctx.strokeStyle = (id===charId)?"#d4af37":"#8b0000"; ctx.lineWidth=2; ctx.stroke();
+            if(t.img) { ctx.save(); ctx.clip(); const i=new Image(); i.src=t.img; ctx.drawImage(i, t.x-15, t.y-15, 30,30); ctx.restore(); }
+            
+            // NOME DO TOKEN
+            ctx.font="bold 12px Arial"; ctx.textAlign="center"; 
+            ctx.strokeStyle = "white"; ctx.lineWidth = 3;
+            ctx.strokeText(t.nome, t.x, t.y-22); // Borda
+            ctx.fillStyle="black";
+            ctx.fillText(t.nome, t.x, t.y-22); // Texto
+        }
+        ctx.restore();
+    }
+
+    // === GM TOOLS (Atualizadas) ===
+    window.toggleGM = () => document.getElementById('gm-panel').style.display=document.getElementById('gm-panel').style.display=='block'?'none':'block';
+    
+    // Atualiza Mundo (Mapa + Musica)
+    window.saveWorld = () => {
+        updateDoc(doc(db,"campaign_settings","global"), {
+            mapa_url: document.getElementById('map-url').value,
+            musica_url: document.getElementById('music-url').value
+        });
+    };
+    
+    // Atualizar Missão
+    window.updateMission = () => {
+        const t = document.getElementById('gm-mission-title').value;
+        const d = document.getElementById('gm-mission-desc').value;
+        if(t) updateDoc(doc(db,"campaign_settings","global"), { missao_titulo: t, missao_desc: d });
+        else alert("Escreva um título para a missão!");
+    };
+
+    window.startPlacingToken = () => { placing=true; document.body.style.cursor="crosshair"; };
+    function placeToken(e) {
+        const m = getMouse(e);
+        const nm = document.getElementById('token-name').value;
+        const im = document.getElementById('token-img').value;
+        const tid = "t_"+Date.now();
+        updateDoc(doc(db,"campaign_settings","global"), {[`posicoes.${tid}`]: {x:m.wx, y:m.wy, nome:nm, img:im}});
+        placing=false; document.body.style.cursor="default";
+    }
+
+    window.zoomMap = z => { view.zoom+=z; if(view.zoom<0.2)view.zoom=0.2; renderMap(); };
+
+    // === UTILS DO JOGADOR ===
+    function updateHUD() {
+        document.getElementById('hud-name').innerText = playerData.Nome;
+        document.getElementById('hud-hp').style.width = ((playerData.PV/playerData.PV_Max)*100)+"%";
+        document.getElementById('hud-mp').style.width = ((playerData.PE/playerData.PE_Max)*100)+"%";
+    }
+    function renderAttributes() {
+        const div = document.getElementById('list-attributes');
+        div.innerHTML = "";
+        ["Força","Agilidade","Intelecto","Vigor", "Mana"].forEach(a => {
+            div.innerHTML += `<div class="action-row" onclick="simpleRoll('${a}', ${playerData[a]||0})"><span>${a}</span> <strong>${playerData[a]||0}</strong></div>`;
+        });
+    }
+    async function loadAssets(sIds, iIds) {
+        const sDiv = document.getElementById('list-skills'); sDiv.innerHTML = "";
+        const iDiv = document.getElementById('list-items'); iDiv.innerHTML = "";
+        knownSkills = [];
+        const load = async (ids, col, container) => {
+            for(const id of ids) {
+                const d = await getDoc(doc(db, col, id));
+                if(d.exists()) {
+                    const data = d.data();
+                    knownSkills.push({name:data.Nome});
+                    // Mostra o item aqui (inventário do jogador) independente do preço.
+                    // A lógica de "não mostrar se preço=0" aplica-se apenas à Loja (não implementada nesta view).
+                    container.innerHTML += `<div class="action-row" onclick="simpleRoll('${data.Nome}')"><span>${data.Nome}</span><small>🎲</small></div>`;
+                }
+            }
+        };
+        await load(sIds, 'skills', sDiv);
+        await load(iIds, 'items', iDiv);
+    }
+    
+    window.switchTab = (id, btn) => {
+        document.querySelectorAll('.tab-content').forEach(c => { c.style.display = 'none'; c.classList.remove('active'); });
+        document.querySelectorAll('.nav-tabs button').forEach(b => b.classList.remove('active'));
+        const activeTab = document.getElementById(id);
+        activeTab.style.display = (id === 'tab-logs') ? 'flex' : 'block'; 
+        activeTab.classList.add('active');
+        btn.classList.add('active');
+    };
+
+    // Chat
+    window.handleChatKey = (e) => { if(e.key === 'Enter') sendChat(); }
+    window.sendChat = async () => {
+        const inp = document.getElementById('chat-msg');
+        const text = inp.value.trim();
+        if(!text) return;
+        await addDoc(collection(db, "logs"), {
+            charName: playerData.Nome || "Desconhecido", message: text, type: 'chat', timestamp: serverTimestamp()
+        });
+        inp.value = "";
+    };
+
+    // Combate
+    window.openAttackMenu = (tid, tname) => {
+        currentTargetId = tid;
+        document.getElementById('atk-target-name').innerText = "Alvo: " + tname;
+        const sel = document.getElementById('atk-select');
+        sel.innerHTML = `<option value="Ataque">Ataque Básico</option>`;
+        knownSkills.forEach(s => sel.innerHTML+=`<option value="${s.name}">${s.name}</option>`);
+        document.getElementById('attack-modal').style.display = 'flex';
+    };
+    window.rollAttack = () => {
+        const act = document.getElementById('atk-select').value;
+        const mod = parseInt(document.querySelector('input[name="mod"]:checked').value);
+        const r = Math.floor(Math.random()*20)+1;
+        const total = r + mod + (playerData.Força||0);
+        lastRollValue = total;
+        addDoc(collection(db, "logs"), {
+            charName: playerData.Nome, actionName: act, detail: `[${r}] + Mod(${mod})`, total: total, type: 'roll', timestamp: serverTimestamp()
+        });
+        document.getElementById('attack-modal').style.display = 'none';
+        showResult(total, `Ataque: ${act}`);
+        document.getElementById('btn-apply-dmg').style.display = currentTargetId ? 'block' : 'none';
+    };
+    window.simpleRoll = (name, bonus=0) => {
+        const r = Math.floor(Math.random()*20)+1;
+        addDoc(collection(db, "logs"), {
+            charName: playerData.Nome, actionName: name, detail: `[${r}] + ${bonus}`, total: r+bonus, type: 'roll', timestamp: serverTimestamp()
+        });
+        showResult(r+bonus, "Teste Simples");
+        document.getElementById('btn-apply-dmg').style.display = 'none';
+    };
+    function showResult(v, d) {
+        document.getElementById('res-val').innerText = v;
+        document.getElementById('res-detail').innerText = d;
+        document.getElementById('result-modal').style.display = 'flex';
+    }
+    window.applyDamage = async () => {
+        if(!currentTargetId) return;
+        const ref = doc(db, "active_encounters", currentTargetId);
+        const snap = await getDoc(ref);
+        if(snap.exists()) {
+            await updateDoc(ref, { PV: snap.data().PV - lastRollValue });
+            document.getElementById('result-modal').style.display = 'none';
+        }
+    };
+
+    init();
+</script>
+</body>
+</html>
