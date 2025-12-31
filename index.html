@@ -1,217 +1,223 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Zatur RPG - Ficha do Jogador</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zatur - Grimório do Mestre</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=MedievalSharp&family=Lora:ital,wght@0,400;1,500&display=swap');
-
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=MedievalSharp&family=Lora:wght@400;700&display=swap');
+        
         :root {
-            --gold: #d4af37; --gold-bright: #ffdf00; --parchment: #f4e4bc;
-            --dark-leather: #1a0f06; --shadow: rgba(0, 0, 0, 0.8);
-            --red: #8b0000; --blue: #1e4d8c;
+            --gold: #d4af37; --gold-dark: #8a7018; 
+            --bg: #0b0704; --panel: #16100a; 
+            --border: #4b2e0e; --danger: #5a1515; --success: #1e4215;
+            --text: #cbbfa3;
         }
 
-        body { margin: 0; font-family: 'Lora', serif; background: #0a0502; color: var(--parchment); min-height: 100vh; }
-
-        /* HEADER */
-        header {
-            background: linear-gradient(to bottom, #2c1a0a, #1a0f06);
-            padding: 15px; text-align: center; border-bottom: 3px solid var(--gold);
+        body {
+            font-family: 'MedievalSharp', cursive; background: var(--bg); color: var(--text); margin: 0;
+            display: grid; grid-template-columns: 320px 1fr; height: 100vh; overflow: hidden;
         }
-        header h1 { font-family: 'Cinzel', serif; margin: 0; color: var(--gold); letter-spacing: 2px; }
-        .currency-bar { font-family:'MedievalSharp'; color:var(--gold-bright); margin-top:5px; font-size: 1.1rem; }
 
-        /* TABS */
-        nav.tabs { display: flex; background: #120b04; border-bottom: 1px solid var(--gold); overflow-x: auto; position: sticky; top: 0; z-index: 100; }
-        nav.tabs button { 
-            flex: 1; padding: 15px; background: none; border: none; color: #888; 
-            font-family: 'Cinzel'; cursor: pointer; transition: 0.3s; white-space: nowrap; 
+        /* BARRA LATERAL */
+        aside {
+            background: var(--panel); border-right: 3px solid var(--gold); padding: 15px;
+            display: flex; flex-direction: column; gap: 20px; overflow-y: auto;
+            box-shadow: 5px 0 15px black; z-index: 10;
         }
-        nav.tabs button.active { color: var(--gold); border-bottom: 3px solid var(--gold); background: rgba(212,175,55,0.1); }
 
-        /* LAYOUT */
-        .container { max-width: 900px; margin: 20px auto; padding: 0 15px; padding-bottom: 80px; }
-        .tab-content { display: none; animation: fadeIn 0.4s ease; }
-        .tab-content.active { display: block; }
-        .card { background: rgba(30, 20, 10, 0.9); border: 1px solid var(--gold); padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 4px 10px var(--shadow); }
+        h1, h2, h3 { font-family: 'Cinzel'; color: var(--gold); margin: 0 0 10px 0; text-shadow: 1px 1px 2px black; }
+        h1 { text-align: center; border-bottom: 1px solid var(--border); padding-bottom: 10px; font-size: 1.8rem; }
 
-        /* BARRAS DE STATUS */
-        .status-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .status-bar { height: 22px; background: #000; border: 1px solid #555; border-radius: 4px; overflow: hidden; position: relative; }
-        .bar-fill { height: 100%; transition: width 0.5s ease; }
-        .bar-label { position: absolute; width: 100%; top:0; left:0; text-align: center; font-size: 0.8rem; font-family: 'MedievalSharp'; color: white; line-height: 22px; text-shadow: 1px 1px 2px black; }
-
-        /* ATRIBUTOS */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; }
-        .stat-box { 
-            background: #2c1a0a; border: 1px solid #4b2e0e; padding: 10px; text-align: center; border-radius: 6px; 
-            cursor: pointer; transition: 0.2s; 
-        }
-        .stat-box:hover { border-color: var(--gold); background: #3d2612; transform: translateY(-2px); }
-        .stat-box label { display: block; font-size: 0.7rem; color: var(--gold); font-family: 'Cinzel'; margin-bottom: 5px; }
-        .stat-box span { font-size: 1.8rem; font-family: 'MedievalSharp'; display: block; }
-
-        /* INFO COMBATE */
-        .combat-info { display: flex; justify-content: space-around; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 8px; margin-top: 15px; border: 1px dashed var(--gold); }
-        .combat-item { text-align: center; }
-        .combat-item small { display: block; font-size: 0.65rem; color: var(--gold); letter-spacing: 1px; }
-        .combat-item span { font-family: 'MedievalSharp'; font-size: 1.2rem; }
-
-        /* LISTAS (PERICIAS / LOJA) */
-        .list-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
-        @media(min-width: 600px) { .list-grid { grid-template-columns: 1fr 1fr; } }
+        .control-group { background: rgba(0,0,0,0.4); padding: 15px; border: 1px solid var(--border); border-radius: 6px; }
+        .control-group label { display: block; font-size: 0.75rem; color: #888; text-transform: uppercase; margin-bottom: 4px; }
         
-        .list-item { 
-            background: rgba(0,0,0,0.4); padding: 12px; border-left: 3px solid var(--gold); border-bottom: 1px solid #333;
-            cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: 0.2s;
+        input, select, textarea {
+            width: 100%; padding: 8px; background: #000; border: 1px solid #444; color: var(--gold);
+            font-family: 'Lora'; margin-bottom: 8px; box-sizing: border-box; border-radius: 4px;
         }
-        .list-item:hover { background: rgba(212,175,55,0.15); padding-left: 15px; }
-        .list-item strong { color: var(--gold); font-family: 'Cinzel'; display: block; }
-        .list-item small { color: #aaa; font-size: 0.8rem; font-style: italic; }
+        input:focus, select:focus { outline: 1px solid var(--gold); border-color: var(--gold); }
 
-        /* INVENTARIO E LOJA GRID */
-        .inv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px; }
-        .inv-slot { 
-            background: #2c1a0a; border: 1px solid #4b2e0e; padding: 10px; text-align: center; 
-            cursor: pointer; border-radius: 4px; transition: 0.2s; position: relative;
+        button {
+            width: 100%; padding: 10px; background: linear-gradient(to bottom, #3a220a, #1a0f06); 
+            color: var(--gold); border: 1px solid var(--gold-dark); cursor: pointer; 
+            font-family: 'Cinzel'; font-weight: bold; transition: 0.2s; margin-top: 5px;
         }
-        .inv-slot:hover { border-color: var(--gold-bright); }
-        .inv-slot img { width: 40px; height: 40px; object-fit: contain; margin-bottom: 5px; filter: drop-shadow(0 0 5px rgba(0,0,0,0.5)); }
-        .inv-price { color: var(--gold-bright); font-size: 0.85rem; font-weight: bold; margin-top: 5px; }
+        button:hover { background: var(--gold); color: #000; }
+        button.danger { background: var(--danger); border-color: #ff4444; color: #ffcccc; }
+        button.danger:hover { background: #ff0000; color: white; }
 
-        /* MAPA */
-        #map-container { background: #000; border: 2px solid var(--gold); position: relative; overflow: hidden; border-radius: 8px; height: 60vh; cursor: grab; }
-        #map-container:active { cursor: grabbing; }
-        #mapCanvas { display: block; width: 100%; height: 100%; }
+        /* ÁREA PRINCIPAL */
+        main { 
+            padding: 30px; overflow-y: auto; 
+            background-image: url('https://www.transparenttextures.com/patterns/black-linen.png');
+            position: relative;
+        }
+
+        .empty-state {
+            text-align: center; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            opacity: 0.3; pointer-events: none;
+        }
+
+        #editor-panel { display: none; max-width: 1000px; margin: 0 auto; padding-bottom: 50px; }
         
-        /* UTILITARIOS */
-        #music-alert { 
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            background: var(--gold); color: black; padding: 12px 25px; border-radius: 50px;
-            font-weight: bold; cursor: pointer; z-index: 1000; display: none;
-            box-shadow: 0 0 20px rgba(212,175,55,0.6); animation: pulse 2s infinite;
+        .char-header {
+            display: flex; justify-content: space-between; align-items: flex-end;
+            border-bottom: 3px double var(--gold); padding-bottom: 10px; margin-bottom: 20px;
         }
 
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; justify-content: center; align-items: center; }
-        .modal-content { background: url('https://www.transparenttextures.com/patterns/aged-paper.png'), var(--parchment); color: #1a0f06; padding: 30px; border-radius: 4px; max-width: 400px; text-align: center; border: 5px double #1a0f06; position: relative; }
+        .grid-dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
         
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes pulse { 0% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.05); } 100% { transform: translateX(-50%) scale(1); } }
+        .card { 
+            background: rgba(22, 16, 10, 0.9); border: 1px solid var(--border); padding: 15px; 
+            border-radius: 6px; position: relative;
+        }
+        .card h3 { border-bottom: 1px solid #333; padding-bottom: 5px; font-size: 1rem; }
+
+        .vitals-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        .vital-box { text-align: center; background: #000; padding: 10px; border: 1px solid #333; }
+        .vital-box label { color: var(--gold); font-size: 0.8rem; display: block; }
+        .vital-box input { text-align: center; font-size: 1.5rem; border: none; background: transparent; color: white; font-family: 'MedievalSharp'; }
+
+        .item-row { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 8px; border-bottom: 1px solid #333; font-size: 0.9rem; 
+        }
+        .item-row:hover { background: rgba(255,255,255,0.05); }
+        .btn-mini { width: auto; padding: 2px 8px; margin: 0; font-size: 0.8rem; }
     </style>
 </head>
 <body>
 
-<header>
-    <h1 id="header-name">Carregando...</h1>
-    <div class="currency-bar">
-        <span>ℤ <span id="zeuro-val">0</span></span> | 
-        <span>XP: <span id="xp-val">0</span></span>
+<aside>
+    <div>
+        <h1>ZATUR RPG</h1>
+        <div style="text-align:center; font-size:0.8rem; color:#666;">PAINEL DE CONTROLE</div>
     </div>
-</header>
 
-<nav class="tabs">
-    <button class="tab-btn active" data-tab="tab-ficha">Ficha</button>
-    <button class="tab-btn" data-tab="tab-hab">Perícias</button>
-    <button class="tab-btn" data-tab="tab-inv">Mochila</button>
-    <button class="tab-btn" data-tab="tab-shop">Loja</button>
-    <button class="tab-btn" data-tab="tab-map">Mapa</button>
-</nav>
+    <div class="control-group">
+        <h2>👤 Herói Ativo</h2>
+        <select id="player-select">
+            <option value="">-- Selecione --</option>
+        </select>
+        <button id="btn-token-add">📍 Invocar Token no Mapa</button>
+    </div>
 
-<div id="music-alert" onclick="activateAudio()">⚡ NOVA MÚSICA DISPONÍVEL</div>
+    <div class="control-group">
+        <h2>⚒️ Forjar</h2>
+        <label>O que você vai criar?</label>
+        <select id="new-type">
+            <option value="items">Item (Equipamento/Consumível)</option>
+            <option value="skills">Perícia (Habilidade/Magia)</option>
+        </select>
 
-<main class="container">
-    
-    <section id="tab-ficha" class="tab-content active">
-        <div class="card">
-            <div class="status-container">
-                <div>
-                    <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--gold)">
-                        <span>VIDA</span> <span>(VIG x 100)</span>
+        <label>Nome</label>
+        <input type="text" id="new-item-name" placeholder="Ex: Espada Longa">
+        
+        <label>Descrição</label>
+        <textarea id="new-item-desc" rows="2" placeholder="Efeito ou detalhes..."></textarea>
+        
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
+            <div><label>Preço ($)</label><input type="number" id="new-item-price" value="0"></div>
+            <div><label>Ícone (URL)</label><input type="text" id="new-item-img"></div>
+        </div>
+        
+        <button id="btn-create-entry" style="border-color:var(--success); color:#cfc;">Salvar no Banco</button>
+    </div>
+
+    <div class="control-group">
+        <h2>🌍 Cenário Global</h2>
+        <label>URL do Mapa</label>
+        <input type="text" id="global-map" placeholder="http://...">
+        
+        <label>URL da Música</label>
+        <input type="text" id="global-music" placeholder="http://...">
+        
+        <button id="btn-update-world">Atualizar Tela dos Jogadores</button>
+        <div style="display:flex; gap:5px; margin-top:5px;">
+            <button class="danger" onclick="clearTokens()">Limpar Mapa</button>
+            <button onclick="resetPositions()">Reset Posições</button>
+        </div>
+    </div>
+</aside>
+
+<main>
+    <div class="empty-state" id="empty-msg">
+        <h1>Selecione um personagem<br>para começar a editar</h1>
+    </div>
+
+    <div id="editor-panel">
+        <div class="char-header">
+            <div>
+                <h1 id="char-name" style="text-align:left; border:none; padding:0; font-size:2.5rem">-</h1>
+                <span id="char-desc" style="color:#888;">Classe | Origem</span>
+            </div>
+            <button onclick="saveCharacter()" style="width:auto; padding: 10px 30px; background:var(--gold); color:black;">💾 SALVAR ALTERAÇÕES</button>
+        </div>
+
+        <div class="grid-dashboard">
+            <div class="card">
+                <h3>❤️ Vitais & Recursos</h3>
+                <div class="vitals-grid">
+                    <div class="vital-box">
+                        <label>VIDA ATUAL</label>
+                        <input type="number" id="inp-pv">
                     </div>
-                    <div class="status-bar">
-                        <div id="bar-pv" class="bar-fill" style="background:var(--red); width: 0%"></div>
-                        <div class="bar-label" id="txt-pv">0/0</div>
+                    <div class="vital-box">
+                        <label>VIDA MÁX</label>
+                        <input type="number" id="inp-pv-max">
+                    </div>
+                    <div class="vital-box">
+                        <label>MANA ATUAL</label>
+                        <input type="number" id="inp-pe">
+                    </div>
+                    <div class="vital-box">
+                        <label>MANA MÁX</label>
+                        <input type="number" id="inp-pe-max">
                     </div>
                 </div>
-                <div>
-                    <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--gold)">
-                        <span>MANA</span> <span>(MANA x 20)</span>
-                    </div>
-                    <div class="status-bar">
-                        <div id="bar-pe" class="bar-fill" style="background:var(--blue); width: 0%"></div>
-                        <div class="bar-label" id="txt-pe">0/0</div>
-                    </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <div><label>XP</label><input type="number" id="inp-xp"></div>
+                    <div><label>Zeuros ($)</label><input type="number" id="inp-gold"></div>
                 </div>
             </div>
 
-            <div class="stats-grid" id="stats-area"></div>
+            <div class="card">
+                <h3>📊 Atributos Base</h3>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <div><label>FORÇA</label><input type="number" id="inp-for"></div>
+                    <div><label>AGILIDADE</label><input type="number" id="inp-agi"></div>
+                    <div><label>MANA (Attr)</label><input type="number" id="inp-man"></div>
+                    <div><label>INTELECTO</label><input type="number" id="inp-int"></div>
+                    <div><label>VIGOR</label><input type="number" id="inp-vig"></div>
+                    <div><label>DEFESA EQ.</label><input type="number" id="inp-def-eq"></div>
+                </div>
+            </div>
 
-            <div class="combat-info">
-                <div class="combat-item"><small>DEFESA TOTAL</small><span id="val-def">0</span></div>
-                <div class="combat-item"><small>DESLOCAMENTO</small><span id="val-desl">0m</span></div>
-                <div class="combat-item"><small>CARGA (KG)</small><span id="val-carga">0/0</span></div>
+            <div class="card">
+                <h3>🎒 Inventário (Items)</h3>
+                <div style="display:flex; gap:5px; margin-bottom:10px;">
+                    <select id="list-global-inv"></select>
+                    <button class="btn-mini" onclick="addEntryToChar('itens', 'list-global-inv')">+</button>
+                </div>
+                <div id="container-inv" style="max-height:200px; overflow-y:auto;"></div>
+            </div>
+
+            <div class="card">
+                <h3>📜 Perícias (Skills)</h3>
+                <div style="display:flex; gap:5px; margin-bottom:10px;">
+                    <select id="list-global-skill"></select>
+                    <button class="btn-mini" onclick="addEntryToChar('pericias', 'list-global-skill')">+</button>
+                </div>
+                <div id="container-skill" style="max-height:200px; overflow-y:auto;"></div>
             </div>
         </div>
-
-        <div class="card">
-            <h3 style="font-family:Cinzel; margin:0 0 10px 0; color:var(--gold); border-bottom:1px solid #444; padding-bottom:5px;">Identidade</h3>
-            <p style="font-size: 0.9rem; margin: 5px 0;"><b>Classe:</b> <span id="char-classe">-</span> | <b>Origem:</b> <span id="char-origem">-</span> | <b>Clã:</b> <span id="char-cla">-</span></p>
-            <p id="char-hist" style="font-style:italic; font-size:0.85rem; color:#aaa; margin-top:10px; line-height:1.4;"></p>
-        </div>
-    </section>
-
-    <section id="tab-hab" class="tab-content">
-        <div class="card">
-            <h2>🧠 Perícias e Habilidades</h2>
-            <div class="list-grid" id="hab-list">
-                <p style="color:#666; font-style:italic;">Carregando habilidades...</p>
-            </div>
-        </div>
-    </section>
-
-    <section id="tab-inv" class="tab-content">
-        <div class="card">
-            <h2>🎒 Sua Mochila</h2>
-            <div class="inv-grid" id="inv-list"></div>
-        </div>
-    </section>
-
-    <section id="tab-shop" class="tab-content">
-        <div class="card">
-            <h2>🏛️ Mercado de Zatur</h2>
-            <p style="font-size:0.8rem; color:#888; margin-bottom:15px;">Clique em um item para comprar. Seu ouro é descontado automaticamente.</p>
-            <div class="inv-grid" id="shop-list"></div>
-        </div>
-    </section>
-
-    <section id="tab-map" class="tab-content">
-        <div id="map-container">
-            <canvas id="mapCanvas"></canvas>
-            <div style="position: absolute; top: 10px; right: 10px; display: flex; flex-direction: column; gap: 5px;">
-                <button onclick="adjustZoom(0.1)" style="width:40px; height:40px; background:rgba(0,0,0,0.6); color:white; border:1px solid var(--gold); cursor:pointer; font-size:1.2rem;">+</button>
-                <button onclick="adjustZoom(-0.1)" style="width:40px; height:40px; background:rgba(0,0,0,0.6); color:white; border:1px solid var(--gold); cursor:pointer; font-size:1.2rem;">-</button>
-            </div>
-        </div>
-        <p style="text-align:center; color:#666; font-size:0.8rem; margin-top:5px;">Arraste seu círculo dourado para se mover.</p>
-    </section>
-
+    </div>
 </main>
-
-<div id="modal" class="modal" onclick="this.style.display='none'">
-    <div class="modal-content" onclick="event.stopPropagation()">
-        <h3 id="m-title" style="font-family:Cinzel; margin-top:0; color:var(--gold-bright)"></h3>
-        <hr style="border-color:#1a0f06; opacity:0.3">
-        <div id="m-desc"></div>
-    </div>
-</div>
-
-<audio id="bg-audio" loop></audio>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, onSnapshot, getDoc, updateDoc, collection, getDocs, arrayUnion } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, onSnapshot, updateDoc, collection, getDocs, addDoc, arrayUnion, arrayRemove, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyAgYVod9B99WIc_QysFx73htOf9O8XtuE8",
@@ -224,286 +230,187 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const charId = new URLSearchParams(window.location.search).get("id");
-    const audio = document.getElementById('bg-audio');
+    let currentCharId = null;
+    let globalNameCache = {}; // Cache para nomes (items E skills)
 
-    let characterData = {};
+    // INICIALIZAÇÃO
+    async function init() {
+        // 1. Carregar lista de Personagens
+        const charsSnap = await getDocs(collection(db, "characters"));
+        const select = document.getElementById('player-select');
+        charsSnap.forEach(d => {
+            select.innerHTML += `<option value="${d.id}">${d.data().Nome}</option>`;
+        });
 
-    // --- FUNÇÃO DE ROLAGEM (D20 + BÔNUS) ---
-    window.rolar = (nome, bonus) => {
-        const dado = Math.floor(Math.random() * 20) + 1;
-        const total = dado + bonus;
-        let cor = "#1a0f06";
-        let msg = "Normal";
+        // 2. Carregar Itens e Skills
+        refreshGlobalData();
+    }
+    init();
+
+    async function refreshGlobalData() {
+        globalNameCache = {};
         
-        if(dado === 20) { msg = "CRÍTICO!"; cor = "#8b0000"; }
-        else if(dado === 1) { msg = "FALHA CRÍTICA!"; cor = "#555"; }
-        else if(total >= 15) { msg = "Sucesso"; cor = "#006400"; }
-        
-        document.getElementById('m-title').innerText = nome;
-        document.getElementById('m-desc').innerHTML = `
-            <div style="font-size:4rem; font-family:MedievalSharp; color:${cor};">${total}</div>
-            <p style="font-size:1.1rem">Dado (${dado}) + Bônus (${bonus})</p>
-            <p style="font-weight:bold; text-transform:uppercase; color:${cor}">${msg}</p>
-        `;
-        document.getElementById('modal').style.display = 'flex';
+        // Carregar Items -> Popular Select Inv
+        const invSel = document.getElementById('list-global-inv');
+        invSel.innerHTML = "";
+        const itemSnap = await getDocs(collection(db, "items"));
+        itemSnap.forEach(d => {
+            const data = d.data();
+            globalNameCache[d.id] = data.Nome;
+            invSel.innerHTML += `<option value="${d.id}">${data.Nome}</option>`;
+        });
+
+        // Carregar Skills -> Popular Select Skill
+        const skillSel = document.getElementById('list-global-skill');
+        skillSel.innerHTML = "";
+        const skillSnap = await getDocs(collection(db, "skills"));
+        skillSnap.forEach(d => {
+            const data = d.data();
+            globalNameCache[d.id] = data.Nome;
+            skillSel.innerHTML += `<option value="${d.id}">${data.Nome}</option>`;
+        });
+    }
+
+    // SELECIONAR JOGADOR
+    document.getElementById('player-select').onchange = (e) => {
+        currentCharId = e.target.value;
+        if(currentCharId) {
+            document.getElementById('empty-msg').style.display = 'none';
+            document.getElementById('editor-panel').style.display = 'block';
+            subscribeToChar(currentCharId);
+        } else {
+            document.getElementById('empty-msg').style.display = 'block';
+            document.getElementById('editor-panel').style.display = 'none';
+        }
     };
 
-    // --- CARREGAMENTO DE DADOS ---
-    if (charId) {
-        // 1. DADOS DO PERSONAGEM (Tempo Real)
-        onSnapshot(doc(db, "characters", charId), (snap) => {
-            if (!snap.exists()) return;
+    // ESCUTAR MUDANÇAS NA FICHA
+    function subscribeToChar(id) {
+        onSnapshot(doc(db, "characters", id), (snap) => {
+            if(!snap.exists()) return;
             const d = snap.data();
-            characterData = d; 
 
-            // Header
-            document.getElementById('header-name').innerText = d.Nome;
-            document.getElementById('zeuro-val').innerText = d.Zeuro || 0;
-            document.getElementById('xp-val').innerText = d.XP || 0;
+            document.getElementById('char-name').innerText = d.Nome;
+            document.getElementById('char-desc').innerText = `${d.Classe || '?'} | ${d.Origem || '?'}`;
 
-            // Identidade
-            document.getElementById('char-classe').innerText = d.Classe || "Desconhecido";
-            document.getElementById('char-origem').innerText = d.Origem || "Desconhecido";
-            document.getElementById('char-cla').innerText = d.Clã || "Nenhum";
-            document.getElementById('char-hist').innerText = d.Historia || "Sem registros...";
-
-            // Barras e Status
-            const maxPV = d.PV_Max || (d.Vigor * 100);
-            const maxPE = d.PE_Max || (d.Mana * 20);
-            updateBar('pv', d.PV, maxPV);
-            updateBar('pe', d.PE, maxPE);
-
-            // Estatísticas Calculadas
-            document.getElementById('val-def').innerText = (d.Força || 0) + (d.Agilidade || 0) + (d.Defesa_Equip || 0);
-            document.getElementById('val-desl').innerText = ((d.Agilidade || 0) + 5) + "m";
-            const pesoTotal = d.itens ? d.itens.length : 0; 
-            document.getElementById('val-carga').innerText = `${pesoTotal} / ${(d.Força + d.Vigor) * 2}`;
-
-            // Renderizar Atributos
-            const stats = ["Força", "Agilidade", "Mana", "Intelecto", "Vigor"];
-            document.getElementById('stats-area').innerHTML = stats.map(s => `
-                <div class="stat-box" onclick="window.rolar('${s}', ${d[s] || 0})">
-                    <label>${s.toUpperCase()}</label>
-                    <span>${d[s] || 0}</span>
-                </div>
-            `).join('');
-
-            // Renderizar Listas (CORRIGIDO PARA BUSCAR NAS COLEÇÕES CERTAS)
-            renderSkills(d.pericias || []);
-            renderInventory(d.itens || []);
-        });
-
-        // 2. DADOS DO MUNDO
-        onSnapshot(doc(db, "campaign_settings", "global"), (snap) => {
-            if (!snap.exists()) return;
-            const conf = snap.data();
+            // Preencher Inputs
+            const fields = ['pv','pv-max','pe','pe-max','xp','gold','for','agi','man','int','vig','def-eq'];
+            const dbFields = ['PV','PV_Max','PE','PE_Max','XP','Zeuro','Força','Agilidade','Mana','Intelecto','Vigor','Defesa_Equip'];
             
-            if (conf.musica_url && audio.src !== conf.musica_url) {
-                audio.src = conf.musica_url;
-                document.getElementById('music-alert').style.display = 'block';
-            }
-            
-            if (conf.mapa_url && mapImg.src !== conf.mapa_url) {
-                mapImg.src = conf.mapa_url;
-                mapImg.onload = () => { 
-                    canvas.width = mapImg.width; 
-                    canvas.height = mapImg.height; 
-                    renderMap(); 
-                };
-            }
-            tokens = conf.posicoes || {};
-            renderMap();
-        });
+            fields.forEach((fid, i) => {
+                const el = document.getElementById(`inp-${fid}`);
+                if(el) el.value = d[dbFields[i]] || 0;
+            });
 
-        // Carrega a Loja (Items)
-        renderShop();
-    }
-
-    function updateBar(type, current, max) {
-        if(!max) max = 1;
-        const pct = Math.min(100, Math.max(0, (current / max) * 100));
-        document.getElementById(`bar-${type}`).style.width = `${pct}%`;
-        document.getElementById(`txt-${type}`).innerText = `${current}/${max}`;
-    }
-
-    // --- BUSCA PERÍCIAS NA COLEÇÃO "SKILLS" ---
-    async function renderSkills(listaIds) {
-        const container = document.getElementById('hab-list');
-        container.innerHTML = "";
-        
-        if(listaIds.length === 0) {
-            container.innerHTML = "<p>Nenhuma habilidade conhecida.</p>";
-            return;
-        }
-
-        for (const id of listaIds) {
-            let nome = id; 
-            let desc = "";
-            let bonus = 0;
-
-            // Busca na coleção SKILLS
-            try {
-                const itemSnap = await getDoc(doc(db, "skills", id));
-                if (itemSnap.exists()) {
-                    const data = itemSnap.data();
-                    nome = data.Nome;
-                    desc = data.Descricao;
-                }
-            } catch(e) { console.log("Skill não encontrada:", id); }
-
-            // Calcular Bônus Automático
-            const matches = nome.match(/\((.*?)\)/);
-            if (matches) {
-                const map = { "FOR": "Força", "AGI": "Agilidade", "MANA": "Mana", "INTC": "Intelecto", "VIG": "Vigor" };
-                const sigla = matches[1].toUpperCase();
-                if(map[sigla]) bonus = characterData[map[sigla]] || 0;
-            }
-
-            const div = document.createElement('div');
-            div.className = 'list-item';
-            div.innerHTML = `
-                <div>
-                    <strong>${nome}</strong>
-                    ${desc ? `<small>${desc}</small>` : ''}
-                </div>
-                <span style="font-family:MedievalSharp; font-size:1.2rem">+${bonus}</span>
-            `;
-            div.onclick = () => window.rolar(nome, bonus);
-            container.appendChild(div);
-        }
-    }
-
-    // --- BUSCA ITENS NA COLEÇÃO "ITEMS" ---
-    async function renderInventory(ids) {
-        const area = document.getElementById('inv-list');
-        area.innerHTML = "";
-        for (const id of ids) {
-            // Busca na coleção ITEMS
-            const itemSnap = await getDoc(doc(db, "items", id));
-            if (itemSnap.exists()) {
-                const data = itemSnap.data();
-                area.innerHTML += `
-                    <div class="inv-slot" onclick="alert('${data.Descricao || data.Nome}')">
-                        <img src="${data.Imagem || 'https://cdn-icons-png.flaticon.com/512/1251/1251784.png'}">
-                        <div>${data.Nome}</div>
-                    </div>`;
-            }
-        }
-    }
-
-    // --- LOJA (ITENS) ---
-    async function renderShop() {
-        const container = document.getElementById('shop-list');
-        container.innerHTML = "Carregando mercadorias...";
-        
-        const q = await getDocs(collection(db, "items"));
-        container.innerHTML = "";
-        
-        q.forEach(docSnap => {
-            const item = docSnap.data();
-            if(item.Preco && item.Preco > 0) {
-                const div = document.createElement('div');
-                div.className = 'inv-slot';
-                div.innerHTML = `
-                    <img src="${item.Imagem || 'https://cdn-icons-png.flaticon.com/512/1251/1251784.png'}">
-                    <div>${item.Nome}</div>
-                    <div class="inv-price">ℤ ${item.Preco}</div>
-                `;
-                div.onclick = () => comprarItem(docSnap.id, item.Nome, item.Preco);
-                container.appendChild(div);
-            }
+            // Renderizar Listas (usando o campo correto do BD)
+            renderList('container-inv', d.itens || [], 'itens');
+            renderList('container-skill', d.pericias || [], 'pericias');
         });
     }
 
-    async function comprarItem(id, nome, preco) {
-        if((characterData.Zeuro || 0) < preco) {
-            alert("Você não tem Zeuros suficientes!");
-            return;
-        }
-        if(confirm(`Comprar ${nome} por ℤ ${preco}?`)) {
-            try {
-                await updateDoc(doc(db, "characters", charId), {
-                    Zeuro: (characterData.Zeuro || 0) - preco,
-                    itens: arrayUnion(id)
-                });
-                alert("Compra realizada com sucesso!");
-            } catch(e) {
-                alert("Erro ao comprar: " + e.message);
-            }
-        }
+    function renderList(containerId, ids, fieldName) {
+        const div = document.getElementById(containerId);
+        div.innerHTML = "";
+        ids.forEach(id => {
+            const nome = globalNameCache[id] || id; 
+            div.innerHTML += `
+                <div class="item-row">
+                    <span>${nome}</span>
+                    <button class="danger btn-mini" onclick="window.removeEntry('${fieldName}', '${id}')">X</button>
+                </div>`;
+        });
     }
 
-    // --- SISTEMA DE MAPA ---
-    const canvas = document.getElementById('mapCanvas');
-    const ctx = canvas.getContext('2d');
-    let mapImg = new Image();
-    let tokens = {};
-    let zoom = 1.0;
-    let isDragging = false;
-
-    function renderMap() {
-        if (!mapImg.src) return;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        ctx.drawImage(mapImg, 0, 0, canvas.width * zoom, canvas.height * zoom);
-
-        for (let id in tokens) {
-            const t = tokens[id];
-            ctx.beginPath();
-            ctx.arc(t.x * zoom, t.y * zoom, 25 * zoom, 0, Math.PI * 2);
-            ctx.fillStyle = (id === charId) ? "#d4af37" : "#800000"; 
-            ctx.fill();
-            ctx.strokeStyle = "white"; ctx.lineWidth = 3; ctx.stroke();
-            
-            ctx.fillStyle = "white"; 
-            ctx.font = `bold ${14 * zoom}px Arial`;
-            ctx.textAlign = "center"; 
-            ctx.fillText(t.nome || "Player", t.x * zoom, (t.y + 45) * zoom);
-        }
-    }
-
-    canvas.onmousedown = (e) => {
-        const rect = canvas.getBoundingClientRect();
-        const mouseX = (e.clientX - rect.left) / (rect.width / canvas.width) / zoom;
-        const mouseY = (e.clientY - rect.top) / (rect.height / canvas.height) / zoom;
-        
-        if (tokens[charId]) {
-            const dist = Math.sqrt((mouseX - tokens[charId].x)**2 + (mouseY - tokens[charId].y)**2);
-            if (dist < 30) isDragging = true;
-        }
+    // SALVAR FICHA MANUALMENTE
+    window.saveCharacter = async () => {
+        if(!currentCharId) return;
+        const data = {
+            PV: parseInt(document.getElementById('inp-pv').value),
+            PV_Max: parseInt(document.getElementById('inp-pv-max').value),
+            PE: parseInt(document.getElementById('inp-pe').value),
+            PE_Max: parseInt(document.getElementById('inp-pe-max').value),
+            XP: parseInt(document.getElementById('inp-xp').value),
+            Zeuro: parseInt(document.getElementById('inp-gold').value),
+            Força: parseInt(document.getElementById('inp-for').value),
+            Agilidade: parseInt(document.getElementById('inp-agi').value),
+            Mana: parseInt(document.getElementById('inp-man').value),
+            Intelecto: parseInt(document.getElementById('inp-int').value),
+            Vigor: parseInt(document.getElementById('inp-vig').value),
+            Defesa_Equip: parseInt(document.getElementById('inp-def-eq').value),
+        };
+        await updateDoc(doc(db, "characters", currentCharId), data);
+        alert("Ficha salva!");
     };
 
-    canvas.onmousemove = (e) => {
-        if (isDragging) {
-            const rect = canvas.getBoundingClientRect();
-            tokens[charId].x = (e.clientX - rect.left) / (rect.width / canvas.width) / zoom;
-            tokens[charId].y = (e.clientY - rect.top) / (rect.height / canvas.height) / zoom;
-            renderMap();
-        }
+    // ADICIONAR / REMOVER DA LISTA DO PERSONAGEM
+    window.addEntryToChar = async (field, selectId) => {
+        const itemId = document.getElementById(selectId).value;
+        if(!currentCharId || !itemId) return;
+        await updateDoc(doc(db, "characters", currentCharId), {
+            [field]: arrayUnion(itemId)
+        });
     };
 
-    canvas.onmouseup = async () => {
-        if (isDragging) {
-            await updateDoc(doc(db, "campaign_settings", "global"), { 
-                [`posicoes.${charId}`]: tokens[charId] 
+    window.removeEntry = async (field, itemId) => {
+        if(confirm("Remover da ficha do jogador?")) {
+            await updateDoc(doc(db, "characters", currentCharId), {
+                [field]: arrayRemove(itemId)
             });
         }
-        isDragging = false;
     };
 
-    window.adjustZoom = (val) => { zoom += val; if(zoom < 0.2) zoom = 0.2; renderMap(); };
-    window.activateAudio = () => { audio.play(); document.getElementById('music-alert').style.display = 'none'; };
+    // CRIAÇÃO DE ITENS OU SKILLS (GLOBAL)
+    document.getElementById('btn-create-entry').onclick = async () => {
+        const collectionName = document.getElementById('new-type').value; // 'items' ou 'skills'
+        const nome = document.getElementById('new-item-name').value;
+        
+        if(!nome) return alert("Nome obrigatório");
+        
+        await addDoc(collection(db, collectionName), {
+            Nome: nome,
+            Descricao: document.getElementById('new-item-desc').value,
+            Preco: parseInt(document.getElementById('new-item-price').value),
+            Imagem: document.getElementById('new-item-img').value
+        });
+        
+        alert(`Criado com sucesso em ${collectionName}!`);
+        
+        // Limpar campos
+        document.getElementById('new-item-name').value = "";
+        document.getElementById('new-item-desc').value = "";
+        
+        refreshGlobalData(); // Atualizar selects
+    };
 
-    // --- NAVEGAÇÃO ---
-    document.querySelectorAll('.tab-btn').forEach(b => {
-        b.onclick = () => {
-            document.querySelectorAll('.tab-btn, .tab-content').forEach(e => e.classList.remove('active'));
-            b.classList.add('active');
-            document.getElementById(b.dataset.tab).classList.add('active');
-            if(b.dataset.tab === 'tab-map') setTimeout(renderMap, 100);
-        };
-    });
+    // CONTROLE DE MUNDO
+    document.getElementById('btn-update-world').onclick = async () => {
+        await setDoc(doc(db, "campaign_settings", "global"), {
+            mapa_url: document.getElementById('global-map').value,
+            musica_url: document.getElementById('global-music').value
+        }, { merge: true });
+        alert("Mundo sincronizado!");
+    };
+
+    document.getElementById('btn-token-add').onclick = async () => {
+        if(!currentCharId) return alert("Selecione um herói");
+        const nome = document.getElementById('char-name').innerText;
+        await updateDoc(doc(db, "campaign_settings", "global"), {
+            [`posicoes.${currentCharId}`]: { x: 50, y: 50, nome: nome }
+        });
+    };
+
+    window.clearTokens = async () => {
+        if(confirm("Remover todos os tokens?")) {
+            await updateDoc(doc(db, "campaign_settings", "global"), { posicoes: {} });
+        }
+    };
+    
+    window.resetPositions = async () => {
+        const snap = await getDoc(doc(db, "campaign_settings", "global"));
+        let pos = snap.data().posicoes || {};
+        for(let k in pos) { pos[k].x = 50; pos[k].y = 50; }
+        await updateDoc(doc(db, "campaign_settings", "global"), { posicoes: pos });
+    };
 
 </script>
 </body>
