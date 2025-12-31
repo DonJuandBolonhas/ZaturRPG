@@ -3,243 +3,168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Zatur - Mesa Virtual Definitiva</title>
+    <title>Zatur - Mesa Virtual</title>
     <style>
-        /* FONTES */
+        /* --- FONTES & VARIÁVEIS --- */
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=MedievalSharp&family=Roboto:wght@400;500;700&display=swap');
         
-        /* VARIÁVEIS DE COR */
         :root {
             --gold: #d4af37; 
             --gold-dim: #8a7018;
-            --bg-dark: #0c0805; 
-            --panel-bg: rgba(18, 14, 10, 0.98);
+            --panel-bg: rgba(18, 14, 10, 0.95);
             --danger: #b91c1c;
-            --danger-dim: #7f1d1d;
             --mana: #1e4d8c;
             --text-main: #e5e5e5;
-            --chat-bg: rgba(0, 0, 0, 0.6);
         }
 
-        /* GERAL */
-        body { margin: 0; overflow: hidden; background: #000; font-family: 'MedievalSharp', cursive; color: var(--text-main); user-select: none; -webkit-tap-highlight-color: transparent; }
-        * { box-sizing: border-box; }
+        /* --- GERAL --- */
+        body { margin: 0; overflow: hidden; background: #050505; font-family: 'MedievalSharp', cursive; color: var(--text-main); user-select: none; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; outline: none; }
 
-        /* SCROLLBAR */
+        /* SCROLLBAR CUSTOMIZADA */
         ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #111; }
+        ::-webkit-scrollbar-track { background: #000; }
         ::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 3px; }
 
-        /* === TELA DE START === */
+        /* --- UI: START SCREEN --- */
         #start-overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0,0,0,0.95); z-index: 9999;
+            background: rgba(0,0,0,0.92); z-index: 9999;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            backdrop-filter: blur(5px);
-            text-align: center;
-            padding: 20px;
+            backdrop-filter: blur(8px); text-align: center;
         }
+        .title-anim { animation: pulseGold 3s infinite; }
+        @keyframes pulseGold { 0% { text-shadow: 0 0 20px #8a7018; } 50% { text-shadow: 0 0 40px #d4af37; } 100% { text-shadow: 0 0 20px #8a7018; } }
+        
         #btn-enter {
-            padding: 15px 50px; font-size: 1.5rem; background: transparent; color: var(--gold);
+            padding: 15px 60px; font-size: 1.5rem; background: transparent; color: var(--gold);
             border: 2px solid var(--gold); font-family: 'Cinzel'; cursor: pointer; 
-            text-transform: uppercase; letter-spacing: 3px; transition: 0.3s;
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+            text-transform: uppercase; letter-spacing: 3px; transition: 0.3s; margin-top: 30px;
         }
-        #btn-enter:hover { background: var(--gold); color: #000; box-shadow: 0 0 40px var(--gold); }
+        #btn-enter:hover { background: var(--gold); color: #000; box-shadow: 0 0 30px var(--gold); transform: scale(1.05); }
 
-        /* === MISSÃO ATUAL === */
-        #mission-bar {
-            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
-            z-index: 20; background: linear-gradient(90deg, transparent, rgba(0,0,0,0.9), transparent);
-            padding: 10px 40px; border-bottom: 2px solid var(--gold-dim);
-            text-align: center; pointer-events: none; width: 60%;
-            transition: all 0.3s ease;
-        }
-        .mission-title { color: var(--gold); font-family: 'Cinzel'; font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; display: block; margin-bottom: 5px; }
-        .mission-text { color: #fff; font-family: 'MedievalSharp'; font-size: 1.4rem; text-shadow: 0 2px 4px #000; }
-
-        /* === MAPA === */
-        #map-layer { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; background: #080808; touch-action: none; }
+        /* --- UI: MAPA & CONTROLES --- */
+        #map-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; background: #111; touch-action: none; }
         
         #bottom-controls {
             position: absolute; bottom: 20px; left: 20px; z-index: 5;
-            display: flex; flex-direction: column; gap: 10px;
+            display: flex; flex-direction: column; gap: 10px; pointer-events: none;
         }
-        .control-grp { display: flex; gap: 5px; background: rgba(0,0,0,0.8); padding: 5px; border-radius: 5px; border: 1px solid #333; }
-        .map-btn { width: 32px; height: 32px; cursor: pointer; background: #222; color: var(--gold); border: 1px solid #444; border-radius: 3px; font-size: 1.2rem; display:flex; align-items:center; justify-content:center; }
-        .map-btn:hover { background: #444; border-color: var(--gold); }
+        .control-grp { 
+            display: flex; gap: 8px; background: rgba(0,0,0,0.7); padding: 8px; 
+            border-radius: 8px; border: 1px solid #444; pointer-events: auto; backdrop-filter: blur(4px);
+        }
+        .map-btn { 
+            width: 40px; height: 40px; cursor: pointer; background: #222; color: var(--gold); 
+            border: 1px solid #555; border-radius: 4px; font-size: 1.4rem; 
+            display:flex; align-items:center; justify-content:center; transition: 0.2s;
+        }
+        .map-btn:active { transform: scale(0.9); background: var(--gold); color: black; }
 
-        /* === HUD LATERAL === */
+        /* --- UI: HUD LATERAL --- */
         #ui-layer {
             position: absolute; top: 0; right: 0; height: 100vh; width: 380px;
-            background: var(--panel-bg); border-left: 3px solid var(--gold-dim);
+            background: var(--panel-bg); border-left: 2px solid var(--gold-dim);
             z-index: 100; display: flex; flex-direction: column;
-            box-shadow: -10px 0 50px rgba(0,0,0,1);
-            transition: transform 0.3s ease, right 0.3s ease;
+            box-shadow: -5px 0 30px rgba(0,0,0,0.8);
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        /* Mobile Toggle */
+        #mobile-hud-toggle {
+            display: none; position: absolute; top: 15px; right: 15px; z-index: 101;
+            width: 50px; height: 50px; background: rgba(0,0,0,0.8); border: 2px solid var(--gold);
+            border-radius: 50%; color: var(--gold); font-size: 1.5rem;
+            align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 0 15px black;
         }
 
-        /* CABEÇALHO DO PERSONAGEM */
-        .char-header { padding: 20px; background: linear-gradient(to bottom, #1a120b, #0c0907); border-bottom: 1px solid var(--gold-dim); }
-        .char-name { margin: 0; color: var(--gold); font-family: 'Cinzel'; font-size: 1.6rem; text-transform: uppercase; text-shadow: 0 2px 4px #000; }
-        .char-details { font-size: 0.8rem; color: #888; margin-bottom: 10px; font-family: 'Roboto'; font-style: italic; }
+        .char-header { padding: 20px; background: linear-gradient(180deg, rgba(20,15,10,1) 0%, rgba(10,5,0,0) 100%); }
+        .char-name { margin: 0; color: var(--gold); font-family: 'Cinzel'; font-size: 1.5rem; text-transform: uppercase; }
         
-        /* BARRAS DE VIDA/MANA */
-        .bars-container { display: flex; flex-direction: column; gap: 6px; }
-        .bar-wrap { position: relative; height: 20px; background: #000; border: 1px solid #444; border-radius: 3px; overflow: hidden; }
-        .bar-fill { height: 100%; transition: width 0.4s ease; }
-        .bar-txt { position: absolute; width: 100%; text-align: center; top: 0; line-height: 20px; font-size: 0.75rem; font-family: 'Roboto'; font-weight: bold; text-shadow: 1px 1px 2px #000; z-index: 2; color: #fff; }
+        .bars-container { display: flex; flex-direction: column; gap: 8px; margin-top: 15px; }
+        .bar-wrap { position: relative; height: 22px; background: #111; border: 1px solid #444; border-radius: 4px; overflow: hidden; }
+        .bar-fill { height: 100%; transition: width 0.5s cubic-bezier(0.25, 1, 0.5, 1); }
+        .bar-txt { position: absolute; width: 100%; text-align: center; top: 2px; font-size: 0.75rem; font-family: 'Roboto'; font-weight: bold; color: #fff; text-shadow: 1px 1px 2px black; z-index: 2; }
 
-        /* ABAS DE NAVEGAÇÃO */
-        .nav-tabs { display: flex; background: #050505; border-bottom: 1px solid #333; }
+        /* TABS */
+        .nav-tabs { display: flex; background: rgba(0,0,0,0.5); }
         .nav-btn {
-            flex: 1; padding: 12px; background: none; border: none; color: #555;
+            flex: 1; padding: 15px; background: none; border: none; color: #666;
             font-family: 'Cinzel'; font-weight: bold; cursor: pointer; 
             border-bottom: 3px solid transparent; transition: 0.3s;
         }
-        .nav-btn:hover { color: #aaa; }
-        .nav-btn.active { color: var(--gold); border-bottom-color: var(--gold); background: linear-gradient(to top, rgba(212,175,55,0.1), transparent); }
+        .nav-btn.active { color: var(--gold); border-bottom-color: var(--gold); background: rgba(212,175,55,0.05); }
 
-        /* CONTEÚDO DAS ABAS */
         .tab-content { flex: 1; overflow-y: auto; padding: 15px; display: none; flex-direction: column; gap: 15px; }
         .tab-content.active { display: flex; }
 
-        /* CARDS E LISTAS */
-        .section-label { color: var(--gold); border-bottom: 1px solid #333; font-family: 'Cinzel'; margin-bottom: 5px; font-size: 0.9rem; }
-        
-        .attr-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        /* LISTAS & CARDS */
+        .attr-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
         .attr-card { 
-            background: rgba(255,255,255,0.03); border: 1px solid #333; padding: 8px; 
-            text-align: center; border-radius: 4px; cursor: pointer; transition: 0.2s;
+            background: rgba(255,255,255,0.03); border: 1px solid #333; padding: 10px; 
+            text-align: center; border-radius: 6px; cursor: pointer; 
         }
-        .attr-card:hover { border-color: var(--gold); transform: translateY(-2px); background: rgba(212,175,55,0.1); }
-        .attr-val { font-size: 1.2rem; font-weight: bold; color: var(--gold); display: block; }
-        .attr-lbl { font-size: 0.7rem; color: #aaa; text-transform: uppercase; }
+        .attr-card:active { transform: scale(0.95); background: rgba(212,175,55,0.2); }
 
-        /* LISTA DE ITENS/MAGIAS */
-        .list-item { 
-            background: rgba(0,0,0,0.3); border: 1px solid #333; border-radius: 4px; 
-            margin-bottom: 5px; overflow: hidden; transition: 0.2s;
-        }
-        .list-header { 
-            padding: 10px; display: flex; justify-content: space-between; align-items: center; 
-            cursor: pointer; background: rgba(255,255,255,0.02);
-        }
-        .list-header:hover { background: rgba(255,255,255,0.05); }
-        .list-body { 
-            padding: 10px; font-family: 'Roboto'; font-size: 0.85rem; color: #ccc; 
-            background: rgba(0,0,0,0.6); border-top: 1px dashed #333; display: none; 
-        }
+        .list-item { background: rgba(0,0,0,0.4); border: 1px solid #333; border-radius: 4px; margin-bottom: 5px; }
+        .list-header { padding: 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .list-body { padding: 10px; font-family: 'Roboto'; font-size: 0.85rem; color: #aaa; background: rgba(0,0,0,0.6); display: none; border-top: 1px solid #333; }
         .list-body.open { display: block; }
-        .btn-roll-mini { background: none; border: 1px solid #444; color: var(--gold); border-radius: 50%; width: 24px; height: 24px; cursor: pointer; }
-        .btn-roll-mini:hover { background: var(--gold); color: black; }
 
-        /* COMBATE */
-        .combat-card {
-            border: 1px solid var(--danger-dim); background: linear-gradient(90deg, #1a0505, #0f0505);
-            padding: 10px; border-radius: 6px; display: flex; flex-direction: column; gap: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        /* COMBATE & CHAT */
+        .combat-card { 
+            background: linear-gradient(90deg, #2a0a0a, #150505); border: 1px solid #522; 
+            padding: 10px; border-radius: 6px; display: flex; flex-direction: column; gap: 10px; 
         }
-        .combat-row { display: flex; gap: 10px; align-items: flex-start; }
-        .enemy-thumb { width: 60px; height: 60px; object-fit: cover; border: 1px solid var(--danger); background: black; border-radius: 4px; }
-        .enemy-stats { flex: 1; }
-        .enemy-name { font-family: 'Cinzel'; color: #ff9999; font-size: 1rem; }
-        .enemy-desc { font-family: 'Roboto'; font-size: 0.75rem; color: #aaa; margin: 2px 0 5px 0; font-style: italic; }
+        .btn-attack-main { width: 100%; padding: 8px; background: #800; color: white; border: 1px solid #a00; font-family: 'Cinzel'; cursor: pointer; }
         
-        .hp-bar-enemy { height: 6px; background: #300; width: 100%; border-radius: 2px; overflow: hidden; }
-        .hp-fill-enemy { height: 100%; background: var(--danger); display: block; transition: 0.3s; }
+        #log-container { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; font-family: 'Roboto'; padding-bottom: 10px; }
+        .msg { padding: 8px 12px; border-radius: 4px; font-size: 0.9rem; border-left: 3px solid #555; background: rgba(255,255,255,0.03); }
+        .msg-roll { border-left-color: var(--gold); background: rgba(50,40,10,0.3); }
+        .crit { color: #ffd700; text-shadow: 0 0 5px #ffd700; }
+        .fumble { color: #ff5555; }
 
-        .btn-attack-main {
-            width: 100%; background: linear-gradient(to bottom, #8b0000, #500);
-            color: white; font-family: 'Cinzel'; border: 1px solid #a00; padding: 6px;
-            cursor: pointer; font-weight: bold; letter-spacing: 1px;
-        }
-        .btn-attack-main:hover { filter: brightness(1.2); }
+        .chat-input-box { display: flex; gap: 5px; padding-top: 10px; border-top: 1px solid #333; }
+        .inp-chat { flex: 1; background: #111; border: 1px solid #444; color: white; padding: 12px; border-radius: 4px; }
+        .btn-send { width: 50px; background: var(--gold); border: none; border-radius: 4px; font-size: 1.2rem; cursor: pointer; }
 
-        /* CHAT */
-        #log-container { 
-            flex: 1; overflow-y: auto; padding-right: 5px; font-family: 'Roboto'; 
-            display: flex; flex-direction: column; gap: 8px;
-        }
-        .msg { padding: 8px; border-radius: 4px; font-size: 0.9rem; line-height: 1.4; word-wrap: break-word; }
-        .msg-chat { background: rgba(255,255,255,0.05); border-left: 2px solid #555; }
-        .msg-roll { background: rgba(0,0,0,0.4); border: 1px solid #333; }
-        .msg-author { color: var(--gold); font-weight: bold; font-family: 'Cinzel'; margin-right: 5px; }
-        .msg-result { float: right; font-size: 1.1rem; font-weight: bold; color: #fff; background: #222; padding: 2px 8px; border-radius: 4px; }
-        .crit { color: var(--gold); border: 1px solid var(--gold); box-shadow: 0 0 5px var(--gold); }
-        .fumble { color: #ff4444; border: 1px solid #ff0000; }
-        
-        .chat-input-box { display: flex; gap: 5px; margin-top: auto; padding-top: 10px; border-top: 1px solid #333; }
-        .inp-chat { flex: 1; background: #111; border: 1px solid #444; color: white; padding: 10px; border-radius: 4px; font-family: 'Roboto'; }
-        .btn-send { background: var(--gold); border: none; padding: 0 15px; font-weight: bold; cursor: pointer; border-radius: 4px; }
+        /* PAINEL GM */
+        #gm-btn { position: absolute; top: 15px; left: 15px; z-index: 50; width: 40px; height: 40px; background: #222; border: 1px solid var(--gold); color: var(--gold); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+        #gm-panel { position: absolute; top: 60px; left: 15px; background: rgba(10,10,10,0.95); padding: 20px; width: 300px; border: 1px solid var(--gold); border-radius: 8px; display: none; z-index: 50; max-height: 80vh; overflow-y: auto; }
+        .gm-inp { width: 100%; padding: 8px; background: #000; color: white; border: 1px solid #444; margin-bottom: 10px; }
 
-        /* MESTRE (GM) */
-        #gm-btn { position: absolute; top: 10px; left: 10px; z-index: 50; background: #222; color: var(--gold); border: 1px solid var(--gold); width: 35px; height: 35px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        #gm-panel { position: absolute; top: 50px; left: 10px; background: var(--panel-bg); border: 1px solid var(--gold); padding: 15px; width: 260px; display: none; z-index: 50; border-radius: 5px; max-height: 80vh; overflow-y: auto; }
-        .gm-inp { width: 100%; background: #000; color: #fff; border: 1px solid #444; padding: 5px; margin-bottom: 5px; }
+        /* MODAIS */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 200; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .modal-box { background: #111; border: 2px solid var(--gold); padding: 30px; width: 90%; max-width: 400px; text-align: center; border-radius: 10px; box-shadow: 0 0 40px rgba(0,0,0,0.8); }
+        .btn-action { width: 100%; padding: 12px; margin-top: 15px; font-weight: bold; cursor: pointer; border: none; border-radius: 4px; background: var(--gold); color: black; font-family: 'Cinzel'; }
 
-        /* MODAL DE AÇÃO */
-        .modal-overlay { 
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
-            background: rgba(0,0,0,0.8); z-index: 200; display: none; 
-            align-items: center; justify-content: center; backdrop-filter: blur(3px); 
-        }
-        .modal-box { 
-            background: #111; border: 2px solid var(--gold); padding: 25px; 
-            width: 350px; max-width: 90%; text-align: center; border-radius: 8px; box-shadow: 0 0 30px rgba(0,0,0,0.8);
-        }
-        .big-number { font-size: 4rem; font-family: 'Cinzel'; margin: 10px 0; color: #fff; }
-        .btn-action { width: 100%; padding: 10px; margin-top: 10px; cursor: pointer; font-weight: bold; border: none; border-radius: 4px; }
-        .btn-confirm { background: var(--danger); color: white; border: 1px solid #f00; }
-        .btn-roll { background: var(--gold); color: black; }
-        .btn-close { background: transparent; color: #777; text-decoration: underline; margin-top: 10px; }
-
-        /* === RESPONSIVIDADE (MOBILE) === */
-        #mobile-hud-toggle {
-            display: none;
-            position: absolute; top: 20px; right: 20px; z-index: 101;
-            width: 45px; height: 45px; border-radius: 50%;
-            background: var(--panel-bg); border: 2px solid var(--gold);
-            color: var(--gold); font-size: 1.5rem; cursor: pointer;
-            box-shadow: 0 0 10px rgba(0,0,0,0.8);
-            align-items: center; justify-content: center;
-        }
-
+        /* --- RESPONSIVIDADE --- */
         @media (max-width: 768px) {
-            #mission-bar { width: 90%; top: 70px; padding: 5px 20px; }
+            #mobile-hud-toggle { display: flex; }
+            #ui-layer { width: 100%; transform: translateX(100%); }
+            #ui-layer.open { transform: translateX(0); }
+            
+            #mission-bar { width: 95%; top: 70px; padding: 10px; font-size: 0.9rem; }
             .mission-text { font-size: 1.1rem; }
             
-            #mobile-hud-toggle { display: flex; }
-            
-            #ui-layer {
-                width: 100%;
-                transform: translateX(100%);
-            }
-            #ui-layer.open {
-                transform: translateX(0);
-            }
-            
-            #bottom-controls { bottom: 10px; left: 10px; }
-            .map-btn { width: 40px; height: 40px; font-size: 1.5rem; } /* Botões maiores para dedo */
-            
-            #gm-panel { width: 90%; left: 5%; }
+            .modal-box { padding: 20px; }
             #start-overlay h1 { font-size: 3rem !important; }
         }
-
     </style>
 </head>
 <body>
 
 <div id="start-overlay">
-    <h1 style="font-family:'Cinzel'; font-size:4rem; color:var(--gold); margin:0; text-shadow:0 0 20px black;">ZATUR</h1>
-    <p style="color:#aaa; font-family:'Roboto'; letter-spacing:1px; margin-bottom:40px;">Mesa de RPG Virtual v3.1</p>
+    <h1 class="title-anim" style="font-family:'Cinzel'; font-size:5rem; color:var(--gold); margin:0;">ZATUR</h1>
+    <p style="color:#aaa; font-family:'Roboto'; letter-spacing:2px;">Mesa de RPG Virtual v3.5</p>
     <button id="btn-enter" onclick="enterGame()">Entrar na Sessão</button>
 </div>
 
 <div id="mobile-hud-toggle" onclick="toggleMobileHUD()">📜</div>
 
-<div id="mission-bar">
-    <span class="mission-title">📜 Objetivo Atual</span>
-    <div id="mission-display" class="mission-text">Aguardando ordens...</div>
+<div id="mission-bar" style="position: absolute; top: 20px; left: 50%; transform: translateX(-50%); z-index: 20; background: linear-gradient(90deg, transparent, rgba(0,0,0,0.8), transparent); padding: 10px 40px; border-bottom: 2px solid var(--gold-dim); text-align: center; pointer-events: none; width: 60%; transition: 0.3s;">
+    <span style="color:var(--gold); font-family:'Cinzel'; font-size:0.8rem; letter-spacing:2px; text-transform:uppercase;">📜 Objetivo Atual</span>
+    <div id="mission-display" class="mission-text" style="color:white; font-size:1.3rem; text-shadow:0 2px 4px black; margin-top:5px;">Aguardando o Mestre...</div>
 </div>
 
 <audio id="bg-audio" loop></audio>
@@ -253,7 +178,7 @@
             <button class="map-btn" onclick="resetView()">⟲</button>
         </div>
         <div class="control-grp">
-            <button class="map-btn" onclick="toggleMute()" id="mute-icon">🔊</button>
+            <button class="map-btn" onclick="toggleMute()" id="mute-icon" style="font-size:1rem">🔊</button>
             <input type="range" min="0" max="1" step="0.1" value="0.5" oninput="setVolume(this.value)" style="width:80px; accent-color:var(--gold);">
         </div>
     </div>
@@ -261,23 +186,34 @@
 
 <div id="gm-btn" onclick="toggleGM()">⚙️</div>
 <div id="gm-panel">
-    <p class="section-label">Configuração da Cena</p>
-    <input type="text" id="gm-map" class="gm-inp" placeholder="URL Imagem do Mapa">
-    <input type="text" id="gm-music" class="gm-inp" placeholder="URL Música (MP3)">
+    <h3 style="color:var(--gold); font-family:'Cinzel'; margin-top:0;">Painel do Mestre</h3>
     
-    <input type="text" id="gm-mission-input" class="gm-inp" placeholder="Texto da Missão Atual">
-    <button class="btn-action btn-roll" onclick="syncWorld()">Sincronizar Mundo</button>
+    <label style="color:#aaa; font-size:0.8rem;">Mapa (URL Imagem)</label>
+    <input type="text" id="gm-map" class="gm-inp" placeholder="https://...">
     
-    <p class="section-label" style="margin-top:15px">Tokens</p>
-    <input type="text" id="tk-name" class="gm-inp" placeholder="Nome NPC">
-    <input type="text" id="tk-img" class="gm-inp" placeholder="URL Token">
-    <button class="btn-action btn-roll" onclick="activateTokenPlacement()">Adicionar Token</button>
+    <label style="color:#aaa; font-size:0.8rem;">Música (URL MP3)</label>
+    <input type="text" id="gm-music" class="gm-inp" placeholder="https://...">
+    
+    <label style="color:#aaa; font-size:0.8rem;">Missão / Texto</label>
+    <input type="text" id="gm-mission-input" class="gm-inp" placeholder="Objetivo atual...">
+    
+    <button class="btn-action" onclick="syncWorld()">Sincronizar Mundo</button>
+    
+    <hr style="border-color:#333; margin:15px 0;">
+    
+    <label style="color:#aaa; font-size:0.8rem;">Novo Token (Nome)</label>
+    <input type="text" id="tk-name" class="gm-inp" placeholder="Goblin, Heroi...">
+    
+    <label style="color:#aaa; font-size:0.8rem;">Imagem do Token (URL)</label>
+    <input type="text" id="tk-img" class="gm-inp" placeholder="https://...">
+    
+    <button class="btn-action" style="background:#333; color:white; border:1px solid #555;" onclick="activateTokenPlacement()">📍 Adicionar no Mapa</button>
 </div>
 
 <aside id="ui-layer">
     <div class="char-header">
         <h2 id="hud-name" class="char-name">Carregando...</h2>
-        <div id="hud-details" class="char-details">Classe, Raça Nvl 1</div>
+        <div id="hud-details" style="color:#888; font-size:0.85rem; font-style:italic;">Classe, Raça Nvl 1</div>
         
         <div class="bars-container">
             <div class="bar-wrap">
@@ -298,27 +234,27 @@
     </nav>
 
     <div id="tab-sheet" class="tab-content active">
-        <div class="section-label">Atributos Base</div>
+        <div style="color:var(--gold); border-bottom:1px solid #333; font-family:'Cinzel'; margin-bottom:10px;">Atributos</div>
         <div id="grid-attrs" class="attr-grid"></div>
 
-        <div class="section-label">Perícias & Habilidades</div>
+        <div style="color:var(--gold); border-bottom:1px solid #333; font-family:'Cinzel'; margin:20px 0 10px;">Perícias & Habilidades</div>
         <div id="list-skills"></div>
 
-        <div class="section-label">Equipamento & Magias</div>
+        <div style="color:var(--gold); border-bottom:1px solid #333; font-family:'Cinzel'; margin:20px 0 10px;">Inventário</div>
         <div id="list-inventory"></div>
     </div>
 
     <div id="tab-combat" class="tab-content">
-        <div class="section-label" style="text-align:center; color:#ff5555;">Inimigos Ativos</div>
+        <div style="text-align:center; color:#ff5555; font-family:'Cinzel'; margin-bottom:10px;">Inimigos Ativos</div>
         <div id="list-enemies">
             <p style="text-align:center; color:#666; font-size:0.9rem; margin-top:20px;">Nenhum inimigo à vista.</p>
         </div>
     </div>
 
-    <div id="tab-chat" class="tab-content" style="height:100%;">
+    <div id="tab-chat" class="tab-content" style="height:100%; padding-bottom:0;">
         <div id="log-container"></div>
-        <div class="chat-input-box">
-            <input type="text" id="inp-msg" class="inp-chat" placeholder="Escreva algo..." onkeypress="if(event.key==='Enter') sendChat()">
+        <div class="chat-input-box" style="margin-bottom:15px;">
+            <input type="text" id="inp-msg" class="inp-chat" placeholder="Mensagem..." onkeypress="if(event.key==='Enter') sendChat()">
             <button class="btn-send" onclick="sendChat()">➤</button>
         </div>
     </div>
@@ -327,29 +263,29 @@
 <div id="modal-attack" class="modal-overlay">
     <div class="modal-box">
         <h3 style="color:var(--danger); margin:0; font-family:'Cinzel'">REALIZAR ATAQUE</h3>
-        <p id="atk-target-label" style="color:#888; font-size:0.9rem; margin-bottom:15px">Alvo: Inimigo</p>
+        <p id="atk-target-label" style="color:#888; font-size:0.9rem; margin-bottom:20px">Alvo: ...</p>
         
-        <select id="atk-option" class="gm-inp" style="padding:10px; font-size:1rem;"></select>
+        <select id="atk-option" class="gm-inp" style="padding:12px; font-size:1rem; border-color:var(--gold);"></select>
         
-        <div style="display:flex; justify-content:center; gap:15px; margin:15px 0;">
+        <div style="display:flex; justify-content:center; gap:20px; margin:20px 0;">
             <label><input type="radio" name="atk-mod" value="0" checked> Normal</label>
             <label style="color:var(--gold)"><input type="radio" name="atk-mod" value="5"> Vantagem</label>
-            <label style="color:var(--danger)"><input type="radio" name="atk-mod" value="-5"> Desvantagem</label>
+            <label style="color:var(--danger)"><input type="radio" name="atk-mod" value="-5"> Desv.</label>
         </div>
 
-        <button class="btn-action btn-roll" onclick="confirmAttack()">ROLAR DADO</button>
-        <button class="btn-close" onclick="closeModal('modal-attack')">Cancelar</button>
+        <button class="btn-action" onclick="confirmAttack()">ROLAR DADO</button>
+        <button style="background:none; border:none; color:#777; margin-top:15px; text-decoration:underline; cursor:pointer;" onclick="closeModal('modal-attack')">Cancelar</button>
     </div>
 </div>
 
 <div id="modal-result" class="modal-overlay">
     <div class="modal-box">
         <h3 style="color:#aaa; margin:0; font-size:1rem">RESULTADO</h3>
-        <div id="res-val" class="big-number">0</div>
-        <div id="res-msg" style="color:#ccc; font-size:0.9rem; margin-bottom:15px">Detalhes...</div>
+        <div id="res-val" style="font-size:5rem; font-family:'Cinzel'; margin:10px 0; color:white;">0</div>
+        <div id="res-msg" style="color:#ccc; font-size:0.9rem; margin-bottom:20px">Detalhes...</div>
         
-        <button id="btn-dmg" class="btn-action btn-confirm" onclick="applyDamageFlow()">💥 APLICAR DANO</button>
-        <button class="btn-close" onclick="closeModal('modal-result')">Fechar</button>
+        <button id="btn-dmg" class="btn-action" style="background:var(--danger); color:white; border:1px solid #f55;" onclick="applyDamageFlow()">💥 APLICAR DANO</button>
+        <button style="background:none; border:none; color:#777; margin-top:15px; text-decoration:underline; cursor:pointer;" onclick="closeModal('modal-result')">Fechar</button>
     </div>
 </div>
 
@@ -376,17 +312,16 @@
     let audio = document.getElementById('bg-audio');
     let hasInteracted = false;
 
-    // --- INICIALIZAÇÃO ---
+    // --- SISTEMA CORE ---
     window.enterGame = () => {
-        document.getElementById('start-overlay').style.display = 'none';
+        document.getElementById('start-overlay').style.opacity = '0';
+        setTimeout(() => document.getElementById('start-overlay').style.display = 'none', 500);
         hasInteracted = true;
         if(audio.src) audio.play().catch(e => console.log("Audio play failed", e));
-        if(!charId && !window.location.href.includes('gm')) console.log("Modo Espectador");
         initSystem();
     };
 
     function initSystem() {
-        // Carregar Personagem (se houver ID)
         if(charId) {
             onSnapshot(doc(db, "characters", charId), (snap) => {
                 if(!snap.exists()) return;
@@ -396,7 +331,6 @@
             });
         }
 
-        // Carregar Inimigos (Combate)
         onSnapshot(collection(db, "active_encounters"), (snap) => {
             const container = document.getElementById('list-enemies');
             container.innerHTML = "";
@@ -406,17 +340,17 @@
             }
             snap.forEach(d => {
                 const en = d.data();
-                const hpPercent = (en.PV / en.PV_Max) * 100;
+                const hpPercent = Math.max(0, Math.min(100, (en.PV / en.PV_Max) * 100));
                 let hpColor = hpPercent > 50 ? "#22c55e" : (hpPercent > 25 ? "#eab308" : "var(--danger)");
                 
                 container.innerHTML += `
                 <div class="combat-card">
-                    <div class="combat-row">
-                        <img src="${en.Imagem || 'https://via.placeholder.com/60'}" class="enemy-thumb">
-                        <div class="enemy-stats">
-                            <div class="enemy-name">${en.Nome}</div>
-                            <div class="hp-bar-enemy" style="background:#333; margin-top:5px;">
-                                <span class="hp-fill-enemy" style="width:${hpPercent}%; background:${hpColor}"></span>
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <img src="${en.Imagem || 'https://via.placeholder.com/60'}" style="width:50px; height:50px; border-radius:4px; object-fit:cover; border:1px solid #555;">
+                        <div style="flex:1;">
+                            <div style="font-family:'Cinzel'; color:#ff9999;">${en.Nome}</div>
+                            <div style="height:6px; background:#333; margin-top:5px; border-radius:2px;">
+                                <div style="height:100%; width:${hpPercent}%; background:${hpColor}; border-radius:2px; transition:width 0.3s;"></div>
                             </div>
                         </div>
                     </div>
@@ -425,7 +359,6 @@
             });
         });
 
-        // Carregar Chat
         const q = query(collection(db, "logs"), orderBy("timestamp", "desc"), limit(30));
         onSnapshot(q, (snap) => {
             const container = document.getElementById('log-container');
@@ -435,18 +368,17 @@
             container.innerHTML = "";
             msgs.forEach(m => {
                 const div = document.createElement('div');
-                div.className = `msg ${m.type === 'chat' ? 'msg-chat' : 'msg-roll'}`;
+                div.className = `msg ${m.type === 'chat' ? '' : 'msg-roll'}`;
                 if(m.type === 'chat') {
-                    div.innerHTML = `<span class="msg-author">${m.charName}:</span> <span style="color:#ddd">${m.message}</span>`;
+                    div.innerHTML = `<span style="color:var(--gold); font-weight:bold;">${m.charName}:</span> <span style="color:#ddd">${m.message}</span>`;
                 } else {
                     let extraClass = m.isCrit ? "crit" : (m.isFumble ? "fumble" : "");
                     div.innerHTML = `
-                        <div style="margin-bottom:2px">
-                            <span class="msg-author">${m.charName}</span>
-                            <span style="font-size:0.8rem; color:#aaa;">usou ${m.actionName}</span>
-                            <span class="msg-result ${extraClass}">${m.total}</span>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-weight:bold; color:#aaa;">${m.charName}</span>
+                            <span class="${extraClass}" style="font-size:1.1rem; font-weight:bold;">${m.total}</span>
                         </div>
-                        <div style="font-size:0.75rem; color:#777;">${m.detail}</div>
+                        <div style="font-size:0.8rem; color:#888;">${m.actionName} <small>(${m.detail})</small></div>
                     `;
                 }
                 container.appendChild(div);
@@ -454,18 +386,15 @@
             container.scrollTop = container.scrollHeight;
         });
 
-        // Configurações Globais (Mapa, Audio, Missão)
         onSnapshot(doc(db,"campaign_settings","global"), (s) => {
             if(!s.exists()) return;
             const data = s.data();
             
-            // Missão Atual
             if(data.missao_atual) {
                 document.getElementById('mission-display').innerText = data.missao_atual;
                 document.getElementById('gm-mission-input').value = data.missao_atual;
             }
 
-            // Mapa
             if(data.mapa_url && (!mapImg || mapImg.src !== data.mapa_url)) {
                 mapImg = new Image(); 
                 mapImg.crossOrigin = "anonymous";
@@ -474,14 +403,12 @@
                 document.getElementById('gm-map').value = data.mapa_url;
             }
             
-            // Audio
             if(data.musica_url && audio.src !== data.musica_url) {
                 audio.src = data.musica_url;
                 document.getElementById('gm-music').value = data.musica_url;
-                if(hasInteracted) audio.play();
+                if(hasInteracted) audio.play().catch(()=>{});
             }
 
-            // Tokens (Atualiza posições em tempo real)
             tokens = data.posicoes || {};
             renderMap();
         });
@@ -491,24 +418,22 @@
 
     // --- INTERFACE ---
     window.toggleMobileHUD = () => {
-        const hud = document.getElementById('ui-layer');
-        hud.classList.toggle('open');
+        document.getElementById('ui-layer').classList.toggle('open');
     };
 
     function updateHUD() {
-        document.getElementById('hud-name').innerText = playerData.Nome || "Desconhecido";
-        document.getElementById('hud-details').innerText = `${playerData.Classe || ''} ${playerData.Raca || ''} - Nvl ${playerData.Nivel || 1}`;
+        document.getElementById('hud-name').innerText = playerData.Nome || "Heroi";
+        document.getElementById('hud-details').innerText = `${playerData.Classe || '?'} - Nvl ${playerData.Nivel || 1}`;
         document.getElementById('bar-hp').style.width = ((playerData.PV / playerData.PV_Max) * 100) + "%";
-        document.getElementById('txt-hp').innerText = `PV: ${playerData.PV}/${playerData.PV_Max}`;
+        document.getElementById('txt-hp').innerText = `${playerData.PV}/${playerData.PV_Max}`;
         document.getElementById('bar-mp').style.width = ((playerData.PE / playerData.PE_Max) * 100) + "%";
-        document.getElementById('txt-mp').innerText = `PM: ${playerData.PE}/${playerData.PE_Max}`;
+        document.getElementById('txt-mp').innerText = `${playerData.PE}/${playerData.PE_Max}`;
         
         const grid = document.getElementById('grid-attrs');
         grid.innerHTML = "";
-        const attrs = ["Força", "Agilidade", "Intelecto", "Vigor", "Presença"];
-        attrs.forEach(a => {
+        ["Força", "Agilidade", "Intelecto", "Vigor", "Presença"].forEach(a => {
             const val = playerData[a] || 0;
-            grid.innerHTML += `<div class="attr-card" onclick="rollSimple('${a}', ${val})"><span class="attr-lbl">${a.substring(0,3)}</span><span class="attr-val">${val}</span></div>`;
+            grid.innerHTML += `<div class="attr-card" onclick="rollSimple('${a}', ${val})"><div style="font-size:0.7rem; color:#888; text-transform:uppercase;">${a.substring(0,3)}</div><div style="font-size:1.3rem; font-weight:bold; color:var(--gold);">${val}</div></div>`;
         });
     }
 
@@ -518,22 +443,20 @@
         skillsDiv.innerHTML = ""; invDiv.innerHTML = "";
         combatOptions = [];
 
-        // Perícias
         const allSkills = [...(playerData.pericias || []), ...(playerData.habilidades || [])];
-        if(allSkills.length === 0) skillsDiv.innerHTML = "<small style='color:#555'>Vazio.</small>";
+        if(!allSkills.length) skillsDiv.innerHTML = "<small style='color:#555'>Vazio</small>";
+        
         allSkills.forEach(s => {
             const match = s.match(/(.+)\s\(([\+\-]?\d+)\)/);
             const name = match ? match[1] : s;
             const bonus = match ? parseInt(match[2]) : 0;
-            createListItem(skillsDiv, "🎲", name, `Bônus: ${bonus}`, () => rollSimple(name, bonus));
+            createListItem(skillsDiv, "🎲", name, `+${bonus}`, () => rollSimple(name, bonus));
             combatOptions.push({ name: name, type: 'Perícia', bonus: bonus });
         });
 
-        // Itens e Magias
         const extIds = [...(playerData.itens || []), ...(playerData.magias || [])];
         for(const id of extIds) {
-            let data = null;
-            let type = "Item";
+            let data = null, type = "Item";
             try {
                 let snap = await getDoc(doc(db, "items", id));
                 if(snap.exists()) { data = snap.data(); type = "Item"; }
@@ -544,12 +467,11 @@
             } catch(e) {}
 
             if(data) {
-                const desc = data.Descricao || "";
-                const stats = data.Dano ? `Dano: ${data.Dano}` : (data.Custo ? `Custo: ${data.Custo}` : "Item Geral");
-                createListItem(invDiv, type === "Item"?"⚔️":"✨", data.Nome, stats, () => rollSimple(data.Nome, 0), desc);
+                const sub = data.Dano ? `Dano: ${data.Dano}` : (data.Custo ? `Custo: ${data.Custo}` : "Item");
+                createListItem(invDiv, type === "Item"?"⚔️":"✨", data.Nome, sub, () => rollSimple(data.Nome, 0), data.Descricao);
                 combatOptions.push({ name: data.Nome, type: type, bonus: 0 });
             } else {
-                createListItem(invDiv, "📦", id, "Inventário", () => rollSimple(id, 0));
+                createListItem(invDiv, "📦", id, "Genérico", () => rollSimple(id, 0));
                 combatOptions.push({ name: id, type: 'Item', bonus: 0 });
             }
         }
@@ -560,27 +482,24 @@
         div.className = 'list-item';
         div.innerHTML = `
             <div class="list-header" onclick="toggleDetails(this)">
-                <div><span style="margin-right:5px">${icon}</span> <strong>${title}</strong> <span style="font-size:0.75rem; color:#888; margin-left:5px">${subtitle}</span></div>
-                <button class="btn-roll-mini" onclick="event.stopPropagation(); callRoll()">🎲</button>
+                <div>${icon} <strong style="color:#eee; margin-left:5px;">${title}</strong> <small style="color:#888;">${subtitle}</small></div>
+                <button style="background:none; border:1px solid #555; border-radius:50%; width:24px; height:24px; color:var(--gold); cursor:pointer;" onclick="event.stopPropagation(); callRoll()">🎲</button>
             </div>
             ${description ? `<div class="list-body">${description}</div>` : ''}
         `;
-        // Hack para passar a função de rolagem
-        div.querySelector('.btn-roll-mini').onclick = (e) => { e.stopPropagation(); onClickRoll(); };
+        div.querySelector('button').onclick = (e) => { e.stopPropagation(); onClickRoll(); };
         container.appendChild(div);
     }
     window.toggleDetails = (el) => { const b=el.nextElementSibling; if(b) b.classList.toggle('open'); }
 
-    // --- COMBATE E DADOS ---
+    // --- COMBATE & DADOS ---
     window.openAttackModal = (enemyId, enemyName) => {
         currentTargetId = enemyId;
         document.getElementById('modal-attack').style.display = 'flex';
         document.getElementById('atk-target-label').innerText = `Alvo: ${enemyName}`;
         const sel = document.getElementById('atk-option');
         sel.innerHTML = `<option value="Ataque Básico">👊 Ataque Básico (Força)</option>`;
-        combatOptions.forEach(opt => {
-            sel.innerHTML += `<option value="${opt.name}">[${opt.type}] ${opt.name}</option>`;
-        });
+        combatOptions.forEach(opt => sel.innerHTML += `<option value="${opt.name}">[${opt.type}] ${opt.name}</option>`);
     };
 
     window.confirmAttack = () => {
@@ -588,20 +507,19 @@
         const mod = parseInt(document.querySelector('input[name="atk-mod"]:checked').value);
         let attrBonus = playerData.Força || 0;
         const opt = combatOptions.find(o => o.name === action);
-        if(opt && opt.type === 'Perícia') attrBonus = opt.bonus;
-        else if(opt && opt.type === 'Magia') attrBonus = playerData.Intelecto || 0;
+        if(opt) attrBonus = opt.type === 'Perícia' ? opt.bonus : (opt.type === 'Magia' ? (playerData.Intelecto||0) : attrBonus);
 
         const d20 = Math.floor(Math.random()*20)+1;
         const total = d20 + mod + attrBonus;
         
         addDoc(collection(db, "logs"), {
             charName: playerData.Nome || "Mestre", actionName: action,
-            total: total, detail: `[${d20}] + Bônus(${attrBonus}) + Mod(${mod})`,
+            total: total, detail: `[${d20}] + Bonus(${attrBonus}) + Mod(${mod})`,
             isCrit: d20===20, isFumble: d20===1, type: 'roll', timestamp: serverTimestamp()
         });
 
         document.getElementById('modal-attack').style.display = 'none';
-        showResultModal(total, `${action} vs Alvo`, d20===20, d20===1, true);
+        showResultModal(total, action, d20===20, d20===1, true);
     };
 
     window.rollSimple = (name, bonus) => {
@@ -618,7 +536,7 @@
         const m = document.getElementById('modal-result');
         const v = document.getElementById('res-val');
         v.innerText = val;
-        v.style.color = crit ? "var(--gold)" : (fumble ? "red" : "white");
+        v.style.color = crit ? "var(--gold)" : (fumble ? "#ff5555" : "white");
         document.getElementById('res-msg').innerText = txt + (crit?" (CRÍTICO!)":"") + (fumble?" (FALHA!)":"");
         document.getElementById('btn-dmg').style.display = showDmg ? 'block' : 'none';
         m.style.display = 'flex';
@@ -633,9 +551,7 @@
             if(snap.exists()) {
                 const novo = Math.max(0, snap.data().PV - dmg);
                 await updateDoc(ref, { PV: novo });
-                addDoc(collection(db, "logs"), {
-                    charName: "SISTEMA", message: `${snap.data().Nome} sofreu ${dmg} de dano!`, type: 'chat', timestamp: serverTimestamp()
-                });
+                addDoc(collection(db, "logs"), { charName: "SISTEMA", message: `${snap.data().Nome} sofreu ${dmg} de dano!`, type: 'chat', timestamp: serverTimestamp() });
             }
         }
         closeModal('modal-result');
@@ -654,131 +570,82 @@
         document.getElementById(id).classList.add('active'); b.classList.add('active');
     };
 
-    // === CANVAS E LÓGICA DO MAPA ===
+    // === ENGINE DE MAPA ===
     let canvas, ctx, mapImg;
-    let tokens = {}; // { id: {x, y, size, img, name} }
+    let tokens = {}, tokenImages = {}; 
     let view = {x:0, y:0, zoom:1};
-    let isMapDrag = false, isTokenDrag = false;
-    let dragTokenId = null;
-    let lastPos = {x:0,y:0};
+    let isMapDrag = false, isTokenDrag = false, dragTokenId = null, lastPos = {x:0,y:0};
     let placingToken = false;
 
     function initCanvas() {
         canvas = document.getElementById('gameCanvas'); 
         ctx = canvas.getContext('2d');
-        
         resize();
         window.onresize = resize;
 
-        // Função unificada para início de interação (Touch ou Mouse)
         const handleStart = (e) => {
-            if(e.type === 'touchstart') {
-               // Previne scroll padrão no mobile enquanto arrasta mapa
-               // mas permite clique em botões. Se for no canvas puro, preventDefault
-               if(e.target === canvas) e.preventDefault();
-            }
-
+            if(e.type === 'touchstart' && e.target === canvas) e.preventDefault();
             if(placingToken){ placeTokenClick(e); return; }
 
             const pos = getEventPos(canvas, e);
-            
-            // Converter mouse para coordenadas do mundo
-            const worldX = (pos.x - view.x) / view.zoom;
-            const worldY = (pos.y - view.y) / view.zoom;
+            const wx = (pos.x - view.x) / view.zoom;
+            const wy = (pos.y - view.y) / view.zoom;
 
             let hitToken = null;
-            // Checar colisão com tokens (inverso para pegar o do topo)
-            const tokenKeys = Object.keys(tokens);
-            for(let i = tokenKeys.length - 1; i >= 0; i--) {
-                const id = tokenKeys[i];
-                const t = tokens[id];
-                const r = (t.size || 50) / 2;
-                if(Math.sqrt((worldX - t.x)**2 + (worldY - t.y)**2) <= r) {
-                    hitToken = id;
-                    break;
+            const keys = Object.keys(tokens);
+            for(let i = keys.length - 1; i >= 0; i--) {
+                const t = tokens[keys[i]];
+                if(Math.sqrt((wx - t.x)**2 + (wy - t.y)**2) <= (t.size||50)/2) {
+                    hitToken = keys[i]; break;
                 }
             }
 
-            if(hitToken) {
-                isTokenDrag = true;
-                dragTokenId = hitToken;
-            } else {
-                isMapDrag = true;
-            }
-            lastPos = { x: pos.x, y: pos.y };
+            if(hitToken) { isTokenDrag = true; dragTokenId = hitToken; } 
+            else { isMapDrag = true; }
+            lastPos = pos;
         };
 
-        // Função unificada para Movimento
         const handleMove = (e) => {
-            if(e.type === 'touchmove') e.preventDefault(); // Impede scroll da tela
-
+            if(e.type === 'touchmove') e.preventDefault();
             if(!isMapDrag && !isTokenDrag) return;
             const pos = getEventPos(canvas, e);
             const dx = pos.x - lastPos.x;
             const dy = pos.y - lastPos.y;
 
-            if(isMapDrag) {
-                view.x += dx;
-                view.y += dy;
-                renderMap();
-            } else if(isTokenDrag && dragTokenId) {
-                // Atualizar posição local do token instantaneamente para feedback visual
+            if(isMapDrag) { view.x += dx; view.y += dy; renderMap(); } 
+            else if(isTokenDrag && dragTokenId) {
                 tokens[dragTokenId].x += dx / view.zoom;
                 tokens[dragTokenId].y += dy / view.zoom;
                 renderMap();
             }
-            lastPos = { x: pos.x, y: pos.y };
+            lastPos = pos;
         };
 
-        // Função unificada para Fim
         const handleEnd = () => {
             if(isTokenDrag && dragTokenId) {
-                // Salvar no Firebase
                 const t = tokens[dragTokenId];
                 updateDoc(doc(db, "campaign_settings", "global"), {
                     [`posicoes.${dragTokenId}`]: { x: t.x, y: t.y, size: t.size, img: t.img, name: t.name }
                 });
             }
-            isMapDrag = false;
-            isTokenDrag = false;
-            dragTokenId = null;
+            isMapDrag = false; isTokenDrag = false; dragTokenId = null;
         };
 
-        // Event Listeners MOUSE
         canvas.addEventListener('mousedown', handleStart);
         canvas.addEventListener('mousemove', handleMove);
         canvas.addEventListener('mouseup', handleEnd);
-        canvas.addEventListener('mouseleave', handleEnd);
-
-        // Event Listeners TOUCH (Mobile)
         canvas.addEventListener('touchstart', handleStart, {passive: false});
         canvas.addEventListener('touchmove', handleMove, {passive: false});
         canvas.addEventListener('touchend', handleEnd);
     }
 
-    // Helper para pegar posição correta (mouse ou touch)
     function getEventPos(cvs, e) {
-        const rect = cvs.getBoundingClientRect();
-        let clientX, clientY;
-        
-        if(e.touches && e.touches.length > 0) {
-            clientX = e.touches[0].clientX;
-            clientY = e.touches[0].clientY;
-        } else {
-            clientX = e.clientX;
-            clientY = e.clientY;
-        }
-        return {
-            x: clientX - rect.left,
-            y: clientY - rect.top
-        };
+        const r = cvs.getBoundingClientRect();
+        const c = (e.touches && e.touches[0]) ? e.touches[0] : e;
+        return { x: c.clientX - r.left, y: c.clientY - r.top };
     }
 
-    function resize() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        renderMap();
-    }
+    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; renderMap(); }
 
     function renderMap() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -786,88 +653,74 @@
         ctx.translate(view.x, view.y);
         ctx.scale(view.zoom, view.zoom);
 
-        if(mapImg) {
-            ctx.drawImage(mapImg, -mapImg.width/2, -mapImg.height/2);
-        }
+        if(mapImg) ctx.drawImage(mapImg, -mapImg.width/2, -mapImg.height/2);
 
-        // Desenhar Tokens
         Object.keys(tokens).forEach(k => {
             const t = tokens[k];
+            const size = t.size || 50;
             ctx.save();
             ctx.beginPath();
-            ctx.arc(t.x, t.y, (t.size||50)/2, 0, Math.PI*2);
+            ctx.arc(t.x, t.y, size/2, 0, Math.PI*2);
             ctx.clip();
-            // Placeholder se imagem falhar
-            ctx.fillStyle = "red"; ctx.fill(); 
-            
-            // Tentar desenhar imagem do token (precisaria carregar imagens previamente na prática real)
-            // Aqui simplificamos desenhando um círculo com nome
-            ctx.fillStyle = "#222"; ctx.fill();
-            ctx.lineWidth = 2; ctx.strokeStyle = "gold"; ctx.stroke();
-            
+            ctx.fillStyle = "#111"; ctx.fill();
+
+            if (t.img) {
+                if (!tokenImages[t.img]) {
+                    const img = new Image();
+                    img.crossOrigin = "anonymous";
+                    img.src = t.img;
+                    img.onload = () => renderMap();
+                    tokenImages[t.img] = img;
+                } else if (tokenImages[t.img].complete) {
+                    ctx.drawImage(tokenImages[t.img], t.x - size/2, t.y - size/2, size, size);
+                }
+            }
+
+            ctx.lineWidth = 3; ctx.strokeStyle = "gold"; ctx.stroke();
             ctx.restore();
             
-            // Texto Nome
-            ctx.fillStyle = "white";
-            ctx.font = "bold 14px Arial";
-            ctx.textAlign = "center";
-            ctx.fillText(t.name || "NPC", t.x, t.y - (t.size||50)/2 - 5);
+            ctx.fillStyle = "white"; ctx.font = "bold 14px Arial"; ctx.textAlign = "center";
+            ctx.shadowColor = "black"; ctx.shadowBlur = 4;
+            ctx.fillText(t.name || "NPC", t.x, t.y - size/2 - 8);
         });
-
         ctx.restore();
     }
 
-    window.zoomMap = (amount) => {
-        view.zoom = Math.max(0.1, view.zoom + amount);
-        renderMap();
-    };
-    
-    window.resetView = () => {
-        view = {x: canvas.width/2, y: canvas.height/2, zoom: 0.5};
-        renderMap();
-    }
-    
-    // Configurações e GM
-    window.toggleGM = () => {
-        const p = document.getElementById('gm-panel');
-        p.style.display = p.style.display==='block'?'none':'block';
-    }
-    
+    window.zoomMap = (v) => { view.zoom = Math.max(0.1, view.zoom + v); renderMap(); };
+    window.resetView = () => { view = {x: canvas.width/2, y: canvas.height/2, zoom: 0.5}; renderMap(); }
+    window.toggleGM = () => { const p = document.getElementById('gm-panel'); p.style.display = p.style.display==='block'?'none':'block'; }
     window.setVolume = (v) => { audio.volume = v; }
     window.toggleMute = () => { audio.muted = !audio.muted; document.getElementById('mute-icon').innerText = audio.muted ? '🔇' : '🔊'; }
 
     window.syncWorld = () => {
-        const m = document.getElementById('gm-map').value;
-        const mu = document.getElementById('gm-music').value;
-        const mis = document.getElementById('gm-mission-input').value;
-        
         updateDoc(doc(db, "campaign_settings", "global"), {
-            mapa_url: m, musica_url: mu, missao_atual: mis
+            mapa_url: document.getElementById('gm-map').value,
+            musica_url: document.getElementById('gm-music').value,
+            missao_atual: document.getElementById('gm-mission-input').value
         });
     }
 
     window.activateTokenPlacement = () => {
         placingToken = true;
         document.getElementById('gm-panel').style.display='none';
-        alert("Clique no mapa para posicionar o token.");
+        alert("Toque no mapa para posicionar o token.");
     }
 
     function placeTokenClick(e) {
         const pos = getEventPos(canvas, e);
-        const worldX = (pos.x - view.x) / view.zoom;
-        const worldY = (pos.y - view.y) / view.zoom;
-        
-        const name = document.getElementById('tk-name').value || "Inimigo";
-        const img = document.getElementById('tk-img').value;
+        const wx = (pos.x - view.x) / view.zoom;
+        const wy = (pos.y - view.y) / view.zoom;
         const id = "tk_" + Date.now();
         
         updateDoc(doc(db, "campaign_settings", "global"), {
-            [`posicoes.${id}`]: { x: worldX, y: worldY, size: 50, img: img, name: name }
+            [`posicoes.${id}`]: { 
+                x: wx, y: wy, size: 50, 
+                img: document.getElementById('tk-img').value, 
+                name: document.getElementById('tk-name').value || "Inimigo" 
+            }
         });
-        
         placingToken = false;
     }
-
 </script>
 </body>
 </html>
