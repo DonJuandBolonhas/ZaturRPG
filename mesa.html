@@ -2,12 +2,12 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Zatur - Mesa Virtual Definitiva</title>
     <style>
         /* FONTES */
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=MedievalSharp&family=Roboto:wght@400;500;700&display=swap');
-
+        
         /* VARIÁVEIS DE COR */
         :root {
             --gold: #d4af37; 
@@ -22,7 +22,7 @@
         }
 
         /* GERAL */
-        body { margin: 0; overflow: hidden; background: #000; font-family: 'MedievalSharp', cursive; color: var(--text-main); user-select: none; }
+        body { margin: 0; overflow: hidden; background: #000; font-family: 'MedievalSharp', cursive; color: var(--text-main); user-select: none; -webkit-tap-highlight-color: transparent; }
         * { box-sizing: border-box; }
 
         /* SCROLLBAR */
@@ -36,6 +36,8 @@
             background: rgba(0,0,0,0.95); z-index: 9999;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             backdrop-filter: blur(5px);
+            text-align: center;
+            padding: 20px;
         }
         #btn-enter {
             padding: 15px 50px; font-size: 1.5rem; background: transparent; color: var(--gold);
@@ -45,18 +47,19 @@
         }
         #btn-enter:hover { background: var(--gold); color: #000; box-shadow: 0 0 40px var(--gold); }
 
-        /* === MISSÃO ATUAL (NOVO) === */
+        /* === MISSÃO ATUAL === */
         #mission-bar {
             position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
             z-index: 20; background: linear-gradient(90deg, transparent, rgba(0,0,0,0.9), transparent);
             padding: 10px 40px; border-bottom: 2px solid var(--gold-dim);
             text-align: center; pointer-events: none; width: 60%;
+            transition: all 0.3s ease;
         }
         .mission-title { color: var(--gold); font-family: 'Cinzel'; font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; display: block; margin-bottom: 5px; }
         .mission-text { color: #fff; font-family: 'MedievalSharp'; font-size: 1.4rem; text-shadow: 0 2px 4px #000; }
 
         /* === MAPA === */
-        #map-layer { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; background: #080808; }
+        #map-layer { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; background: #080808; touch-action: none; }
         
         #bottom-controls {
             position: absolute; bottom: 20px; left: 20px; z-index: 5;
@@ -70,9 +73,9 @@
         #ui-layer {
             position: absolute; top: 0; right: 0; height: 100vh; width: 380px;
             background: var(--panel-bg); border-left: 3px solid var(--gold-dim);
-            z-index: 10; display: flex; flex-direction: column;
+            z-index: 100; display: flex; flex-direction: column;
             box-shadow: -10px 0 50px rgba(0,0,0,1);
-            transition: transform 0.3s ease;
+            transition: transform 0.3s ease, right 0.3s ease;
         }
 
         /* CABEÇALHO DO PERSONAGEM */
@@ -171,24 +174,56 @@
 
         /* MESTRE (GM) */
         #gm-btn { position: absolute; top: 10px; left: 10px; z-index: 50; background: #222; color: var(--gold); border: 1px solid var(--gold); width: 35px; height: 35px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        #gm-panel { position: absolute; top: 50px; left: 10px; background: var(--panel-bg); border: 1px solid var(--gold); padding: 15px; width: 260px; display: none; z-index: 50; border-radius: 5px; }
+        #gm-panel { position: absolute; top: 50px; left: 10px; background: var(--panel-bg); border: 1px solid var(--gold); padding: 15px; width: 260px; display: none; z-index: 50; border-radius: 5px; max-height: 80vh; overflow-y: auto; }
         .gm-inp { width: 100%; background: #000; color: #fff; border: 1px solid #444; padding: 5px; margin-bottom: 5px; }
 
         /* MODAL DE AÇÃO */
         .modal-overlay { 
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
-            background: rgba(0,0,0,0.8); z-index: 100; display: none; 
+            background: rgba(0,0,0,0.8); z-index: 200; display: none; 
             align-items: center; justify-content: center; backdrop-filter: blur(3px); 
         }
         .modal-box { 
             background: #111; border: 2px solid var(--gold); padding: 25px; 
-            width: 350px; text-align: center; border-radius: 8px; box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            width: 350px; max-width: 90%; text-align: center; border-radius: 8px; box-shadow: 0 0 30px rgba(0,0,0,0.8);
         }
         .big-number { font-size: 4rem; font-family: 'Cinzel'; margin: 10px 0; color: #fff; }
         .btn-action { width: 100%; padding: 10px; margin-top: 10px; cursor: pointer; font-weight: bold; border: none; border-radius: 4px; }
         .btn-confirm { background: var(--danger); color: white; border: 1px solid #f00; }
         .btn-roll { background: var(--gold); color: black; }
         .btn-close { background: transparent; color: #777; text-decoration: underline; margin-top: 10px; }
+
+        /* === RESPONSIVIDADE (MOBILE) === */
+        #mobile-hud-toggle {
+            display: none;
+            position: absolute; top: 20px; right: 20px; z-index: 101;
+            width: 45px; height: 45px; border-radius: 50%;
+            background: var(--panel-bg); border: 2px solid var(--gold);
+            color: var(--gold); font-size: 1.5rem; cursor: pointer;
+            box-shadow: 0 0 10px rgba(0,0,0,0.8);
+            align-items: center; justify-content: center;
+        }
+
+        @media (max-width: 768px) {
+            #mission-bar { width: 90%; top: 70px; padding: 5px 20px; }
+            .mission-text { font-size: 1.1rem; }
+            
+            #mobile-hud-toggle { display: flex; }
+            
+            #ui-layer {
+                width: 100%;
+                transform: translateX(100%);
+            }
+            #ui-layer.open {
+                transform: translateX(0);
+            }
+            
+            #bottom-controls { bottom: 10px; left: 10px; }
+            .map-btn { width: 40px; height: 40px; font-size: 1.5rem; } /* Botões maiores para dedo */
+            
+            #gm-panel { width: 90%; left: 5%; }
+            #start-overlay h1 { font-size: 3rem !important; }
+        }
 
     </style>
 </head>
@@ -199,6 +234,8 @@
     <p style="color:#aaa; font-family:'Roboto'; letter-spacing:1px; margin-bottom:40px;">Mesa de RPG Virtual v3.1</p>
     <button id="btn-enter" onclick="enterGame()">Entrar na Sessão</button>
 </div>
+
+<div id="mobile-hud-toggle" onclick="toggleMobileHUD()">📜</div>
 
 <div id="mission-bar">
     <span class="mission-title">📜 Objetivo Atual</span>
@@ -229,7 +266,6 @@
     <input type="text" id="gm-music" class="gm-inp" placeholder="URL Música (MP3)">
     
     <input type="text" id="gm-mission-input" class="gm-inp" placeholder="Texto da Missão Atual">
-    
     <button class="btn-action btn-roll" onclick="syncWorld()">Sincronizar Mundo</button>
     
     <p class="section-label" style="margin-top:15px">Tokens</p>
@@ -345,7 +381,7 @@
         document.getElementById('start-overlay').style.display = 'none';
         hasInteracted = true;
         if(audio.src) audio.play().catch(e => console.log("Audio play failed", e));
-        if(!charId) alert("ID do personagem não encontrado na URL! Modo Espectador/Mestre");
+        if(!charId && !window.location.href.includes('gm')) console.log("Modo Espectador");
         initSystem();
     };
 
@@ -454,6 +490,11 @@
     }
 
     // --- INTERFACE ---
+    window.toggleMobileHUD = () => {
+        const hud = document.getElementById('ui-layer');
+        hud.classList.toggle('open');
+    };
+
     function updateHUD() {
         document.getElementById('hud-name').innerText = playerData.Nome || "Desconhecido";
         document.getElementById('hud-details').innerText = `${playerData.Classe || ''} ${playerData.Raca || ''} - Nvl ${playerData.Nivel || 1}`;
@@ -629,12 +670,21 @@
         resize();
         window.onresize = resize;
 
-        canvas.onmousedown = e => {
+        // Função unificada para início de interação (Touch ou Mouse)
+        const handleStart = (e) => {
+            if(e.type === 'touchstart') {
+               // Previne scroll padrão no mobile enquanto arrasta mapa
+               // mas permite clique em botões. Se for no canvas puro, preventDefault
+               if(e.target === canvas) e.preventDefault();
+            }
+
             if(placingToken){ placeTokenClick(e); return; }
 
+            const pos = getEventPos(canvas, e);
+            
             // Converter mouse para coordenadas do mundo
-            const worldX = (e.clientX - view.x) / view.zoom;
-            const worldY = (e.clientY - view.y) / view.zoom;
+            const worldX = (pos.x - view.x) / view.zoom;
+            const worldY = (pos.y - view.y) / view.zoom;
 
             let hitToken = null;
             // Checar colisão com tokens (inverso para pegar o do topo)
@@ -655,42 +705,72 @@
             } else {
                 isMapDrag = true;
             }
-            lastPos = {x: e.clientX, y: e.clientY};
+            lastPos = { x: pos.x, y: pos.y };
         };
 
-        canvas.onmousemove = e => {
-            if(!isMapDrag && !isTokenDrag) return;
+        // Função unificada para Movimento
+        const handleMove = (e) => {
+            if(e.type === 'touchmove') e.preventDefault(); // Impede scroll da tela
 
-            const dx = e.clientX - lastPos.x;
-            const dy = e.clientY - lastPos.y;
-            lastPos = {x: e.clientX, y: e.clientY};
+            if(!isMapDrag && !isTokenDrag) return;
+            const pos = getEventPos(canvas, e);
+            const dx = pos.x - lastPos.x;
+            const dy = pos.y - lastPos.y;
 
             if(isMapDrag) {
                 view.x += dx;
                 view.y += dy;
                 renderMap();
             } else if(isTokenDrag && dragTokenId) {
+                // Atualizar posição local do token instantaneamente para feedback visual
                 tokens[dragTokenId].x += dx / view.zoom;
                 tokens[dragTokenId].y += dy / view.zoom;
                 renderMap();
             }
+            lastPos = { x: pos.x, y: pos.y };
         };
 
-        canvas.onmouseup = () => {
+        // Função unificada para Fim
+        const handleEnd = () => {
             if(isTokenDrag && dragTokenId) {
-                // Salvar nova posição no Firebase
-                saveTokens();
+                // Salvar no Firebase
+                const t = tokens[dragTokenId];
+                updateDoc(doc(db, "campaign_settings", "global"), {
+                    [`posicoes.${dragTokenId}`]: { x: t.x, y: t.y, size: t.size, img: t.img, name: t.name }
+                });
             }
             isMapDrag = false;
             isTokenDrag = false;
             dragTokenId = null;
         };
 
-        // Zoom no scroll
-        canvas.onwheel = e => {
-            e.preventDefault();
-            const scaleAmount = -e.deltaY * 0.001;
-            zoomMap(scaleAmount);
+        // Event Listeners MOUSE
+        canvas.addEventListener('mousedown', handleStart);
+        canvas.addEventListener('mousemove', handleMove);
+        canvas.addEventListener('mouseup', handleEnd);
+        canvas.addEventListener('mouseleave', handleEnd);
+
+        // Event Listeners TOUCH (Mobile)
+        canvas.addEventListener('touchstart', handleStart, {passive: false});
+        canvas.addEventListener('touchmove', handleMove, {passive: false});
+        canvas.addEventListener('touchend', handleEnd);
+    }
+
+    // Helper para pegar posição correta (mouse ou touch)
+    function getEventPos(cvs, e) {
+        const rect = cvs.getBoundingClientRect();
+        let clientX, clientY;
+        
+        if(e.touches && e.touches.length > 0) {
+            clientX = e.touches[0].clientX;
+            clientY = e.touches[0].clientY;
+        } else {
+            clientX = e.clientX;
+            clientY = e.clientY;
+        }
+        return {
+            x: clientX - rect.left,
+            y: clientY - rect.top
         };
     }
 
@@ -701,141 +781,91 @@
     }
 
     function renderMap() {
-        if(!ctx) return;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
         ctx.save();
         ctx.translate(view.x, view.y);
         ctx.scale(view.zoom, view.zoom);
 
-        // Desenhar Mapa
         if(mapImg) {
-            ctx.drawImage(mapImg, 0, 0);
-        } else {
-            // Placeholder se não tiver mapa
-            ctx.fillStyle = "#111";
-            ctx.fillRect(0,0, 2000, 1500);
-            ctx.strokeStyle = "#333";
-            ctx.lineWidth = 5;
-            ctx.strokeRect(0,0, 2000, 1500);
+            ctx.drawImage(mapImg, -mapImg.width/2, -mapImg.height/2);
         }
 
         // Desenhar Tokens
-        for(let id in tokens) {
-            const t = tokens[id];
-            const size = t.size || 50;
-            const r = size / 2;
-
+        Object.keys(tokens).forEach(k => {
+            const t = tokens[k];
             ctx.save();
             ctx.beginPath();
-            ctx.arc(t.x, t.y, r, 0, Math.PI * 2);
-            ctx.closePath();
+            ctx.arc(t.x, t.y, (t.size||50)/2, 0, Math.PI*2);
             ctx.clip();
-
-            if(t.img) {
-                const img = new Image();
-                img.src = t.img;
-                ctx.drawImage(img, t.x - r, t.y - r, size, size);
-            } else {
-                ctx.fillStyle = "var(--gold)";
-                ctx.fill();
-                ctx.fillStyle = "black";
-                ctx.font = "bold 20px Arial";
-                ctx.textAlign = "center";
-                ctx.textBaseline = "middle";
-                ctx.fillText(t.name ? t.name[0].toUpperCase() : "?", t.x, t.y);
-            }
+            // Placeholder se imagem falhar
+            ctx.fillStyle = "red"; ctx.fill(); 
+            
+            // Tentar desenhar imagem do token (precisaria carregar imagens previamente na prática real)
+            // Aqui simplificamos desenhando um círculo com nome
+            ctx.fillStyle = "#222"; ctx.fill();
+            ctx.lineWidth = 2; ctx.strokeStyle = "gold"; ctx.stroke();
+            
             ctx.restore();
-
-            // Borda do Token
-            ctx.beginPath();
-            ctx.arc(t.x, t.y, r, 0, Math.PI * 2);
-            ctx.strokeStyle = "white";
-            ctx.lineWidth = 2;
-            ctx.stroke();
-
-            // DESENHAR NOME ACIMA DO TOKEN
-            ctx.save();
+            
+            // Texto Nome
             ctx.fillStyle = "white";
-            ctx.font = "bold 14px Roboto";
+            ctx.font = "bold 14px Arial";
             ctx.textAlign = "center";
-            ctx.shadowColor = "black";
-            ctx.shadowBlur = 4;
-            ctx.lineWidth = 3;
-            ctx.strokeStyle = "black";
-            
-            // Posição do texto (acima do token)
-            const textY = t.y - r - 10;
-            
-            // Traço preto (outline) para legibilidade
-            ctx.strokeText(t.name || "NPC", t.x, textY);
-            // Texto branco preenchido
-            ctx.fillText(t.name || "NPC", t.x, textY);
-            ctx.restore();
-        }
+            ctx.fillText(t.name || "NPC", t.x, t.y - (t.size||50)/2 - 5);
+        });
 
         ctx.restore();
     }
 
-    // --- FUNÇÕES DE CONTROLE (ZOOM, GM, AUDIO) ---
     window.zoomMap = (amount) => {
-        view.zoom = Math.max(0.1, Math.min(5, view.zoom + amount));
+        view.zoom = Math.max(0.1, view.zoom + amount);
         renderMap();
     };
-
+    
     window.resetView = () => {
-        view = {x: 0, y: 0, zoom: 1};
-        renderMap();
-    };
-
-    window.toggleMute = () => {
-        audio.muted = !audio.muted;
-        document.getElementById('mute-icon').innerText = audio.muted ? "🔇" : "🔊";
-    };
-    window.setVolume = (v) => audio.volume = v;
-
-    window.toggleGM = () => {
-        const p = document.getElementById('gm-panel');
-        p.style.display = p.style.display === 'block' ? 'none' : 'block';
-    };
-
-    window.syncWorld = async () => {
-        const mapUrl = document.getElementById('gm-map').value;
-        const musicUrl = document.getElementById('gm-music').value;
-        const missionText = document.getElementById('gm-mission-input').value;
-
-        await setDoc(doc(db, "campaign_settings", "global"), {
-            mapa_url: mapUrl,
-            musica_url: musicUrl,
-            missao_atual: missionText, // Salva a missão
-            posicoes: tokens // Preserva tokens atuais
-        }, { merge: true });
-        alert("Mundo Sincronizado!");
-    };
-
-    window.activateTokenPlacement = () => {
-        document.body.style.cursor = "crosshair";
-        placingToken = true;
-        toggleGM(); // Fecha painel
-    };
-
-    function placeTokenClick(e) {
-        const worldX = (e.clientX - view.x) / view.zoom;
-        const worldY = (e.clientY - view.y) / view.zoom;
-        const name = document.getElementById('tk-name').value || "NPC";
-        const img = document.getElementById('tk-img').value || "";
-        
-        const newId = "token_" + Date.now();
-        tokens[newId] = { x: worldX, y: worldY, size: 60, name: name, img: img };
-        
-        saveTokens();
-        placingToken = false;
-        document.body.style.cursor = "default";
+        view = {x: canvas.width/2, y: canvas.height/2, zoom: 0.5};
         renderMap();
     }
+    
+    // Configurações e GM
+    window.toggleGM = () => {
+        const p = document.getElementById('gm-panel');
+        p.style.display = p.style.display==='block'?'none':'block';
+    }
+    
+    window.setVolume = (v) => { audio.volume = v; }
+    window.toggleMute = () => { audio.muted = !audio.muted; document.getElementById('mute-icon').innerText = audio.muted ? '🔇' : '🔊'; }
 
-    async function saveTokens() {
-        await updateDoc(doc(db, "campaign_settings", "global"), { posicoes: tokens });
+    window.syncWorld = () => {
+        const m = document.getElementById('gm-map').value;
+        const mu = document.getElementById('gm-music').value;
+        const mis = document.getElementById('gm-mission-input').value;
+        
+        updateDoc(doc(db, "campaign_settings", "global"), {
+            mapa_url: m, musica_url: mu, missao_atual: mis
+        });
+    }
+
+    window.activateTokenPlacement = () => {
+        placingToken = true;
+        document.getElementById('gm-panel').style.display='none';
+        alert("Clique no mapa para posicionar o token.");
+    }
+
+    function placeTokenClick(e) {
+        const pos = getEventPos(canvas, e);
+        const worldX = (pos.x - view.x) / view.zoom;
+        const worldY = (pos.y - view.y) / view.zoom;
+        
+        const name = document.getElementById('tk-name').value || "Inimigo";
+        const img = document.getElementById('tk-img').value;
+        const id = "tk_" + Date.now();
+        
+        updateDoc(doc(db, "campaign_settings", "global"), {
+            [`posicoes.${id}`]: { x: worldX, y: worldY, size: 50, img: img, name: name }
+        });
+        
+        placingToken = false;
     }
 
 </script>
