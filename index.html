@@ -16,36 +16,37 @@
 
         body {
             font-family: 'MedievalSharp', cursive; background: var(--bg); color: var(--text); margin: 0;
-            display: grid; grid-template-columns: 320px 1fr; height: 100vh; overflow: hidden;
+            display: grid; grid-template-columns: 350px 1fr; height: 100vh; overflow: hidden;
         }
 
         /* BARRA LATERAL */
         aside {
             background: var(--panel); border-right: 3px solid var(--gold); padding: 15px;
-            display: flex; flex-direction: column; gap: 20px; overflow-y: auto;
+            display: flex; flex-direction: column; gap: 15px; overflow-y: auto;
             box-shadow: 5px 0 15px black; z-index: 10;
         }
 
         h1, h2, h3 { font-family: 'Cinzel'; color: var(--gold); margin: 0 0 10px 0; text-shadow: 1px 1px 2px black; }
         h1 { text-align: center; border-bottom: 1px solid var(--border); padding-bottom: 10px; font-size: 1.8rem; }
 
-        .control-group { background: rgba(0,0,0,0.4); padding: 15px; border: 1px solid var(--border); border-radius: 6px; }
-        .control-group label { display: block; font-size: 0.75rem; color: #888; text-transform: uppercase; margin-bottom: 4px; }
+        .control-group { background: rgba(0,0,0,0.4); padding: 12px; border: 1px solid var(--border); border-radius: 6px; }
+        .control-group h2 { font-size: 0.95rem; border-bottom: 1px dashed #333; padding-bottom: 5px; margin-bottom: 10px; color:#ddd;}
+        .control-group label { display: block; font-size: 0.7rem; color: #888; text-transform: uppercase; margin-bottom: 3px; margin-top: 8px; }
         
         input, select, textarea {
-            width: 100%; padding: 8px; background: #000; border: 1px solid #444; color: var(--gold);
-            font-family: 'Lora'; margin-bottom: 8px; box-sizing: border-box; border-radius: 4px;
+            width: 100%; padding: 6px; background: #000; border: 1px solid #444; color: var(--gold);
+            font-family: 'Lora'; box-sizing: border-box; border-radius: 4px; font-size: 0.9rem;
         }
-        input:focus, select:focus { outline: 1px solid var(--gold); border-color: var(--gold); }
+        input:focus, select:focus, textarea:focus { outline: 1px solid var(--gold); border-color: var(--gold); }
 
         button {
-            width: 100%; padding: 10px; background: linear-gradient(to bottom, #3a220a, #1a0f06); 
+            width: 100%; padding: 8px; background: linear-gradient(to bottom, #3a220a, #1a0f06); 
             color: var(--gold); border: 1px solid var(--gold-dark); cursor: pointer; 
-            font-family: 'Cinzel'; font-weight: bold; transition: 0.2s; margin-top: 5px;
+            font-family: 'Cinzel'; font-weight: bold; transition: 0.2s; margin-top: 10px; font-size: 0.8rem;
         }
         button:hover { background: var(--gold); color: #000; }
         button.danger { background: var(--danger); border-color: #ff4444; color: #ffcccc; }
-        button.danger:hover { background: #ff0000; color: white; }
+        button.success { background: var(--success); border-color: #44ff44; color: #ccffcc; }
 
         /* ÁREA PRINCIPAL */
         main { 
@@ -77,14 +78,16 @@
         .vitals-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
         .vital-box { text-align: center; background: #000; padding: 10px; border: 1px solid #333; }
         .vital-box label { color: var(--gold); font-size: 0.8rem; display: block; }
-        .vital-box input { text-align: center; font-size: 1.5rem; border: none; background: transparent; color: white; font-family: 'MedievalSharp'; }
+        .vital-box input { text-align: center; font-size: 1.5rem; border: none; background: transparent; color: white; font-family: 'MedievalSharp'; margin-top:0; }
 
         .item-row { 
             display: flex; justify-content: space-between; align-items: center; 
             padding: 8px; border-bottom: 1px solid #333; font-size: 0.9rem; 
         }
-        .item-row:hover { background: rgba(255,255,255,0.05); }
         .btn-mini { width: auto; padding: 2px 8px; margin: 0; font-size: 0.8rem; }
+        
+        /* Highlight para diferenciar seções */
+        .section-icon { margin-right: 5px; }
     </style>
 </head>
 <body>
@@ -92,58 +95,92 @@
 <aside>
     <div>
         <h1>ZATUR RPG</h1>
-        <div style="text-align:center; font-size:0.8rem; color:#666;">PAINEL DE CONTROLE</div>
+        <div style="text-align:center; font-size:0.7rem; color:#666;">PAINEL DO MESTRE v3.0</div>
     </div>
 
     <div class="control-group">
-        <h2>👤 Herói Ativo</h2>
-        <select id="player-select">
-            <option value="">-- Selecione --</option>
-        </select>
-        <button id="btn-token-add">📍 Invocar Token no Mapa</button>
+        <h2>📜 Narrativa / Missão</h2>
+        <input type="text" id="gm-mission-title" placeholder="Título (Ex: A Tumba)">
+        <textarea id="gm-mission-desc" rows="2" placeholder="Descrição da missão..."></textarea>
+        <button onclick="updateMission()">Atualizar HUD Jogadores</button>
     </div>
 
     <div class="control-group">
-        <h2>⚒️ Forjar</h2>
-        <label>O que você vai criar?</label>
-        <select id="new-type">
-            <option value="items">Item (Equipamento/Consumível)</option>
-            <option value="skills">Perícia (Habilidade/Magia)</option>
-        </select>
-
-        <label>Nome</label>
-        <input type="text" id="new-item-name" placeholder="Ex: Espada Longa">
-        
-        <label>Descrição</label>
-        <textarea id="new-item-desc" rows="2" placeholder="Efeito ou detalhes..."></textarea>
-        
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
-            <div><label>Preço ($)</label><input type="number" id="new-item-price" value="0"></div>
-            <div><label>Ícone (URL)</label><input type="text" id="new-item-img"></div>
-        </div>
-        
-        <button id="btn-create-entry" style="border-color:var(--success); color:#cfc;">Salvar no Banco</button>
-    </div>
-
-    <div class="control-group">
-        <h2>🌍 Cenário Global</h2>
-        <label>URL do Mapa</label>
+        <h2>🌍 Cenário & Som</h2>
+        <label>Imagem do Mapa (URL)</label>
         <input type="text" id="global-map" placeholder="http://...">
         
-        <label>URL da Música</label>
-        <input type="text" id="global-music" placeholder="http://...">
+        <label>Música de Fundo (MP3 URL)</label>
+        <input type="text" id="global-music" placeholder="http://... .mp3">
         
-        <button id="btn-update-world">Atualizar Tela dos Jogadores</button>
-        <div style="display:flex; gap:5px; margin-top:5px;">
-            <button class="danger" onclick="clearTokens()">Limpar Mapa</button>
-            <button onclick="resetPositions()">Reset Posições</button>
+        <button id="btn-update-world">Sincronizar Mesa</button>
+        <button class="danger" onclick="clearTokens()" style="margin-top:5px; font-size:0.7rem">Limpar Todos Tokens</button>
+    </div>
+
+    <div class="control-group">
+        <h2>📍 Novo Token no Mapa</h2>
+        
+        <label>Vincular a Jogador (Opcional)</label>
+        <select id="token-player-select" onchange="autoFillToken()">
+            <option value="">-- Nenhum (Monstro/NPC) --</option>
+        </select>
+
+        <label>Nome do Token</label>
+        <input type="text" id="token-custom-name" placeholder="Ex: Orc ou Nome do Jogador">
+
+        <label>Imagem do Token (URL)</label>
+        <input type="text" id="token-custom-img" placeholder="Deixe vazio para usar a da ficha">
+
+        <button onclick="addMapToken()" style="background:#444; color:white; border:1px solid #666;">Colocar no Mapa</button>
+    </div>
+
+    <div class="control-group">
+        <h2>⚔️ Spawnar Inimigo (Combate)</h2>
+        <div style="display:grid; grid-template-columns: 2fr 1fr; gap:5px;">
+            <input type="text" id="mob-name" placeholder="Nome (Orc)">
+            <input type="number" id="mob-hp" placeholder="PV" value="20">
         </div>
+        <input type="text" id="mob-img" placeholder="URL Imagem" style="margin-top:5px">
+        <button class="danger" onclick="spawnMonster()">Adicionar ao Tracker</button>
+        <button onclick="clearMonsters()" style="background:none; border:none; color:#666; font-size:0.7rem; padding:0; margin-top:5px;">(Limpar Lista de Combate)</button>
+    </div>
+
+    <div class="control-group">
+        <h2>⚒️ Forjar Item/Skill</h2>
+        <select id="new-type" style="margin-bottom:5px">
+            <option value="items">Item (Equipamento)</option>
+            <option value="skills">Perícia (Habilidade)</option>
+        </select>
+        
+        <input type="text" id="new-item-name" placeholder="Nome">
+        <textarea id="new-item-desc" rows="1" placeholder="Efeito..."></textarea>
+        
+        <div style="display:grid; grid-template-columns: 1fr 2fr; gap:5px; margin-top:5px;">
+            <div>
+                <label style="margin:0">Preço ($)</label>
+                <input type="number" id="new-item-price" value="0">
+            </div>
+            <div>
+                <label style="margin:0">Imagem (URL)</label>
+                <input type="text" id="new-item-img">
+            </div>
+        </div>
+        <small style="color:#666; font-size:0.6rem">* Preço 0 = Não aparece na loja</small>
+
+        <button id="btn-create-entry" class="success">Salvar no Banco</button>
+    </div>
+
+    <div class="control-group" style="border-color:var(--gold);">
+        <h2>📝 Editar Ficha</h2>
+        <select id="edit-player-select">
+            <option value="">-- Selecione para Editar --</option>
+        </select>
     </div>
 </aside>
 
 <main>
     <div class="empty-state" id="empty-msg">
-        <h1>Selecione um personagem<br>para começar a editar</h1>
+        <h1>Grimório do Mestre<br><span style="font-size:1rem; font-family:'Lora'">Selecione um personagem abaixo para editar</span></h1>
     </div>
 
     <div id="editor-panel">
@@ -152,29 +189,17 @@
                 <h1 id="char-name" style="text-align:left; border:none; padding:0; font-size:2.5rem">-</h1>
                 <span id="char-desc" style="color:#888;">Classe | Origem</span>
             </div>
-            <button onclick="saveCharacter()" style="width:auto; padding: 10px 30px; background:var(--gold); color:black;">💾 SALVAR ALTERAÇÕES</button>
+            <button onclick="saveCharacter()" style="width:auto; padding: 10px 30px; background:var(--gold); color:black;">💾 SALVAR FICHA</button>
         </div>
 
         <div class="grid-dashboard">
             <div class="card">
                 <h3>❤️ Vitais & Recursos</h3>
                 <div class="vitals-grid">
-                    <div class="vital-box">
-                        <label>VIDA ATUAL</label>
-                        <input type="number" id="inp-pv">
-                    </div>
-                    <div class="vital-box">
-                        <label>VIDA MÁX</label>
-                        <input type="number" id="inp-pv-max">
-                    </div>
-                    <div class="vital-box">
-                        <label>MANA ATUAL</label>
-                        <input type="number" id="inp-pe">
-                    </div>
-                    <div class="vital-box">
-                        <label>MANA MÁX</label>
-                        <input type="number" id="inp-pe-max">
-                    </div>
+                    <div class="vital-box"><label>VIDA ATUAL</label><input type="number" id="inp-pv"></div>
+                    <div class="vital-box"><label>VIDA MÁX</label><input type="number" id="inp-pv-max"></div>
+                    <div class="vital-box"><label>MANA ATUAL</label><input type="number" id="inp-pe"></div>
+                    <div class="vital-box"><label>MANA MÁX</label><input type="number" id="inp-pe-max"></div>
                 </div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                     <div><label>XP</label><input type="number" id="inp-xp"></div>
@@ -183,19 +208,19 @@
             </div>
 
             <div class="card">
-                <h3>📊 Atributos Base</h3>
+                <h3>📊 Atributos</h3>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                     <div><label>FORÇA</label><input type="number" id="inp-for"></div>
                     <div><label>AGILIDADE</label><input type="number" id="inp-agi"></div>
                     <div><label>MANA (Attr)</label><input type="number" id="inp-man"></div>
                     <div><label>INTELECTO</label><input type="number" id="inp-int"></div>
                     <div><label>VIGOR</label><input type="number" id="inp-vig"></div>
-                    <div><label>DEFESA EQ.</label><input type="number" id="inp-def-eq"></div>
+                    <div><label>DEFESA</label><input type="number" id="inp-def-eq"></div>
                 </div>
             </div>
 
             <div class="card">
-                <h3>🎒 Inventário (Items)</h3>
+                <h3>🎒 Inventário</h3>
                 <div style="display:flex; gap:5px; margin-bottom:10px;">
                     <select id="list-global-inv"></select>
                     <button class="btn-mini" onclick="addEntryToChar('itens', 'list-global-inv')">+</button>
@@ -204,7 +229,7 @@
             </div>
 
             <div class="card">
-                <h3>📜 Perícias (Skills)</h3>
+                <h3>📜 Habilidades</h3>
                 <div style="display:flex; gap:5px; margin-bottom:10px;">
                     <select id="list-global-skill"></select>
                     <button class="btn-mini" onclick="addEntryToChar('pericias', 'list-global-skill')">+</button>
@@ -217,7 +242,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, onSnapshot, updateDoc, collection, getDocs, addDoc, arrayUnion, arrayRemove, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, onSnapshot, updateDoc, collection, getDocs, addDoc, arrayUnion, arrayRemove, getDoc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyAgYVod9B99WIc_QysFx73htOf9O8XtuE8",
@@ -231,48 +256,111 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     let currentCharId = null;
-    let globalNameCache = {}; // Cache para nomes (items E skills)
+    let globalNameCache = {}; 
 
-    // INICIALIZAÇÃO
+    // === INICIALIZAÇÃO ===
     async function init() {
-        // 1. Carregar lista de Personagens
+        // Carrega Lista de Personagens para os dois selects (Edição e Token)
         const charsSnap = await getDocs(collection(db, "characters"));
-        const select = document.getElementById('player-select');
+        const editSel = document.getElementById('edit-player-select');
+        const tokenSel = document.getElementById('token-player-select');
+        
         charsSnap.forEach(d => {
-            select.innerHTML += `<option value="${d.id}">${d.data().Nome}</option>`;
+            const opt = `<option value="${d.id}">${d.data().Nome}</option>`;
+            editSel.innerHTML += opt;
+            tokenSel.innerHTML += opt;
         });
 
-        // 2. Carregar Itens e Skills
+        // Carrega Configs Globais
+        const globalSnap = await getDoc(doc(db, "campaign_settings", "global"));
+        if(globalSnap.exists()) {
+            const gd = globalSnap.data();
+            document.getElementById('gm-mission-title').value = gd.missao_titulo || "";
+            document.getElementById('gm-mission-desc').value = gd.missao_desc || "";
+            document.getElementById('global-map').value = gd.mapa_url || "";
+            document.getElementById('global-music').value = gd.musica_url || "";
+        }
         refreshGlobalData();
     }
     init();
 
-    async function refreshGlobalData() {
-        globalNameCache = {};
+    // === 1. TOKENS DO MAPA (Lógica Nova) ===
+    window.autoFillToken = async () => {
+        const pid = document.getElementById('token-player-select').value;
+        if(pid) {
+            // Se selecionou jogador, busca nome
+            const snap = await getDoc(doc(db, "characters", pid));
+            if(snap.exists()) {
+                document.getElementById('token-custom-name').value = snap.data().Nome;
+                // Deixa imagem vazia para usar padrão ou o mestre escolhe outra
+            }
+        } else {
+            document.getElementById('token-custom-name').value = "";
+        }
+    };
+
+    window.addMapToken = async () => {
+        const pid = document.getElementById('token-player-select').value;
+        const name = document.getElementById('token-custom-name').value;
+        const img = document.getElementById('token-custom-img').value;
+
+        if(!name) return alert("O token precisa de um nome!");
+
+        // Se tiver PID, usa ele como chave (para linkar status). Se não, cria ID aleatório.
+        const tokenId = pid ? pid : "npc_" + Date.now();
         
-        // Carregar Items -> Popular Select Inv
-        const invSel = document.getElementById('list-global-inv');
-        invSel.innerHTML = "";
-        const itemSnap = await getDocs(collection(db, "items"));
-        itemSnap.forEach(d => {
-            const data = d.data();
-            globalNameCache[d.id] = data.Nome;
-            invSel.innerHTML += `<option value="${d.id}">${data.Nome}</option>`;
-        });
+        const tokenData = {
+            x: 50, // Posição padrão
+            y: 50,
+            nome: name,
+            img: img // Se vazio, o sistema do mapa deve lidar com isso ou usar imagem padrão
+        };
 
-        // Carregar Skills -> Popular Select Skill
-        const skillSel = document.getElementById('list-global-skill');
-        skillSel.innerHTML = "";
-        const skillSnap = await getDocs(collection(db, "skills"));
-        skillSnap.forEach(d => {
-            const data = d.data();
-            globalNameCache[d.id] = data.Nome;
-            skillSel.innerHTML += `<option value="${d.id}">${data.Nome}</option>`;
+        await updateDoc(doc(db, "campaign_settings", "global"), {
+            [`posicoes.${tokenId}`]: tokenData
         });
-    }
+        
+        alert("Token posicionado no (50,50)!");
+    };
 
-    // SELECIONAR JOGADOR
-    document.getElementById('player-select').onchange = (e) => {
+    window.clearTokens = async () => {
+        if(confirm("ATENÇÃO: Isso removerá TODOS os tokens do mapa. Continuar?")) {
+            await updateDoc(doc(db, "campaign_settings", "global"), { posicoes: {} });
+        }
+    };
+
+    // === 2. CENÁRIO & SOM ===
+    document.getElementById('btn-update-world').onclick = async () => {
+        await updateDoc(doc(db, "campaign_settings", "global"), {
+            mapa_url: document.getElementById('global-map').value,
+            musica_url: document.getElementById('global-music').value
+        });
+        alert("Mapa e Música atualizados!");
+    };
+
+    // === 3. FORJA (Com Preço e Imagem) ===
+    document.getElementById('btn-create-entry').onclick = async () => {
+        const col = document.getElementById('new-type').value;
+        const nome = document.getElementById('new-item-name').value;
+        const preco = parseInt(document.getElementById('new-item-price').value) || 0;
+        const img = document.getElementById('new-item-img').value;
+        
+        if(!nome) return alert("Nome obrigatório");
+
+        await addDoc(collection(db, col), {
+            Nome: nome,
+            Descricao: document.getElementById('new-item-desc').value,
+            Preco: preco,
+            Imagem: img
+        });
+        
+        alert(`Item criado! Preço: ${preco}`);
+        document.getElementById('new-item-name').value = "";
+        refreshGlobalData();
+    };
+
+    // === 4. EDIÇÃO DE FICHA ===
+    document.getElementById('edit-player-select').onchange = (e) => {
         currentCharId = e.target.value;
         if(currentCharId) {
             document.getElementById('empty-msg').style.display = 'none';
@@ -284,47 +372,55 @@
         }
     };
 
-    // ESCUTAR MUDANÇAS NA FICHA
     function subscribeToChar(id) {
         onSnapshot(doc(db, "characters", id), (snap) => {
             if(!snap.exists()) return;
             const d = snap.data();
-
             document.getElementById('char-name').innerText = d.Nome;
             document.getElementById('char-desc').innerText = `${d.Classe || '?'} | ${d.Origem || '?'}`;
 
-            // Preencher Inputs
-            const fields = ['pv','pv-max','pe','pe-max','xp','gold','for','agi','man','int','vig','def-eq'];
-            const dbFields = ['PV','PV_Max','PE','PE_Max','XP','Zeuro','Força','Agilidade','Mana','Intelecto','Vigor','Defesa_Equip'];
+            const inputs = ['pv','pv-max','pe','pe-max','xp','gold','for','agi','man','int','vig','def-eq'];
+            const dbKeys = ['PV','PV_Max','PE','PE_Max','XP','Zeuro','Força','Agilidade','Mana','Intelecto','Vigor','Defesa_Equip'];
             
-            fields.forEach((fid, i) => {
-                const el = document.getElementById(`inp-${fid}`);
-                if(el) el.value = d[dbFields[i]] || 0;
+            inputs.forEach((id, i) => {
+                const el = document.getElementById(`inp-${id}`);
+                if(el) el.value = d[dbKeys[i]] || 0;
             });
-
-            // Renderizar Listas (usando o campo correto do BD)
             renderList('container-inv', d.itens || [], 'itens');
             renderList('container-skill', d.pericias || [], 'pericias');
         });
     }
 
-    function renderList(containerId, ids, fieldName) {
-        const div = document.getElementById(containerId);
-        div.innerHTML = "";
-        ids.forEach(id => {
-            const nome = globalNameCache[id] || id; 
-            div.innerHTML += `
-                <div class="item-row">
-                    <span>${nome}</span>
-                    <button class="danger btn-mini" onclick="window.removeEntry('${fieldName}', '${id}')">X</button>
-                </div>`;
+    // === 5. OUTRAS FUNÇÕES (Missão, Combate, Listas) ===
+    window.updateMission = async () => {
+        await updateDoc(doc(db, "campaign_settings", "global"), {
+            missao_titulo: document.getElementById('gm-mission-title').value,
+            missao_desc: document.getElementById('gm-mission-desc').value
         });
-    }
+        alert("Missão atualizada!");
+    };
 
-    // SALVAR FICHA MANUALMENTE
+    window.spawnMonster = async () => {
+        const name = document.getElementById('mob-name').value;
+        if(!name) return alert("Nome necessário");
+        await addDoc(collection(db, "active_encounters"), {
+            Nome: name,
+            PV: parseInt(document.getElementById('mob-hp').value),
+            PV_Max: parseInt(document.getElementById('mob-hp').value),
+            Imagem: document.getElementById('mob-img').value
+        });
+        alert("Inimigo adicionado ao Combate!");
+    };
+    
+    window.clearMonsters = async () => {
+        if(!confirm("Limpar tracker de combate?")) return;
+        const s = await getDocs(collection(db, "active_encounters"));
+        s.forEach(d => deleteDoc(d.ref));
+    };
+
     window.saveCharacter = async () => {
         if(!currentCharId) return;
-        const data = {
+        const d = {
             PV: parseInt(document.getElementById('inp-pv').value),
             PV_Max: parseInt(document.getElementById('inp-pv-max').value),
             PE: parseInt(document.getElementById('inp-pe').value),
@@ -338,80 +434,37 @@
             Vigor: parseInt(document.getElementById('inp-vig').value),
             Defesa_Equip: parseInt(document.getElementById('inp-def-eq').value),
         };
-        await updateDoc(doc(db, "characters", currentCharId), data);
-        alert("Ficha salva!");
+        await updateDoc(doc(db, "characters", currentCharId), d);
+        alert("Salvo!");
     };
 
-    // ADICIONAR / REMOVER DA LISTA DO PERSONAGEM
-    window.addEntryToChar = async (field, selectId) => {
-        const itemId = document.getElementById(selectId).value;
-        if(!currentCharId || !itemId) return;
-        await updateDoc(doc(db, "characters", currentCharId), {
-            [field]: arrayUnion(itemId)
-        });
+    window.addEntryToChar = async (field, selId) => {
+        const v = document.getElementById(selId).value;
+        if(currentCharId && v) await updateDoc(doc(db, "characters", currentCharId), { [field]: arrayUnion(v) });
+    };
+    window.removeEntry = async (field, id) => {
+        if(confirm("Remover?")) await updateDoc(doc(db, "characters", currentCharId), { [field]: arrayRemove(id) });
     };
 
-    window.removeEntry = async (field, itemId) => {
-        if(confirm("Remover da ficha do jogador?")) {
-            await updateDoc(doc(db, "characters", currentCharId), {
-                [field]: arrayRemove(itemId)
+    async function refreshGlobalData() {
+        const load = async (c, t) => {
+            const el = document.getElementById(t); el.innerHTML = "";
+            const s = await getDocs(collection(db, c));
+            s.forEach(d => {
+                globalNameCache[d.id] = d.data().Nome;
+                el.innerHTML += `<option value="${d.id}">${d.data().Nome}</option>`;
             });
-        }
-    };
+        };
+        await load('items', 'list-global-inv');
+        await load('skills', 'list-global-skill');
+    }
 
-    // CRIAÇÃO DE ITENS OU SKILLS (GLOBAL)
-    document.getElementById('btn-create-entry').onclick = async () => {
-        const collectionName = document.getElementById('new-type').value; // 'items' ou 'skills'
-        const nome = document.getElementById('new-item-name').value;
-        
-        if(!nome) return alert("Nome obrigatório");
-        
-        await addDoc(collection(db, collectionName), {
-            Nome: nome,
-            Descricao: document.getElementById('new-item-desc').value,
-            Preco: parseInt(document.getElementById('new-item-price').value),
-            Imagem: document.getElementById('new-item-img').value
+    function renderList(cid, ids, field) {
+        const div = document.getElementById(cid); div.innerHTML = "";
+        ids.forEach(id => {
+            div.innerHTML += `<div class="item-row"><span>${globalNameCache[id]||id}</span><button class="danger btn-mini" onclick="window.removeEntry('${field}','${id}')">X</button></div>`;
         });
-        
-        alert(`Criado com sucesso em ${collectionName}!`);
-        
-        // Limpar campos
-        document.getElementById('new-item-name').value = "";
-        document.getElementById('new-item-desc').value = "";
-        
-        refreshGlobalData(); // Atualizar selects
-    };
-
-    // CONTROLE DE MUNDO
-    document.getElementById('btn-update-world').onclick = async () => {
-        await setDoc(doc(db, "campaign_settings", "global"), {
-            mapa_url: document.getElementById('global-map').value,
-            musica_url: document.getElementById('global-music').value
-        }, { merge: true });
-        alert("Mundo sincronizado!");
-    };
-
-    document.getElementById('btn-token-add').onclick = async () => {
-        if(!currentCharId) return alert("Selecione um herói");
-        const nome = document.getElementById('char-name').innerText;
-        await updateDoc(doc(db, "campaign_settings", "global"), {
-            [`posicoes.${currentCharId}`]: { x: 50, y: 50, nome: nome }
-        });
-    };
-
-    window.clearTokens = async () => {
-        if(confirm("Remover todos os tokens?")) {
-            await updateDoc(doc(db, "campaign_settings", "global"), { posicoes: {} });
-        }
-    };
-    
-    window.resetPositions = async () => {
-        const snap = await getDoc(doc(db, "campaign_settings", "global"));
-        let pos = snap.data().posicoes || {};
-        for(let k in pos) { pos[k].x = 50; pos[k].y = 50; }
-        await updateDoc(doc(db, "campaign_settings", "global"), { posicoes: pos });
-    };
-
+    }
 </script>
 </body>
 </html>
