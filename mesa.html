@@ -161,7 +161,6 @@
 </div>
 
 <div id="mobile-hud-toggle" onclick="toggleMobileHUD()">📜</div>
-
 <div id="mission-bar" style="position: absolute; top: 20px; left: 50%; transform: translateX(-50%); z-index: 20; background: linear-gradient(90deg, transparent, rgba(0,0,0,0.8), transparent); padding: 10px 40px; border-bottom: 2px solid var(--gold-dim); text-align: center; pointer-events: none; width: 60%; transition: 0.3s;">
     <span style="color:var(--gold); font-family:'Cinzel'; font-size:0.8rem; letter-spacing:2px; text-transform:uppercase;">📜 Objetivo Atual</span>
     <div id="mission-display" class="mission-text" style="color:white; font-size:1.3rem; text-shadow:0 2px 4px black; margin-top:5px;">Aguardando o Mestre...</div>
@@ -293,6 +292,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, doc, onSnapshot, getDoc, collection, updateDoc, setDoc, addDoc, query, orderBy, limit, serverTimestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+    // --- CONFIGURAÇÃO ---
     const firebaseConfig = {
         apiKey: "AIzaSyAgYVod9B99WIc_QysFx73htOf9O8XtuE8",
         authDomain: "zatur-rpg.firebaseapp.com",
@@ -331,6 +331,7 @@
             });
         }
 
+        // Monstros Ativos
         onSnapshot(collection(db, "active_encounters"), (snap) => {
             const container = document.getElementById('list-enemies');
             container.innerHTML = "";
@@ -340,7 +341,7 @@
             }
             snap.forEach(d => {
                 const en = d.data();
-                const hpPercent = Math.max(0, Math.min(100, (en.PV / en.PV_Max) * 100));
+                const hpPercent = Math.max(0, Math.min(100, (en['Pontos de Vida Atual'] / en['Pontos de Vida Max']) * 100));
                 let hpColor = hpPercent > 50 ? "#22c55e" : (hpPercent > 25 ? "#eab308" : "var(--danger)");
                 
                 container.innerHTML += `
@@ -359,6 +360,7 @@
             });
         });
 
+        // Chat
         const q = query(collection(db, "logs"), orderBy("timestamp", "desc"), limit(30));
         onSnapshot(q, (snap) => {
             const container = document.getElementById('log-container');
@@ -386,15 +388,18 @@
             container.scrollTop = container.scrollHeight;
         });
 
+        // Configurações Globais
         onSnapshot(doc(db,"campaign_settings","global"), (s) => {
             if(!s.exists()) return;
             const data = s.data();
             
+            // Missão
             if(data.missao_atual) {
                 document.getElementById('mission-display').innerText = data.missao_atual;
                 document.getElementById('gm-mission-input').value = data.missao_atual;
             }
 
+            // Mapa
             if(data.mapa_url && (!mapImg || mapImg.src !== data.mapa_url)) {
                 mapImg = new Image(); 
                 mapImg.crossOrigin = "anonymous";
@@ -403,6 +408,7 @@
                 document.getElementById('gm-map').value = data.mapa_url;
             }
             
+            // Audio
             if(data.musica_url && audio.src !== data.musica_url) {
                 audio.src = data.musica_url;
                 document.getElementById('gm-music').value = data.musica_url;
@@ -424,10 +430,10 @@
     function updateHUD() {
         document.getElementById('hud-name').innerText = playerData.Nome || "Heroi";
         document.getElementById('hud-details').innerText = `${playerData.Classe || '?'} - Nvl ${playerData.Nivel || 1}`;
-        document.getElementById('bar-hp').style.width = ((playerData.PV / playerData.PV_Max) * 100) + "%";
-        document.getElementById('txt-hp').innerText = `${playerData.PV}/${playerData.PV_Max}`;
-        document.getElementById('bar-mp').style.width = ((playerData.PE / playerData.PE_Max) * 100) + "%";
-        document.getElementById('txt-mp').innerText = `${playerData.PE}/${playerData.PE_Max}`;
+        document.getElementById('bar-hp').style.width = ((playerData['Pontos de Vida Atual'] / playerData['Pontos de Vida Max']) * 100) + "%";
+        document.getElementById('txt-hp').innerText = `${playerData['Pontos de Vida Atual']}/${playerData['Pontos de Vida Max']}`;
+        document.getElementById('bar-mp').style.width = ((playerData['Pontos de Mana Atual'] / playerData['Pontos de Mana Max']) * 100) + "%";
+        document.getElementById('txt-mp').innerText = `${playerData['Pontos de Mana Atual']}/${playerData['Pontos de Mana Max']}`;
         
         const grid = document.getElementById('grid-attrs');
         grid.innerHTML = "";
@@ -443,38 +449,32 @@
         skillsDiv.innerHTML = ""; invDiv.innerHTML = "";
         combatOptions = [];
 
-        const allSkills = [...(playerData.pericias || []), ...(playerData.habilidades || [])];
-        if(!allSkills.length) skillsDiv.innerHTML = "<small style='color:#555'>Vazio</small>";
+        // Perícias (Agora é Array de IDs, buscamos na coleção 'skills')
+        // Se a estrutura antiga era string "Nome (+Bonus)", precisamos adaptar ou assumir IDs
+        // O código do mestre agora salva IDs.
         
-        allSkills.forEach(s => {
-            const match = s.match(/(.+)\s\(([\+\-]?\d+)\)/);
-            const name = match ? match[1] : s;
-            const bonus = match ? parseInt(match[2]) : 0;
-            createListItem(skillsDiv, "🎲", name, `+${bonus}`, () => rollSimple(name, bonus));
-            combatOptions.push({ name: name, type: 'Perícia', bonus: bonus });
-        });
+        const loadList = async (listIds, collectionName, targetDiv, icon, type) => {
+            if(!listIds || listIds.length === 0) return;
+            for(let id of listIds) {
+                // Tenta buscar no banco
+                let data = null;
+                try {
+                    let snap = await getDoc(doc(db, collectionName, id));
+                    if(snap.exists()) data = snap.data();
+                } catch(e){}
 
-        const extIds = [...(playerData.itens || []), ...(playerData.magias || [])];
-        for(const id of extIds) {
-            let data = null, type = "Item";
-            try {
-                let snap = await getDoc(doc(db, "items", id));
-                if(snap.exists()) { data = snap.data(); type = "Item"; }
-                else {
-                    snap = await getDoc(doc(db, "spells", id));
-                    if(snap.exists()) { data = snap.data(); type = "Magia"; }
+                if(data) {
+                    const sub = data.Dano ? `Dano: ${data.Dano}` : (data.Bonus ? `+${data.Bonus}` : "");
+                    createListItem(targetDiv, icon, data.Nome, sub, () => rollSimple(data.Nome, data.Bonus||0), data.Descricao);
+                    combatOptions.push({ name: data.Nome, type: type, bonus: data.Bonus||0, dmg: data.Dano });
                 }
-            } catch(e) {}
-
-            if(data) {
-                const sub = data.Dano ? `Dano: ${data.Dano}` : (data.Custo ? `Custo: ${data.Custo}` : "Item");
-                createListItem(invDiv, type === "Item"?"⚔️":"✨", data.Nome, sub, () => rollSimple(data.Nome, 0), data.Descricao);
-                combatOptions.push({ name: data.Nome, type: type, bonus: 0 });
-            } else {
-                createListItem(invDiv, "📦", id, "Genérico", () => rollSimple(id, 0));
-                combatOptions.push({ name: id, type: 'Item', bonus: 0 });
             }
-        }
+        };
+
+        await loadList(playerData.Pericias, 'skills', skillsDiv, '🎲', 'Perícia');
+        await loadList(playerData.Habilidades, 'abilities', skillsDiv, '⚡', 'Habilidade');
+        await loadList(playerData.Itens, 'items', invDiv, '⚔️', 'Item');
+        await loadList(playerData.Magias, 'spells', invDiv, '🔮', 'Magia');
     }
 
     function createListItem(container, icon, title, subtitle, onClickRoll, description = null) {
@@ -549,8 +549,8 @@
             const ref = doc(db, "active_encounters", currentTargetId);
             const snap = await getDoc(ref);
             if(snap.exists()) {
-                const novo = Math.max(0, snap.data().PV - dmg);
-                await updateDoc(ref, { PV: novo });
+                const novo = Math.max(0, snap.data()['Pontos de Vida Atual'] - dmg);
+                await updateDoc(ref, { 'Pontos de Vida Atual': novo });
                 addDoc(collection(db, "logs"), { charName: "SISTEMA", message: `${snap.data().Nome} sofreu ${dmg} de dano!`, type: 'chat', timestamp: serverTimestamp() });
             }
         }
@@ -572,7 +572,7 @@
 
     // === ENGINE DE MAPA ===
     let canvas, ctx, mapImg;
-    let tokens = {}, tokenImages = {}; 
+    let tokens = {}; // { id: {x, y, size, img, name} }
     let view = {x:0, y:0, zoom:1};
     let isMapDrag = false, isTokenDrag = false, dragTokenId = null, lastPos = {x:0,y:0};
     let placingToken = false;
@@ -583,144 +583,99 @@
         resize();
         window.onresize = resize;
 
-        const handleStart = (e) => {
-            if(e.type === 'touchstart' && e.target === canvas) e.preventDefault();
+        canvas.onmousedown = e => {
             if(placingToken){ placeTokenClick(e); return; }
 
-            const pos = getEventPos(canvas, e);
-            const wx = (pos.x - view.x) / view.zoom;
-            const wy = (pos.y - view.y) / view.zoom;
+            const worldX = (e.clientX - view.x) / view.zoom;
+            const worldY = (e.clientY - view.y) / view.zoom;
 
             let hitToken = null;
-            const keys = Object.keys(tokens);
-            for(let i = keys.length - 1; i >= 0; i--) {
-                const t = tokens[keys[i]];
-                if(Math.sqrt((wx - t.x)**2 + (wy - t.y)**2) <= (t.size||50)/2) {
-                    hitToken = keys[i]; break;
+            const tokenKeys = Object.keys(tokens);
+            for(let i = tokenKeys.length - 1; i >= 0; i--) {
+                const id = tokenKeys[i];
+                const t = tokens[id];
+                const size = t.size || 50;
+                if(Math.sqrt((worldX - t.x)**2 + (worldY - t.y)**2) <= size/2) {
+                    hitToken = id; break; 
                 }
             }
 
             if(hitToken) { isTokenDrag = true; dragTokenId = hitToken; } 
             else { isMapDrag = true; }
-            lastPos = pos;
+            lastPos = {x:e.clientX, y:e.clientY};
         };
 
-        const handleMove = (e) => {
-            if(e.type === 'touchmove') e.preventDefault();
-            if(!isMapDrag && !isTokenDrag) return;
-            const pos = getEventPos(canvas, e);
-            const dx = pos.x - lastPos.x;
-            const dy = pos.y - lastPos.y;
-
-            if(isMapDrag) { view.x += dx; view.y += dy; renderMap(); } 
-            else if(isTokenDrag && dragTokenId) {
-                tokens[dragTokenId].x += dx / view.zoom;
-                tokens[dragTokenId].y += dy / view.zoom;
+        canvas.onmousemove = e => {
+            if(isTokenDrag && dragTokenId) {
+                const dx = (e.clientX - lastPos.x) / view.zoom;
+                const dy = (e.clientY - lastPos.y) / view.zoom;
+                tokens[dragTokenId].x += dx; tokens[dragTokenId].y += dy;
+                renderMap();
+            } else if(isMapDrag) {
+                view.x += e.clientX - lastPos.x; view.y += e.clientY - lastPos.y;
                 renderMap();
             }
-            lastPos = pos;
+            lastPos = {x:e.clientX, y:e.clientY};
         };
 
-        const handleEnd = () => {
-            if(isTokenDrag && dragTokenId) {
-                const t = tokens[dragTokenId];
-                updateDoc(doc(db, "campaign_settings", "global"), {
-                    [`posicoes.${dragTokenId}`]: { x: t.x, y: t.y, size: t.size, img: t.img, name: t.name }
-                });
+        canvas.onmouseup = async () => {
+            if(isTokenDrag) {
+                await updateDoc(doc(db,"campaign_settings","global"), { posicoes: tokens });
             }
             isMapDrag = false; isTokenDrag = false; dragTokenId = null;
         };
-
-        canvas.addEventListener('mousedown', handleStart);
-        canvas.addEventListener('mousemove', handleMove);
-        canvas.addEventListener('mouseup', handleEnd);
-        canvas.addEventListener('touchstart', handleStart, {passive: false});
-        canvas.addEventListener('touchmove', handleMove, {passive: false});
-        canvas.addEventListener('touchend', handleEnd);
-    }
-
-    function getEventPos(cvs, e) {
-        const r = cvs.getBoundingClientRect();
-        const c = (e.touches && e.touches[0]) ? e.touches[0] : e;
-        return { x: c.clientX - r.left, y: c.clientY - r.top };
     }
 
     function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; renderMap(); }
 
     function renderMap() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.save();
-        ctx.translate(view.x, view.y);
-        ctx.scale(view.zoom, view.zoom);
-
-        if(mapImg) ctx.drawImage(mapImg, -mapImg.width/2, -mapImg.height/2);
-
-        Object.keys(tokens).forEach(k => {
-            const t = tokens[k];
+        if(!ctx) return;
+        ctx.fillStyle = "#080808"; ctx.fillRect(0,0,canvas.width,canvas.height);
+        ctx.save(); ctx.translate(view.x, view.y); ctx.scale(view.zoom, view.zoom);
+        
+        if(mapImg) ctx.drawImage(mapImg, 0, 0);
+        
+        for(let id in tokens) {
+            const t = tokens[id];
             const size = t.size || 50;
             ctx.save();
-            ctx.beginPath();
-            ctx.arc(t.x, t.y, size/2, 0, Math.PI*2);
-            ctx.clip();
-            ctx.fillStyle = "#111"; ctx.fill();
-
-            if (t.img) {
-                if (!tokenImages[t.img]) {
-                    const img = new Image();
-                    img.crossOrigin = "anonymous";
-                    img.src = t.img;
-                    img.onload = () => renderMap();
-                    tokenImages[t.img] = img;
-                } else if (tokenImages[t.img].complete) {
-                    ctx.drawImage(tokenImages[t.img], t.x - size/2, t.y - size/2, size, size);
-                }
-            }
-
-            ctx.lineWidth = 3; ctx.strokeStyle = "gold"; ctx.stroke();
+            ctx.beginPath(); ctx.arc(t.x, t.y, size/2, 0, Math.PI*2);
+            ctx.fillStyle = "#222"; ctx.fill(); 
+            ctx.strokeStyle = "gold"; ctx.lineWidth = 2; ctx.stroke();
+            ctx.fillStyle = "white"; ctx.font = "bold 14px Arial"; ctx.textAlign="center";
+            ctx.fillText(t.name || "?", t.x, t.y - size/2 - 5);
             ctx.restore();
-            
-            ctx.fillStyle = "white"; ctx.font = "bold 14px Arial"; ctx.textAlign = "center";
-            ctx.shadowColor = "black"; ctx.shadowBlur = 4;
-            ctx.fillText(t.name || "NPC", t.x, t.y - size/2 - 8);
-        });
+        }
         ctx.restore();
     }
 
-    window.zoomMap = (v) => { view.zoom = Math.max(0.1, view.zoom + v); renderMap(); };
-    window.resetView = () => { view = {x: canvas.width/2, y: canvas.height/2, zoom: 0.5}; renderMap(); }
-    window.toggleGM = () => { const p = document.getElementById('gm-panel'); p.style.display = p.style.display==='block'?'none':'block'; }
-    window.setVolume = (v) => { audio.volume = v; }
-    window.toggleMute = () => { audio.muted = !audio.muted; document.getElementById('mute-icon').innerText = audio.muted ? '🔇' : '🔊'; }
-
-    window.syncWorld = () => {
-        updateDoc(doc(db, "campaign_settings", "global"), {
+    // --- GM TOOLS (Só para quando logar sem ID, modo espectador/GM) ---
+    window.toggleGM = () => document.getElementById('gm-panel').style.display = document.getElementById('gm-panel').style.display==='block'?'none':'block';
+    window.syncWorld = async () => {
+        await updateDoc(doc(db,"campaign_settings","global"), {
             mapa_url: document.getElementById('gm-map').value,
             musica_url: document.getElementById('gm-music').value,
             missao_atual: document.getElementById('gm-mission-input').value
         });
-    }
-
-    window.activateTokenPlacement = () => {
-        placingToken = true;
-        document.getElementById('gm-panel').style.display='none';
-        alert("Toque no mapa para posicionar o token.");
-    }
-
+    };
+    window.activateTokenPlacement = () => { placingToken = true; document.body.style.cursor = "crosshair"; };
+    
     function placeTokenClick(e) {
-        const pos = getEventPos(canvas, e);
-        const wx = (pos.x - view.x) / view.zoom;
-        const wy = (pos.y - view.y) / view.zoom;
-        const id = "tk_" + Date.now();
-        
-        updateDoc(doc(db, "campaign_settings", "global"), {
-            [`posicoes.${id}`]: { 
-                x: wx, y: wy, size: 50, 
-                img: document.getElementById('tk-img').value, 
-                name: document.getElementById('tk-name').value || "Inimigo" 
-            }
-        });
-        placingToken = false;
+        const wx = (e.clientX - view.x) / view.zoom;
+        const wy = (e.clientY - view.y) / view.zoom;
+        const id = "tk_"+Date.now();
+        tokens[id] = { x:wx, y:wy, size:50, name: document.getElementById('tk-name').value||"Token", img: document.getElementById('tk-img').value };
+        updateDoc(doc(db,"campaign_settings","global"), { posicoes: tokens });
+        placingToken = false; document.body.style.cursor="default";
+        renderMap();
     }
+
+    // Zoom
+    window.zoomMap = (z) => { view.zoom = Math.max(0.2, view.zoom+z); renderMap(); };
+    window.resetView = () => { view = {x:0,y:0,zoom:1}; renderMap(); };
+    window.toggleMute = () => { audio.muted = !audio.muted; document.getElementById('mute-icon').innerText = audio.muted?'🔇':'🔊'; };
+    window.setVolume = (v) => audio.volume = v;
+
 </script>
 </body>
 </html>
