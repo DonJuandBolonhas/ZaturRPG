@@ -1,271 +1,541 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-    <title>Zatur RPG - Player Mobile V2</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Zatur RPG - Grimório do Jogador</title>
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=MedievalSharp&family=Lora:ital,wght@0,400;1,500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=MedievalSharp&family=Roboto:wght@300;400;500;700&display=swap');
 
+        /* =========================================
+           1. VARIÁVEIS E RESET
+           ========================================= */
         :root {
-            --gold: #d4af37; --gold-bright: #ffdf00; --parchment: #f4e4bc;
-            --bg-dark: #0a0502; --panel-bg: rgba(30, 20, 10, 0.95);
-            --red: #8b0000; --blue: #1e4d8c; --purple: #6a0dad; --skill: #3498db;
+            --bg-dark: #050505;
+            --bg-panel: #101010;
+            --bg-card: #181818;
+            
+            --gold: #d4af37;
+            --gold-bright: #ffd700;
+            --gold-dim: #8a7018;
+            
+            --text-main: #e0e0e0;
+            --text-muted: #888888;
+            
+            --hp-color: #b91c1c;
+            --mp-color: #1e4d8c;
+            --xp-color: #6a0dad;
+            
+            --border-radius: 8px;
+            --nav-height: 70px;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-        body { 
-            margin: 0; font-family: 'Lora', serif; 
-            background: var(--bg-dark); color: var(--parchment); 
-            padding-bottom: 80px; overscroll-behavior-y: none;
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none; /* Previne seleção de texto acidental em app */
         }
 
-        /* --- HEADER --- */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow: hidden; /* App-like feel */
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Scrollbar Personalizada */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 3px; }
+
+        /* =========================================
+           2. HEADER (HUD SUPERIOR)
+           ========================================= */
         header {
-            background: linear-gradient(to bottom, #2c1a0a, #120b04);
-            padding: 10px; text-align: center; border-bottom: 2px solid var(--gold);
-            position: sticky; top: 0; z-index: 50; box-shadow: 0 2px 10px rgba(0,0,0,0.8);
-        }
-        header h1 { font-family: 'Cinzel', serif; margin: 0; color: var(--gold); font-size: 1.2rem; }
-        .currency-bar { 
-            font-family:'MedievalSharp'; color:var(--gold-bright); margin-top:5px; font-size: 0.9rem; 
-            display: flex; justify-content: center; gap: 15px; 
+            background: linear-gradient(180deg, rgba(20,10,5,0.95) 0%, rgba(10,5,0,0.8) 100%);
+            border-bottom: 2px solid var(--gold-dim);
+            padding: 10px 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 50;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.8);
         }
 
-        /* --- TABS --- */
-        nav.tabs { 
-            position: fixed; bottom: 0; left: 0; width: 100%; height: 65px;
-            background: #1a0f06; border-top: 2px solid var(--gold);
-            display: flex; justify-content: space-around; align-items: center;
-            z-index: 100; box-shadow: 0 -4px 15px rgba(0,0,0,0.5);
+        .char-identity {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        nav.tabs button { 
-            background: none; border: none; color: #666; 
-            font-family: 'Cinzel'; font-size: 0.65rem; font-weight: bold;
-            display: flex; flex-direction: column; align-items: center; gap: 4px;
-            cursor: pointer; transition: 0.2s; width: 100%; height: 100%; justify-content: center;
-        }
-        nav.tabs button span.icon { font-size: 1.3rem; display: block; margin-bottom: 2px; }
-        nav.tabs button.active { color: var(--gold-bright); background: rgba(255, 215, 0, 0.05); }
 
-        /* --- CONTENT --- */
-        .container { max-width: 800px; margin: 0 auto; padding: 15px; animation: fadeIn 0.3s ease; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
+        .char-name {
+            font-family: 'Cinzel', serif;
+            font-size: 1.4rem;
+            color: var(--gold);
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+            margin: 0;
+        }
+
+        .char-lvl {
+            font-family: 'MedievalSharp', cursive;
+            background: var(--gold-dim);
+            color: #000;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .resources-bar {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--gold-bright);
+            font-family: 'MedievalSharp', cursive;
+            background: rgba(0,0,0,0.4);
+            padding: 5px 10px;
+            border-radius: 20px;
+            border: 1px solid #333;
+        }
+
+        /* Barras de Vida/Mana */
+        .bars-container {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .bar-wrapper {
+            position: relative;
+            height: 18px;
+            background: #000;
+            border: 1px solid #444;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+        }
+
+        .bar-text {
+            position: absolute;
+            width: 100%;
+            top: 0;
+            left: 0;
+            text-align: center;
+            font-size: 0.7rem;
+            line-height: 16px;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px #000, -1px -1px 2px #000;
+            z-index: 2;
+            color: #fff;
+            letter-spacing: 1px;
+        }
+
+        /* =========================================
+           3. NAVEGAÇÃO (TABS)
+           ========================================= */
+        .nav-dock {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: var(--nav-height);
+            background: linear-gradient(0deg, #15100a 0%, #0a0500 100%);
+            border-top: 2px solid var(--gold-dim);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 100;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.8);
+        }
+
+        .nav-item {
+            background: none;
+            border: none;
+            color: #555;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            font-family: 'Cinzel', serif;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            height: 100%;
+            justify-content: center;
+        }
+
+        .nav-item i {
+            font-size: 1.4rem;
+            transition: transform 0.2s;
+        }
+
+        .nav-item.active {
+            color: var(--gold-bright);
+            text-shadow: 0 0 10px var(--gold-dim);
+            background: radial-gradient(circle, rgba(212,175,55,0.1) 0%, transparent 70%);
+        }
+
+        .nav-item.active i {
+            transform: translateY(-3px);
+        }
+
+        /* =========================================
+           4. ÁREA DE CONTEÚDO
+           ========================================= */
+        main {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 15px 15px 90px 15px; /* Espaço para a nav bar */
+            scroll-behavior: smooth;
+        }
+
+        .tab-view {
+            display: none;
+            animation: slideUp 0.3s ease-out;
+        }
+        .tab-view.active { display: block; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* CARDS GERAIS */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid #333;
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .card h3 {
+            margin: 0 0 15px 0;
+            color: var(--gold);
+            font-family: 'Cinzel', serif;
+            font-size: 1.1rem;
+            border-bottom: 1px solid #333;
+            padding-bottom: 8px;
+        }
+
+        /* GRIDS DE ATRIBUTOS */
+        .attr-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .attr-box {
+            background: linear-gradient(135deg, #251810 0%, #1a100a 100%);
+            border: 1px solid var(--gold-dim);
+            border-radius: 6px;
+            padding: 10px 5px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .attr-box:active { transform: scale(0.95); }
+        .attr-box::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.05); opacity: 0; transition: opacity 0.2s;
+        }
+        .attr-box:hover::after { opacity: 1; }
+
+        .attr-label {
+            font-size: 0.65rem;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .attr-value {
+            font-family: 'MedievalSharp', cursive;
+            font-size: 1.6rem;
+            color: #fff;
+            display: block;
+        }
+
+        .dice-icon {
+            position: absolute;
+            bottom: 3px;
+            right: 3px;
+            font-size: 0.7rem;
+            color: var(--gold-dim);
+            opacity: 0.5;
+        }
+
+        /* LISTAS (Itens, Magias) */
+        .list-item {
+            display: flex;
+            align-items: center;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid #2a2a2a;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            padding: 10px;
+            transition: border-color 0.2s;
+        }
+        .list-item:hover { border-color: var(--gold-dim); }
+
+        .item-icon {
+            width: 40px; height: 40px;
+            background: #000;
+            border: 1px solid #444;
+            border-radius: 4px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem;
+            margin-right: 12px;
+            color: var(--gold);
+        }
+
+        .item-details { flex: 1; }
+        .item-name { font-weight: bold; color: #ddd; font-size: 0.95rem; }
+        .item-meta { font-size: 0.75rem; color: #888; margin-top: 2px; }
         
-        .card { 
-            background: var(--panel-bg); border: 1px solid #4b2e0e; 
-            padding: 15px; border-radius: 8px; margin-bottom: 15px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3); 
+        .action-btn {
+            background: var(--bg-panel);
+            border: 1px solid var(--gold-dim);
+            color: var(--gold);
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: 0.2s;
+        }
+        .action-btn:active { background: var(--gold); color: #000; transform: scale(0.9); }
+
+        /* LOJA */
+        .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+        .shop-card {
+            background: #15100a; border: 1px solid #332211;
+            padding: 10px; border-radius: 6px; text-align: center;
+            display: flex; flex-direction: column; justify-content: space-between;
+        }
+        .shop-price { color: var(--gold-bright); font-weight: bold; font-family: 'MedievalSharp'; margin: 5px 0; }
+        .btn-buy {
+            background: var(--success); color: #fff; border: none;
+            padding: 8px; border-radius: 4px; font-weight: bold; cursor: pointer; width: 100%;
         }
 
-        /* --- BARRAS --- */
-        .status-wrapper { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
-        .status-row { display: flex; align-items: center; gap: 10px; }
-        .status-icon { font-size: 1.2rem; width: 25px; text-align: center; }
-        .status-bar-container { flex-grow: 1; height: 18px; background: #000; border: 1px solid #555; border-radius: 4px; position: relative; }
-        .bar-fill { height: 100%; transition: width 0.4s ease-out; }
-        .bar-text { position: absolute; width: 100%; top: -1px; text-align: center; font-size: 0.75rem; font-family: 'MedievalSharp'; text-shadow: 1px 1px 1px black; color: white; }
-
-        /* --- ATRIBUTOS --- */
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-        .stat-box { 
-            background: #251608; border: 1px solid #3d2612; padding: 8px 5px; text-align: center; 
-            border-radius: 6px; cursor: pointer; position: relative; overflow: hidden;
+        /* =========================================
+           5. MAPA ENGINE
+           ========================================= */
+        #map-wrapper {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 10; touch-action: none;
         }
-        .stat-box:active { background: #5a3a1a; transform: scale(0.98); }
-        .stat-box label { font-size: 0.6rem; color: #aaa; display: block; letter-spacing: 1px; }
-        .stat-box span { font-size: 1.4rem; font-family: 'MedievalSharp'; color: var(--parchment); }
+        canvas { display: block; width: 100%; height: 100%; }
         
-        /* --- PERÍCIAS --- */
-        .pericia-tag {
-            display: inline-flex; align-items: center; justify-content: space-between;
-            background: #112233; color: var(--skill); border: 1px solid #1e4d8c;
-            padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; margin: 4px;
-            cursor: pointer; transition: 0.2s;
+        .map-controls {
+            position: absolute; bottom: 90px; right: 20px;
+            display: flex; flex-direction: column; gap: 10px; z-index: 20;
         }
-        .pericia-tag:active { background: var(--skill); color: #fff; }
-        .pericia-val { background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 10px; margin-left: 8px; font-weight: bold; }
+        .ctrl-btn {
+            width: 50px; height: 50px; border-radius: 50%;
+            background: rgba(0,0,0,0.8); border: 2px solid var(--gold);
+            color: #fff; font-size: 1.5rem; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            backdrop-filter: blur(2px);
+        }
 
-        /* --- LISTAS --- */
-        .list-item { 
-            background: rgba(0,0,0,0.3); padding: 12px; border-bottom: 1px solid #333; margin-bottom: 5px;
-            display: flex; justify-content: space-between; align-items: center; border-radius: 4px;
+        /* =========================================
+           6. MODAIS E FEEDBACK
+           ========================================= */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 2000;
+            align-items: center; justify-content: center;
+            backdrop-filter: blur(5px);
         }
-        .list-item:active { background: rgba(212,175,55,0.1); }
-        .list-info h4 { margin: 0; font-size: 0.95rem; color: var(--gold); }
-        .list-info small { color: #999; font-size: 0.75rem; display: block; }
-        .roll-btn { 
-            background: #222; border: 1px solid #555; color: #ddd; width: 40px; height: 40px; 
-            border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
-            cursor: pointer; margin-left: 10px;
+        .modal-content {
+            background: #121212; border: 2px solid var(--gold);
+            padding: 30px; border-radius: 12px; width: 85%; max-width: 350px;
+            text-align: center; position: relative; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .roll-btn:active { background: var(--gold); color: black; }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-        /* --- INVENTARIO GRID --- */
-        .inv-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-        .inv-slot { 
-            background: #251608; border: 1px solid #3d2612; aspect-ratio: 1/1; 
-            border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            cursor: pointer; position: relative; padding: 5px;
+        .roll-result-big {
+            font-size: 4rem; font-family: 'MedievalSharp';
+            color: #fff; margin: 15px 0; text-shadow: 0 0 20px rgba(255,255,255,0.2);
         }
-        .inv-slot img { width: 100%; height: 70%; object-fit: contain; }
-        .inv-slot span { font-size: 0.6rem; margin-top: 3px; text-align: center; white-space: nowrap; overflow: hidden; width: 100%; text-overflow: ellipsis; }
+        .roll-detail { color: #888; font-size: 0.9rem; background: #222; padding: 5px 10px; border-radius: 20px; display: inline-block; }
+        
+        .crit-success { color: var(--gold-bright); text-shadow: 0 0 15px var(--gold); }
+        .crit-fail { color: var(--hp-color); }
 
-        /* --- MAPA --- */
-        #map-container { 
-            width: 100%; height: 70vh; background: #000; border: 2px solid var(--gold); 
-            position: relative; overflow: hidden; border-radius: 4px; touch-action: none;
-        }
-        #mapCanvas { width: 100%; height: 100%; display: block; }
-        .zoom-controls { position: absolute; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; }
-        .zoom-btn { width: 45px; height: 45px; border-radius: 50%; background: rgba(0,0,0,0.7); border: 2px solid var(--gold); color: white; font-size: 1.5rem; }
-
-        /* --- MODAL DE DADOS --- */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
-        .modal-content { 
-            background: #f4e4bc; color: #1a0f06; padding: 20px; border-radius: 8px; width: 85%; max-width: 320px; 
-            text-align: center; border: 4px double #1a0f06; box-shadow: 0 0 30px black; animation: fadeIn 0.2s;
-        }
-        .dice-result { font-size: 4rem; font-family: 'MedievalSharp'; font-weight: bold; margin: 10px 0; display: block; }
-        .dice-formula { font-size: 0.8rem; color: #555; background: rgba(0,0,0,0.05); padding: 5px; border-radius: 4px; display: inline-block; margin-bottom: 10px;}
-        .dice-crit { color: #8b0000; text-shadow: 0 0 10px rgba(139,0,0,0.5); }
-        .dice-fail { color: #444; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
+<div id="loader" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:9999; display:flex; align-items:center; justify-content:center; color:var(--gold); flex-direction:column;">
+    <i class="fas fa-dragon fa-spin" style="font-size:3rem; margin-bottom:20px;"></i>
+    <div style="font-family:'Cinzel'">Carregando Zatur...</div>
+</div>
+
 <header>
-    <div style="font-size:0.7rem; color:#888; text-transform:uppercase;" id="player-name-display">...</div>
-    <h1 id="header-name">Zatur RPG</h1>
-    <div class="currency-bar">
-        <span>💰 <span id="zeuro-val">0</span></span>
-        <span>✨ <span id="xp-val">0</span></span>
+    <div class="char-identity">
+        <h1 class="char-name" id="hud-name">Desconhecido</h1>
+        <span class="char-lvl" id="hud-lvl">Nvl 1</span>
+    </div>
+    
+    <div class="bars-container">
+        <div class="bar-wrapper">
+            <div id="bar-hp" class="bar-fill" style="background: var(--hp-color); width: 0%;"></div>
+            <div id="txt-hp" class="bar-text">PV: 0/0</div>
+        </div>
+        <div class="bar-wrapper">
+            <div id="bar-mp" class="bar-fill" style="background: var(--mp-color); width: 0%;"></div>
+            <div id="txt-mp" class="bar-text">PM: 0/0</div>
+        </div>
+    </div>
+
+    <div class="resources-bar">
+        <span><i class="fas fa-coins"></i> <span id="hud-gold">0</span></span>
+        <span><i class="fas fa-star"></i> <span id="hud-xp">0</span></span>
     </div>
 </header>
 
-<main class="container">
-    
-    <section id="tab-ficha" class="tab-content active">
-        <div class="card">
-            <div class="status-wrapper">
-                <div class="status-row">
-                    <span class="status-icon">❤️</span>
-                    <div class="status-bar-container">
-                        <div id="bar-pv" class="bar-fill" style="background:var(--red); width: 0%"></div>
-                        <div class="bar-text" id="txt-pv">0/0</div>
-                    </div>
-                </div>
-                <div class="status-row">
-                    <span class="status-icon">💧</span>
-                    <div class="status-bar-container">
-                        <div id="bar-pe" class="bar-fill" style="background:var(--blue); width: 0%"></div>
-                        <div class="bar-text" id="txt-pe">0/0</div>
-                    </div>
-                </div>
-            </div>
-
-            <h3 style="margin:5px 0; font-size:0.8rem; color:#666; font-family:'Cinzel'">Atributos (1d20)</h3>
-            <div class="stats-grid" id="stats-area"></div>
-            
-            <div style="display:flex; justify-content:space-between; margin-top:10px; background:rgba(0,0,0,0.2); padding:5px; border-radius:4px;">
-                <div style="text-align:center;"><small style="color:#888">DEFESA</small><br><strong style="color:white" id="val-def">0</strong></div>
-                <div style="text-align:center;"><small style="color:#888">DESL</small><br><strong style="color:white" id="val-desl">0m</strong></div>
-            </div>
-        </div>
-
-        <div class="card" id="pericias-card" style="display:none;">
-            <h3 style="margin:0 0 10px 0; color:var(--skill); font-family:Cinzel;">Perícias & Treinos</h3>
-            <div id="pericias-list" style="display:flex; flex-wrap:wrap; justify-content:center;"></div>
+<main>
+    <section id="tab-stats" class="tab-view active">
+        <div class="card" style="padding:10px; text-align:center;">
+            <p id="hud-desc" style="color:#aaa; font-style:italic; margin:0; font-size:0.9rem;">...</p>
         </div>
 
         <div class="card">
-            <h3 style="margin:0 0 5px 0; font-family:Cinzel; color:#888; font-size:0.9rem;">Biografia</h3>
-            <p id="char-bio" style="font-size:0.8rem; color:#aaa; font-style:italic; margin:0;"></p>
+            <h3>Atributos Principais</h3>
+            <div class="attr-grid" id="container-attrs">
+                </div>
+        </div>
+
+        <div class="card">
+            <h3>Perícias</h3>
+            <div id="container-skills"></div>
+        </div>
+
+        <div class="card">
+            <h3>História</h3>
+            <p id="hud-bio" style="font-size:0.85rem; color:#ccc; line-height:1.6; white-space: pre-wrap;"></p>
         </div>
     </section>
 
-    <section id="tab-combat" class="tab-content">
+    <section id="tab-powers" class="tab-view">
         <div class="card">
-            <h2 style="color:var(--gold); font-family:Cinzel; font-size:1.1rem; border-bottom:1px solid #333; padding-bottom:5px;">⚔️ Habilidades</h2>
-            <div id="hab-list"></div>
+            <h3>Habilidades de Classe</h3>
+            <div id="container-abilities"></div>
         </div>
         
-        <div class="card" style="border-color: var(--purple);">
-            <h2 style="color:#b19cd9; font-family:Cinzel; font-size:1.1rem; border-bottom:1px solid #4a235a; padding-bottom:5px;">🔮 Grimório</h2>
-            <div id="spell-list"></div>
+        <div class="card" style="border-color: #4a235a;">
+            <h3 style="color:#b19cd9">Grimório Arcano</h3>
+            <div id="container-spells"></div>
         </div>
     </section>
 
-    <section id="tab-inv" class="tab-content">
+    <section id="tab-inventory" class="tab-view">
         <div class="card">
-            <h2 style="color:var(--gold); font-family:Cinzel; font-size:1.2rem;">🎒 Mochila</h2>
-            <div class="inv-grid" id="inv-list"></div>
+            <h3>Equipamento</h3>
+            <div id="container-items"></div>
         </div>
     </section>
 
-    <section id="tab-shop" class="tab-content">
+    <section id="tab-shop" class="tab-view">
         <div class="card">
-            <h2 style="color:var(--gold); font-family:Cinzel; font-size:1.2rem;">🏛️ Mercado</h2>
-            <div id="shop-container">
-                <div class="inv-grid" id="shop-list"></div>
+            <h3 style="color:var(--success)">Mercado</h3>
+            <p style="font-size:0.8rem; color:#888; margin-top:-10px; margin-bottom:15px;">Toque para comprar.</p>
+            
+            <div id="shop-content">
+                <div class="shop-grid" id="container-shop"></div>
             </div>
-            <div id="shop-locked" style="text-align:center; padding:30px; display:none;">
-                <i class="fas fa-lock" style="font-size:2rem; color:#555; margin-bottom:10px;"></i><br>LOJA FECHADA
+            
+            <div id="shop-closed-msg" style="text-align:center; padding:40px; display:none;">
+                <i class="fas fa-lock" style="font-size:3rem; color:#333; margin-bottom:10px;"></i>
+                <div style="color:#666; font-family:'Cinzel'">Loja Fechada pelo Mestre</div>
             </div>
         </div>
     </section>
 
-    <section id="tab-map" class="tab-content">
-        <div id="map-container">
-            <canvas id="mapCanvas"></canvas>
-            <div class="zoom-controls">
-                <button class="zoom-btn" onclick="adjustZoom(0.1)">+</button>
-                <button class="zoom-btn" onclick="adjustZoom(-0.1)">-</button>
-            </div>
+    <section id="tab-map" class="tab-view" style="height:100%; position:fixed; top:0; left:0; width:100%; z-index:200;">
+        <div id="map-wrapper">
+            <canvas id="gameCanvas"></canvas>
         </div>
-        <p style="text-align:center; font-size:0.75rem; color:#666; margin-top:5px;">Toque e arraste para mover seu token.</p>
-    </section>
+        
+        <div style="position:absolute; top:10px; left:10px; z-index:210;">
+            <button onclick="changeTab('tab-stats')" style="background:rgba(0,0,0,0.7); border:1px solid #fff; color:#fff; padding:5px 10px; border-radius:4px;">
+                <i class="fas fa-arrow-left"></i> Voltar
+            </button>
+        </div>
 
+        <div class="map-controls">
+            <button class="ctrl-btn" onclick="mapZoom(0.1)">+</button>
+            <button class="ctrl-btn" onclick="mapZoom(-0.1)">-</button>
+            <button class="ctrl-btn" onclick="toggleAudio()" id="btn-audio">🔇</button>
+        </div>
+        
+        <div style="position:absolute; bottom:100px; width:100%; text-align:center; pointer-events:none;">
+            <span style="background:rgba(0,0,0,0.6); padding:5px 10px; border-radius:10px; font-size:0.8rem; color:#fff;">
+                Arraste seu Token para mover
+            </span>
+        </div>
+    </section>
 </main>
 
-<nav class="tabs">
-    <button class="tab-btn active" data-tab="tab-ficha">
-        <span class="icon"><i class="fas fa-user-circle"></i></span> Ficha
+<nav class="nav-dock">
+    <button class="nav-item active" onclick="changeTab('tab-stats')">
+        <i class="fas fa-user-circle"></i> Ficha
     </button>
-    <button class="tab-btn" data-tab="tab-combat">
-        <span class="icon"><i class="fas fa-hand-sparkles"></i></span> Poderes
+    <button class="nav-item" onclick="changeTab('tab-powers')">
+        <i class="fas fa-bolt"></i> Poderes
     </button>
-    <button class="tab-btn" data-tab="tab-inv">
-        <span class="icon"><i class="fas fa-hiking"></i></span> Itens
+    <button class="nav-item" onclick="changeTab('tab-inventory')">
+        <i class="fas fa-briefcase"></i> Itens
     </button>
-    <button class="tab-btn" data-tab="tab-shop">
-        <span class="icon"><i class="fas fa-store"></i></span> Loja
+    <button class="nav-item" onclick="changeTab('tab-shop')">
+        <i class="fas fa-store"></i> Loja
     </button>
-    <button class="tab-btn" data-tab="tab-map">
-        <span class="icon"><i class="fas fa-map-marked-alt"></i></span> Mapa
+    <button class="nav-item" onclick="changeTab('tab-map')">
+        <i class="fas fa-map"></i> Mapa
     </button>
 </nav>
 
-<div id="modal" class="modal" onclick="this.style.display='none'">
+<div id="modal-roll" class="modal" onclick="this.style.display='none'">
     <div class="modal-content" onclick="event.stopPropagation()">
-        <h3 id="m-title" style="margin-top:0; font-family:Cinzel; color:#1a0f06;">Resultado</h3>
-        <div id="m-result-area"></div>
-        <button onclick="document.getElementById('modal').style.display='none'" style="margin-top:15px; background:#1a0f06; color:var(--gold); border:none; padding:10px 25px; border-radius:4px; font-weight:bold;">FECHAR</button>
+        <h3 id="roll-title" style="margin:0; color:var(--text-muted); font-size:1rem;">Teste</h3>
+        <div id="roll-result" class="roll-result-big">20</div>
+        <div id="roll-calc" class="roll-detail">1d20 + 5</div>
+        <div style="margin-top:20px;">
+            <button onclick="document.getElementById('modal-roll').style.display='none'" style="background:transparent; border:1px solid #555; color:#fff; padding:8px 20px; border-radius:4px;">Fechar</button>
+        </div>
     </div>
 </div>
 
-<div id="music-alert" onclick="activateAudio()" style="position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:var(--gold); color:black; padding:8px 20px; border-radius:20px; font-size:0.8rem; font-weight:bold; z-index:90; display:none; box-shadow:0 0 15px var(--gold);">🎵 TOCAR MÚSICA</div>
 <audio id="bg-audio" loop></audio>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, doc, onSnapshot, getDoc, updateDoc, collection, getDocs, arrayUnion } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+    // 1. CONFIGURAÇÃO (Mantendo a sua)
     const firebaseConfig = {
         apiKey: "AIzaSyAgYVod9B99WIc_QysFx73htOf9O8XtuE8",
         authDomain: "zatur-rpg.firebaseapp.com",
@@ -278,373 +548,384 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const charId = new URLSearchParams(window.location.search).get("id");
-    const audio = document.getElementById('bg-audio');
-    
+
+    // 2. CACHE GLOBAL (Para performance)
+    const DB_CACHE = {
+        items: {},
+        spells: {},
+        skills: {},
+        abilities: {}
+    };
+
     let charData = {};
-    let spellsCache = {}; // Cache global de magias para pegar o Dano
-    let itemsCache = {}; // Cache de itens
+    let globalSettings = {};
+    const audio = document.getElementById('bg-audio');
 
-    // --- CARREGAMENTO INICIAL ---
-    async function init() {
-        // Carrega magias para cache (para saber o dado de dano)
-        const sQuery = await getDocs(collection(db, "spells"));
-        sQuery.forEach(doc => spellsCache[doc.data().Nome] = doc.data());
-        
-        // Carrega Itens para cache
-        const iQuery = await getDocs(collection(db, "items"));
-        iQuery.forEach(doc => itemsCache[doc.id] = doc.data());
-
-        if (charId) {
-            onSnapshot(doc(db, "characters", charId), (snap) => {
-                if (!snap.exists()) return;
-                charData = snap.data();
-                renderCharacter(charData);
-            });
-        }
+    // --- STARTUP ---
+    if(!charId) {
+        alert("ID não encontrado. Use ?id=SEU_ID na URL.");
+        document.getElementById('loader').innerHTML = "Erro: ID Faltante";
+    } else {
+        startSystem();
     }
-    init();
 
-    // --- RENDERIZAÇÃO ---
-    function renderCharacter(d) {
-        document.getElementById('header-name').innerText = d.Nome;
-        document.getElementById('player-name-display').innerText = d.PlayerName || "Aventureiro";
-        document.getElementById('zeuro-val').innerText = d.Zeuro || 0;
-        document.getElementById('xp-val').innerText = d.XP || 0;
-        document.getElementById('char-bio').innerText = d.Historia || "Sem biografia.";
-        
-        // Barras
-        updateBar('pv', d.PV, d.PV_Max);
-        updateBar('pe', d.PE, d.PE_Max);
+    async function startSystem() {
+        // A. Carregar "Tudo" do Banco para Cache (Leitura Única)
+        // Isso evita ler o banco toda vez que renderiza um item
+        await preloadCollection('items');
+        await preloadCollection('spells');
+        await preloadCollection('skills');
+        await preloadCollection('abilities');
 
-        // Stats Secundários
-        document.getElementById('val-def').innerText = d.Defesa_Total || 0;
-        document.getElementById('val-desl').innerText = d.Deslocamento || "9m";
+        // B. Listener do Personagem
+        onSnapshot(doc(db, "characters", charId), (snap) => {
+            if(!snap.exists()) return;
+            charData = snap.data();
+            renderAll();
+            document.getElementById('loader').style.display = 'none';
+        });
+
+        // C. Listener Global (Loja, Mapa)
+        onSnapshot(doc(db, "campaign_settings", "global"), (snap) => {
+            if(snap.exists()) {
+                globalSettings = snap.data();
+                updateEnvironment();
+            }
+        });
+
+        initCanvas();
+    }
+
+    async function preloadCollection(colName) {
+        const snap = await getDocs(collection(db, colName));
+        snap.forEach(d => {
+            DB_CACHE[colName][d.id] = { id: d.id, ...d.data() };
+        });
+    }
+
+    // --- RENDERIZADORES ---
+    function renderAll() {
+        const p = charData;
+
+        // Header
+        document.getElementById('hud-name').innerText = p.Nome || "Sem Nome";
+        document.getElementById('hud-lvl').innerText = `Nvl ${p.Nivel || 1} ${p.Classe || ''}`;
+        document.getElementById('hud-desc').innerText = `${p.Origem || ''} • ${p.Clã || ''}`;
+        document.getElementById('hud-bio').innerText = p.História || p.Descrição || "Sem história.";
+        document.getElementById('hud-gold').innerText = p.Zeuros || 0;
+        document.getElementById('hud-xp').innerText = p.XP || 0;
+
+        // Barras (Usando nomes longos da nova arquitetura)
+        updateBar('bar-hp', 'txt-hp', p['Pontos de Vida Atual'], p['Pontos de Vida Max'], 'PV');
+        updateBar('bar-mp', 'txt-mp', p['Pontos de Mana Atual'], p['Pontos de Mana Max'], 'PM');
 
         // Atributos
-        const stats = ["Força", "Agilidade", "Intelecto", "Vigor", "Mana"];
-        document.getElementById('stats-area').innerHTML = stats.map(s => {
-            const val = d[s] || 0;
-            return `
-            <div class="stat-box" onclick="window.rolar('${s}', null, ${val})">
-                <label>${s.substring(0,3).toUpperCase()}</label>
-                <span>${val}</span>
-                <i class="fas fa-dice-d20" style="position:absolute; bottom:5px; right:5px; font-size:0.6rem; color:#555;"></i>
-            </div>`;
-        }).join('');
-
-        // Perícias (Sincronizado com o novo formato de string "Nome (+5)")
-        const pList = d.pericias || [];
-        const pDiv = document.getElementById('pericias-list');
-        const pCard = document.getElementById('pericias-card');
+        const attrs = ['Força', 'Agilidade', 'Intelecto', 'Vigor', 'Mana'];
+        const attrContainer = document.getElementById('container-attrs');
+        attrContainer.innerHTML = "";
         
-        if(pList.length > 0) {
-            pCard.style.display = 'block';
-            pDiv.innerHTML = "";
-            pList.forEach(pStr => {
-                // Parse string: "Furtividade (+5)" ou "Luta (+2)"
-                const match = pStr.match(/(.+)\s\(([\+\-]?\d+)\)/);
-                let nome = pStr; 
-                let bonus = 0;
-                
-                if(match) {
-                    nome = match[1];
-                    bonus = parseInt(match[2]);
-                }
+        attrs.forEach(a => {
+            const val = p[a] || 0;
+            const lbl = a.substring(0,3);
+            attrContainer.innerHTML += `
+            <div class="attr-box" onclick="rollCheck('${a}', ${val})">
+                <span class="attr-label">${a}</span>
+                <span class="attr-value">${val}</span>
+                <i class="fas fa-dice-d20 dice-icon"></i>
+            </div>`;
+        });
 
-                const el = document.createElement('div');
-                el.className = 'pericia-tag';
-                el.innerHTML = `${nome} <span class="pericia-val">${bonus>=0?'+':''}${bonus}</span>`;
-                el.onclick = () => window.rolar(nome, null, bonus); // Rola 1d20 + Bonus
-                pDiv.appendChild(el);
-            });
-        } else {
-            pCard.style.display = 'none';
-        }
-
-        // Listas
-        renderHabilidades(d.habilidades || []);
-        renderInventory(d.itens || []);
+        // Listas (Resolve IDs usando o Cache)
+        renderList('container-items', p.Itens, 'items', 'fas fa-sack-dollar');
+        renderList('container-spells', p.Magias, 'spells', 'fas fa-hat-wizard');
+        renderList('container-skills', p.Pericias, 'skills', 'fas fa-dice');
+        renderList('container-abilities', p.Habilidades, 'abilities', 'fas fa-bolt');
     }
 
-    // --- RENDERIZADORES ESPECÍFICOS ---
-    function renderHabilidades(list) {
-        // Habilidades e Magias agora podem estar misturadas ou separadas
-        // O Desktop salvava em 'habilidades'. Vamos verificar se é magia pelo cache.
-        const habDiv = document.getElementById('hab-list');
-        const spellDiv = document.getElementById('spell-list');
-        habDiv.innerHTML = ""; spellDiv.innerHTML = "";
-
-        if(list.length === 0) {
-            habDiv.innerHTML = "<small style='display:block; text-align:center; color:#555'>Vazio</small>";
-            spellDiv.innerHTML = "<small style='display:block; text-align:center; color:#555'>Vazio</small>";
+    function renderList(containerId, idArray, cacheKey, iconClass) {
+        const div = document.getElementById(containerId);
+        div.innerHTML = "";
+        
+        if(!idArray || idArray.length === 0) {
+            div.innerHTML = "<div style='color:#444; font-style:italic; text-align:center; padding:10px;'>Vazio</div>";
             return;
         }
 
-        list.forEach(itemStr => {
-            // Verifica se é uma Magia conhecida (está no cache de spells)
-            if(spellsCache[itemStr]) {
-                const s = spellsCache[itemStr];
-                const dano = s.Dano || ""; // Ex: "2d6"
-                const desc = `Custo: ${s.Custo || 0} PE | ${s.Descricao?.substring(0,40)}...`;
-                
-                const div = document.createElement('div');
-                div.className = "list-item";
-                div.innerHTML = `
-                    <div class="list-info" style="flex:1">
-                        <h4>${itemStr}</h4>
-                        <small style="color:#b19cd9">${dano ? 'Dano: '+dano : 'Efeito'} | ${desc}</small>
-                    </div>
-                    <div class="roll-btn" onclick="window.rolar('${itemStr}', '${dano}', 0)">
-                        <i class="fas fa-dice"></i>
-                    </div>
-                `;
-                spellDiv.appendChild(div);
-            } else {
-                // É uma habilidade manual ou item não mágico
-                const div = document.createElement('div');
-                div.className = "list-item";
-                div.innerHTML = `
-                    <div class="list-info">
-                        <h4>${itemStr}</h4>
-                        <small>Habilidade</small>
-                    </div>
-                    <div class="roll-btn" onclick="window.rolar('${itemStr}', null, 0)">
-                        <i class="fas fa-dice-d20"></i>
-                    </div>
-                `;
-                habDiv.appendChild(div);
-            }
-        });
-    }
-
-    function renderInventory(ids) {
-        const area = document.getElementById('inv-list');
-        area.innerHTML = "";
-        ids.forEach(itemId => {
-            const item = itemsCache[itemId] || { Nome: itemId, Imagem: null, Dano: null };
+        idArray.forEach(id => {
+            // Busca dados reais no cache
+            const item = DB_CACHE[cacheKey][id] || { Nome: "Desconhecido", Descricao: "Item removido do banco." };
             
-            const el = document.createElement('div');
-            el.className = 'inv-slot';
-            // Se tiver dano (arma), ao clicar rola o dano. Se não, mostra descrição.
-            if(item.Dano) {
-                el.onclick = () => window.rolar(item.Nome, item.Dano, 0); // Ex: Rolar Espada 1d8
-            } else {
-                el.onclick = () => alert(`${item.Nome}\n\n${item.Descricao || "Sem descrição."}`);
-            }
+            // Verifica se tem rolagem (Dano/Dado)
+            const rollAction = (item.Dado || item.Dano) 
+                ? `onclick="rollItem('${item.Nome}', '${item.Dado||''}', '${item.Dano||''}', ${item.Bonus||0})"` 
+                : "";
+            
+            const btnHtml = rollAction 
+                ? `<div class="action-btn"><i class="fas fa-dice"></i></div>` 
+                : "";
 
-            el.innerHTML = `
-                <img src="${item.Imagem || 'https://cdn-icons-png.flaticon.com/512/1251/1251784.png'}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1251/1251784.png'">
-                <span>${item.Nome}</span>
-                ${item.Dano ? '<i class="fas fa-dice" style="position:absolute; top:2px; right:2px; font-size:0.6rem; color:var(--gold)"></i>' : ''}
-            `;
-            area.appendChild(el);
+            let meta = "";
+            if(item.Dano) meta += `Dano: ${item.Dano} `;
+            if(item.Custo) meta += `Cust: ${item.Custo} `;
+            
+            div.innerHTML += `
+            <div class="list-item" ${rollAction ? 'style="cursor:pointer"' : ''} ${!rollAction ? '' : rollAction}>
+                <div class="item-icon"><i class="${iconClass}"></i></div>
+                <div class="item-details">
+                    <div class="item-name">${item.Nome}</div>
+                    <div class="item-meta" style="color:var(--gold)">${meta}</div>
+                    <div class="item-meta">${(item.Descrição || item.Descricao || "").substring(0,50)}</div>
+                </div>
+                ${btnHtml}
+            </div>`;
         });
     }
 
-    // --- SISTEMA DE ROLAGEM AVANÇADO ---
-    window.rolar = (nome, dadoStr, bonus = 0) => {
-        const modal = document.getElementById('modal');
-        const title = document.getElementById('m-title');
-        const area = document.getElementById('m-result-area');
+    function updateBar(barId, txtId, cur, max, label) {
+        if(!max) max = 1; 
+        if(cur === undefined) cur = 0;
+        const pct = Math.max(0, Math.min(100, (cur/max)*100));
+        document.getElementById(barId).style.width = pct + "%";
+        document.getElementById(txtId).innerText = `${label} ${cur}/${max}`;
+    }
+
+    // --- LOJA DINÂMICA ---
+    function updateEnvironment() {
+        const shopDiv = document.getElementById('shop-content');
+        const shopMsg = document.getElementById('shop-closed-msg');
         
-        title.innerText = nome;
-        modal.style.display = 'flex';
+        if(globalSettings.loja_aberta) {
+            shopDiv.style.display = 'block';
+            shopMsg.style.display = 'none';
+            renderShop();
+        } else {
+            shopDiv.style.display = 'none';
+            shopMsg.style.display = 'block';
+        }
 
-        let total = 0;
-        let formulaText = "";
-        let resultHtml = "";
-        let isCrit = false;
-        let isFail = false;
+        // Audio e Mapa
+        if(globalSettings.musica_url && audio.src !== globalSettings.musica_url) {
+            audio.src = globalSettings.musica_url;
+        }
+        if(globalSettings.mapa_url && mapImg.src !== globalSettings.mapa_url) {
+            mapImg.src = globalSettings.mapa_url;
+            mapImg.onload = renderMap;
+        }
+        
+        tokens = globalSettings.posicoes || {};
+        renderMap();
+    }
 
-        // 1. Se NÃO tiver string de dado (null ou vazio), rola 1d20 (Padrão Atributos/Perícias)
-        if(!dadoStr) {
-            const d20 = Math.floor(Math.random() * 20) + 1;
-            total = d20 + bonus;
-            formulaText = `1d20 (${d20}) + ${bonus}`;
-            
-            if(d20 === 20) { isCrit = true; resultHtml = "SUCESSO CRÍTICO!"; }
-            else if(d20 === 1) { isFail = true; resultHtml = "FALHA CRÍTICA!"; }
-            else { resultHtml = "Normal"; }
+    function renderShop() {
+        const div = document.getElementById('container-shop');
+        if(div.innerHTML !== "") return; // Já renderizou
 
-            area.innerHTML = `
-                <span class="dice-formula">${formulaText}</span>
-                <span class="dice-result ${isCrit?'dice-crit':''} ${isFail?'dice-fail':''}">${total}</span>
-                <div style="font-weight:bold; color:#555;">${resultHtml}</div>
-            `;
-        } 
-        // 2. Se tiver string de dado (Ex: "2d6", "1d8+2")
-        else {
-            // Regex simples para XdY
-            const match = dadoStr.toLowerCase().match(/(\d+)d(\d+)/);
-            if(match) {
-                const qtd = parseInt(match[1]);
-                const faces = parseInt(match[2]);
-                let somaDados = 0;
-                let detalhes = [];
-
-                for(let i=0; i<qtd; i++) {
-                    const r = Math.floor(Math.random() * faces) + 1;
-                    somaDados += r;
-                    detalhes.push(r);
-                }
-                
-                total = somaDados + bonus; // O bonus aqui vem do parametro, mas as vezes o bonus ta na string do item. Simplificando.
-                formulaText = `${dadoStr} [${detalhes.join('+')}] ${bonus!=0 ? '+ '+bonus : ''}`;
-                
-                area.innerHTML = `
-                    <span class="dice-formula">${formulaText}</span>
-                    <span class="dice-result" style="color:var(--gold)">${total}</span>
-                    <div style="font-size:0.8rem; color:#888;">Dano / Efeito</div>
-                `;
-            } else {
-                // Fallback se a string for inválida (ex: "Especial")
-                area.innerHTML = `<p>${dadoStr}</p>`;
+        // Itera sobre todo o cache de itens
+        Object.values(DB_CACHE.items).forEach(item => {
+            if(item.Valor && item.Valor > 0) {
+                div.innerHTML += `
+                <div class="shop-card">
+                    <div style="font-size:0.9rem; font-weight:bold; color:#ddd; margin-bottom:5px;">${item.Nome}</div>
+                    <div style="font-size:0.7rem; color:#888;">${(item.Descrição||"").substring(0,30)}</div>
+                    <div class="shop-price">$${item.Valor}</div>
+                    <button class="btn-buy" onclick="buyItem('${item.id}', ${item.Valor})">COMPRAR</button>
+                </div>`;
             }
+        });
+    }
+
+    window.buyItem = async (itemId, price) => {
+        const money = charData.Zeuros || 0;
+        if(money < price) return alert("Sem dinheiro suficiente!");
+        
+        if(confirm(`Comprar por $${price}?`)) {
+            // Desconta e Adiciona ID ao array
+            await updateDoc(doc(db, "characters", charId), {
+                Zeuros: money - price,
+                Itens: arrayUnion(itemId)
+            });
+            alert("Comprado!");
         }
     };
 
-    function updateBar(type, current, max) {
-        if(!max) max = 1;
-        const pct = Math.min(100, Math.max(0, (current / max) * 100));
-        document.getElementById(`bar-${type}`).style.width = `${pct}%`;
-        document.getElementById(`txt-${type}`).innerText = `${current}/${max}`;
-    }
+    // --- ROLAGENS ---
+    window.rollCheck = (attrName, bonus) => {
+        const d20 = Math.floor(Math.random()*20)+1;
+        const total = d20 + bonus;
+        showModalResult(`Teste de ${attrName}`, total, `1d20 (${d20}) + ${bonus}`, d20===20, d20===1);
+    };
 
-    // --- LOJA & GLOBAL SETTINGS ---
-    onSnapshot(doc(db, "campaign_settings", "global"), (snap) => {
-        if (!snap.exists()) return;
-        const g = snap.data();
-        
-        // Musica
-        if (g.musica_url && audio.src !== g.musica_url) {
-            audio.src = g.musica_url;
-            document.getElementById('music-alert').style.display = 'block';
-        }
-        
-        // Mapa
-        if (g.mapa_url && mapImg.src !== g.mapa_url) {
-            mapImg.src = g.mapa_url;
-            mapImg.onload = () => { canvas.width = mapImg.width; canvas.height = mapImg.height; renderMap(); };
-        }
-        tokens = g.posicoes || {};
-        renderMap();
-
-        // Loja
-        const shopDiv = document.getElementById('shop-container');
-        const shopLock = document.getElementById('shop-locked');
-        if(g.loja_aberta) {
-            shopDiv.style.display = 'block'; shopLock.style.display = 'none'; renderShop();
-        } else {
-            shopDiv.style.display = 'none'; shopLock.style.display = 'block';
-        }
-    });
-
-    async function renderShop() {
-        const area = document.getElementById('shop-list');
-        if(area.innerHTML !== "") return;
-        const q = await getDocs(collection(db, "items"));
-        area.innerHTML = "";
-        q.forEach(s => {
-            const i = s.data();
-            if(i.Preco) {
-                const el = document.createElement('div');
-                el.className = 'inv-slot';
-                el.innerHTML = `
-                    <img src="${i.Imagem || 'https://cdn-icons-png.flaticon.com/512/1251/1251784.png'}">
-                    <span>${i.Nome}</span>
-                    <span style="color:var(--gold-bright); font-weight:bold;">$${i.Preco}</span>
-                `;
-                el.onclick = () => comprarItem(s.id, i.Nome, i.Preco);
-                area.appendChild(el);
+    window.rollItem = (name, dadoStr, danoStr, bonus) => {
+        let str = dadoStr || danoStr || "1d20"; // Prefere dado de acerto, senao dano
+        // Parse simples XdY
+        try {
+            // Regex para pegar 1d8, 2d6, etc.
+            const match = str.toLowerCase().match(/(\d+)d(\d+)/);
+            let total = 0;
+            let details = "";
+            
+            if(match) {
+                const qtd = parseInt(match[1]);
+                const faces = parseInt(match[2]);
+                let rolls = [];
+                for(let i=0; i<qtd; i++) {
+                    const r = Math.floor(Math.random()*faces)+1;
+                    total += r;
+                    rolls.push(r);
+                }
+                total += bonus;
+                details = `[${rolls.join('+')}] + ${bonus}`;
+            } else {
+                // Fallback 1d20
+                const r = Math.floor(Math.random()*20)+1;
+                total = r + bonus;
+                details = `1d20 (${r}) + ${bonus}`;
             }
-        });
+            
+            showModalResult(name, total, details, false, false);
+        } catch(e) { alert("Erro no dado do item"); }
+    };
+
+    function showModalResult(title, val, det, crit, fail) {
+        const m = document.getElementById('modal-roll');
+        document.getElementById('roll-title').innerText = title;
+        const rEl = document.getElementById('roll-result');
+        rEl.innerText = val;
+        rEl.className = 'roll-result-big ' + (crit?'crit-success':(fail?'crit-fail':''));
+        document.getElementById('roll-calc').innerText = det;
+        m.style.display = 'flex';
     }
 
-    async function comprarItem(id, nome, preco) {
-        if((charData.Zeuro || 0) < preco) return alert("Dinheiro insuficiente!");
-        if(confirm(`Comprar ${nome} por $${preco}?`)) {
-            await updateDoc(doc(db, "characters", charId), {
-                Zeuro: (charData.Zeuro || 0) - preco,
-                itens: arrayUnion(id)
-            });
-            alert("Compra realizada!");
-        }
+    // --- NAVEGAÇÃO ---
+    window.changeTab = (id) => {
+        document.querySelectorAll('.tab-view').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        
+        document.getElementById(id).classList.add('active');
+        // Acha o botão correspondente (gambiarra visual simples)
+        const btns = document.querySelectorAll('.nav-item');
+        if(id === 'tab-stats') btns[0].classList.add('active');
+        if(id === 'tab-powers') btns[1].classList.add('active');
+        if(id === 'tab-inventory') btns[2].classList.add('active');
+        if(id === 'tab-shop') btns[3].classList.add('active');
+        if(id === 'tab-map') btns[4].classList.add('active');
     }
 
     // --- MAPA ENGINE ---
-    const canvas = document.getElementById('mapCanvas');
-    const ctx = canvas.getContext('2d');
-    let mapImg = new Image();
-    let tokens = {};
-    let zoom = 1.0;
-    let isDragging = false;
+    let canvas, ctx, mapImg = new Image(), tokens = {}, view = {x:0,y:0,zoom:1};
+    let isDrag=false, lastPos={x:0,y:0};
+
+    function initCanvas() {
+        canvas = document.getElementById('gameCanvas');
+        ctx = canvas.getContext('2d');
+        resize();
+        window.onresize = resize;
+
+        // Touch/Mouse Events
+        const start = (e) => {
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            
+            // Check Hit no próprio token
+            const r = canvas.getBoundingClientRect();
+            const wx = (clientX - r.left - view.x)/view.zoom;
+            const wy = (clientY - r.top - view.y)/view.zoom;
+            
+            const myToken = tokens[charId];
+            if(myToken) {
+                const radius = (myToken.size || 60)/2;
+                if(Math.sqrt((wx-myToken.x)**2 + (wy-myToken.y)**2) <= radius) {
+                    isDrag = true;
+                }
+            }
+            lastPos = {x:clientX, y:clientY};
+        };
+
+        const move = (e) => {
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            const dx = clientX - lastPos.x;
+            const dy = clientY - lastPos.y;
+            lastPos = {x:clientX, y:clientY};
+
+            if(isDrag && tokens[charId]) {
+                tokens[charId].x += dx/view.zoom;
+                tokens[charId].y += dy/view.zoom;
+                renderMap();
+            } else if (e.buttons === 1 || e.type === 'touchmove') {
+                // Pan
+                view.x += dx; view.y += dy;
+                renderMap();
+            }
+        };
+
+        const end = async () => {
+            if(isDrag) {
+                // Salvar
+                await updateDoc(doc(db,"campaign_settings","global"), {
+                    [`posicoes.${charId}`]: tokens[charId]
+                });
+                isDrag = false;
+            }
+        };
+
+        canvas.addEventListener('mousedown', start);
+        canvas.addEventListener('mousemove', move);
+        canvas.addEventListener('mouseup', end);
+        
+        canvas.addEventListener('touchstart', start);
+        canvas.addEventListener('touchmove', move);
+        canvas.addEventListener('touchend', end);
+    }
+
+    function resize(){
+        canvas.width = window.innerWidth; 
+        canvas.height = window.innerHeight; 
+        renderMap();
+    }
 
     function renderMap() {
-        if (!mapImg.src) return;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(mapImg, 0, 0, canvas.width * zoom, canvas.height * zoom);
+        if(!ctx) return;
+        ctx.fillStyle = "#000"; ctx.fillRect(0,0,canvas.width,canvas.height);
         
-        for (let id in tokens) {
-            const t = tokens[id];
-            ctx.beginPath();
-            ctx.arc(t.x * zoom, t.y * zoom, 20 * zoom, 0, Math.PI * 2);
-            ctx.fillStyle = (id === charId) ? "rgba(255,215,0,0.8)" : "rgba(139,0,0,0.6)";
-            ctx.fill();
-            ctx.lineWidth = 3; ctx.strokeStyle = "white"; ctx.stroke();
+        ctx.save();
+        ctx.translate(view.x, view.y);
+        ctx.scale(view.zoom, view.zoom);
+        
+        if(mapImg.src) ctx.drawImage(mapImg, 0, 0);
+
+        // Tokens
+        Object.keys(tokens).forEach(k => {
+            const t = tokens[k];
+            const isMe = k === charId;
+            const size = t.size || 60;
             
-            // Desenha nome
-            ctx.fillStyle = "white"; ctx.font = `${12*zoom}px Arial`; ctx.textAlign = "center";
-            ctx.fillText(t.nome || "?", t.x * zoom, (t.y * zoom) - (25*zoom));
-        }
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(t.x, t.y, size/2, 0, Math.PI*2);
+            ctx.fillStyle = isMe ? "var(--gold)" : "red";
+            ctx.fill();
+            
+            // Ring
+            ctx.lineWidth = isMe ? 3 : 1;
+            ctx.strokeStyle = isMe ? "#fff" : "black";
+            ctx.stroke();
+            
+            // Name
+            ctx.fillStyle = "#fff";
+            ctx.font = "bold 14px Arial";
+            ctx.textAlign = "center";
+            ctx.shadowColor="black"; ctx.shadowBlur=4;
+            ctx.fillText(t.name || "PC", t.x, t.y - size/2 - 5);
+            
+            ctx.restore();
+        });
+        ctx.restore();
     }
 
-    function getEventPos(e) {
-        const rect = canvas.getBoundingClientRect();
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-        return {
-            x: (clientX - rect.left) / (rect.width / canvas.width) / zoom,
-            y: (clientY - rect.top) / (rect.height / canvas.height) / zoom
-        };
-    }
+    window.mapZoom = (v) => { view.zoom = Math.max(0.2, view.zoom + v); renderMap(); };
+    window.toggleAudio = () => { audio.muted = !audio.muted; document.getElementById('btn-audio').innerText = audio.muted ? '🔇' : '🔊'; if(!audio.paused) audio.play(); };
 
-    function startDrag(e) {
-        const pos = getEventPos(e);
-        if (tokens[charId]) {
-            const dist = Math.sqrt((pos.x - tokens[charId].x)**2 + (pos.y - tokens[charId].y)**2);
-            if (dist < 40) isDragging = true;
-        }
-    }
-    function moveDrag(e) {
-        if (isDragging) {
-            e.preventDefault();
-            const pos = getEventPos(e);
-            tokens[charId].x = pos.x; tokens[charId].y = pos.y;
-            renderMap();
-        }
-    }
-    async function endDrag() {
-        if (isDragging) {
-            await updateDoc(doc(db, "campaign_settings", "global"), { [`posicoes.${charId}`]: tokens[charId] });
-        }
-        isDragging = false;
-    }
-
-    canvas.addEventListener('mousedown', startDrag); canvas.addEventListener('mousemove', moveDrag); canvas.addEventListener('mouseup', endDrag);
-    canvas.addEventListener('touchstart', startDrag, {passive: false}); canvas.addEventListener('touchmove', moveDrag, {passive: false}); canvas.addEventListener('touchend', endDrag);
-
-    window.adjustZoom = (val) => { zoom += val; if(zoom < 0.2) zoom = 0.2; renderMap(); };
-    window.activateAudio = () => { audio.play(); document.getElementById('music-alert').style.display = 'none'; };
-
-    // Tabs
-    document.querySelectorAll('.tab-btn').forEach(b => {
-        b.onclick = () => {
-            document.querySelectorAll('.tab-btn, .tab-content').forEach(e => e.classList.remove('active'));
-            b.classList.add('active');
-            document.getElementById(b.dataset.tab).classList.add('active');
-            if(b.dataset.tab === 'tab-map') setTimeout(renderMap, 100);
-        };
-    });
 </script>
 </body>
 </html>
