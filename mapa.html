@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Zatur - Controle de Mapa</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Roboto:wght@400;500;700&display=swap');
+
+        :root {
+            --bg-dark: #050505;
+            --bg-panel: #111;
+            --gold: #d4af37;
+            --danger: #b91c1c;
+            --success: #15803d;
+            --mana: #1e4d8c;
+            --border: #333;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            margin: 0; padding: 0;
+            background: var(--bg-dark);
+            color: #e0e0e0;
+            font-family: 'Roboto', sans-serif;
+            height: 100vh;
+            display: flex; flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* --- HEADER --- */
+        header {
+            height: 50px;
+            background: var(--bg-panel);
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 15px; flex-shrink: 0;
+        }
+        .brand { font-family: 'Cinzel'; color: var(--gold); font-weight: bold; }
+        .status { font-size: 0.7rem; color: var(--success); }
+
+        /* --- MAPA AREA --- */
+        #map-viewport {
+            flex: 1; /* Ocupa o espaço que sobrar */
+            position: relative;
+            background: #000;
+            overflow: hidden;
+            border-bottom: 2px solid var(--gold);
+        }
+        canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
+        canvas:active { cursor: grabbing; }
+
+        /* --- CONTROLES INFERIORES (TABS) --- */
+        #controls-area {
+            height: 55%; /* Um pouco maior para caber a galeria */
+            background: #0a0a0a;
+            display: flex; flex-direction: column;
+        }
+
+        .tabs {
+            display: flex; background: #1a1a1a;
+            border-bottom: 1px solid var(--border);
+        }
+        .tab-btn {
+            flex: 1; padding: 15px; background: transparent; border: none;
+            color: #666; font-size: 1.2rem; cursor: pointer; border-bottom: 3px solid transparent;
+        }
+        .tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); background: #111; }
+
+        .tab-content {
+            flex: 1; overflow-y: auto; padding: 15px; display: none;
+        }
+        .tab-content.active { display: block; }
+
+        /* --- COMPONENTES --- */
+        .control-group { margin-bottom: 20px; border-bottom: 1px solid #222; padding-bottom: 15px; }
+        h3 { font-family: 'Cinzel'; color: #ccc; margin-top: 0; font-size: 1rem; }
+        
+        label { font-size: 0.75rem; color: #888; display: block; margin-bottom: 5px; text-transform: uppercase; }
+        input, select {
+            width: 100%; background: #222; border: 1px solid #444; color: #fff;
+            padding: 10px; border-radius: 4px; margin-bottom: 10px; font-size: 1rem;
+        }
+        
+        .btn {
+            width: 100%; padding: 12px; border: none; border-radius: 4px;
+            font-weight: bold; cursor: pointer; text-transform: uppercase; font-family: 'Cinzel';
+            margin-bottom: 5px;
+        }
+        .btn-gold { background: var(--gold); color: #000; }
+        .btn-red { background: var(--danger); color: #fff; }
+        .btn-blue { background: var(--mana); color: #fff; }
+        .btn-green { background: var(--success); color: #fff; }
+        .btn-small { width: auto; padding: 8px 15px; font-size: 0.8rem; }
+
+        /* PRESETS GRID */
+        .preset-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .preset-card {
+            background: #161616; border: 1px solid #333; border-radius: 6px;
+            padding: 5px; text-align: center; position: relative; cursor: pointer;
+        }
+        .preset-card:active { border-color: var(--gold); background: #222; }
+        .preset-img { width: 100%; height: 50px; object-fit: cover; background: #000; margin-bottom: 5px; border-radius: 4px; }
+        .preset-title { font-size: 0.7rem; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ddd; }
+        .del-btn {
+            position: absolute; top: -5px; right: -5px; width: 20px; height: 20px;
+            background: var(--danger); color: #fff; border-radius: 50%; border:none;
+            display: flex; align-items: center; justify-content: center; font-size: 0.8rem;
+        }
+
+        /* OVERLAY MAPA */
+        .map-overlay-controls {
+            position: absolute; top: 10px; right: 10px;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .icon-btn {
+            width: 40px; height: 40px; border-radius: 50%; background: rgba(0,0,0,0.7);
+            border: 1px solid var(--gold); color: #fff; font-size: 1rem;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand">ZATUR CONTROLE</div>
+        <div class="status" id="connection-status">● Online</div>
+    </header>
+
+    <div id="map-viewport">
+        <canvas id="gameCanvas"></canvas>
+        
+        <div class="map-overlay-controls">
+            <button class="icon-btn" onclick="zoomMap(0.1)"><i class="fas fa-plus"></i></button>
+            <button class="icon-btn" onclick="zoomMap(-0.1)"><i class="fas fa-minus"></i></button>
+            <button class="icon-btn" style="border-color:var(--danger); color:var(--danger)" onclick="clearMap()"><i class="fas fa-trash"></i></button>
+        </div>
+    </div>
+
+    <div id="controls-area">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="setTab('tokens')"><i class="fas fa-chess-pawn"></i></button>
+            <button class="tab-btn" onclick="setTab('presets')"><i class="fas fa-map"></i></button>
+            <button class="tab-btn" onclick="setTab('audio')"><i class="fas fa-music"></i></button>
+        </div>
+
+        <div id="tab-tokens" class="tab-content active">
+            
+            <div class="control-group">
+                <h3>Criar & Salvar Token</h3>
+                <input type="text" id="token-name" placeholder="Nome (Ex: Goblin Arqueiro)">
+                <input type="text" id="token-img" placeholder="URL da Imagem">
+                <div style="display:flex; gap:10px;">
+                    <button class="btn-gold" style="flex:1" onclick="addCustomToken()">SÓ COLOCAR</button>
+                    <button class="btn-green" style="flex:1" onclick="saveTokenPreset()">SALVAR</button>
+                </div>
+            </div>
+
+            <h3>Meus Tokens Salvos</h3>
+            <p style="font-size:0.7rem; color:#666; margin-bottom:10px;">Toque para adicionar ao mapa.</p>
+            <div id="tokens-list" class="preset-grid">
+                </div>
+
+            <br>
+            <div class="control-group">
+                <h3>Lista de Players / Bestiário</h3>
+                <div style="display:flex; gap:5px;">
+                    <select id="source-select" style="flex:1;">
+                        <option value="">Carregando...</option>
+                    </select>
+                    <button class="btn-gold btn-small" onclick="addFromList()">ADD</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-presets" class="tab-content">
+            <div class="control-group">
+                <h3>Salvar Link de Mapa</h3>
+                <input type="text" id="new-preset-name" placeholder="Nome (Ex: Taverna)">
+                <input type="text" id="new-preset-url" placeholder="URL da Imagem">
+                <button class="btn-blue" onclick="saveMapPreset()">SALVAR MAPA</button>
+            </div>
+
+            <h3>Galeria de Mapas</h3>
+            <div id="presets-list" class="preset-grid">
+                </div>
+        </div>
+
+        <div id="tab-audio" class="tab-content">
+            
+            <div class="control-group">
+                <h3>DJ da Mesa</h3>
+                <div style="display:flex; gap:5px;">
+                    <input type="text" id="current-music-url" placeholder="URL do Audio/MP3">
+                    <button class="btn-gold btn-small" onclick="updateMusic()"><i class="fas fa-play"></i></button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>Salvar Música</h3>
+                <input type="text" id="audio-name" placeholder="Nome (Ex: Batalha)">
+                <input type="text" id="audio-url" placeholder="URL">
+                <button class="btn-blue" onclick="saveAudioPreset()">SALVAR NA PLAYLIST</button>
+            </div>
+
+            <h3>Playlist</h3>
+            <div id="audio-list" class="preset-grid">
+                </div>
+        </div>
+
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, collection, getDocs, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAgYVod9B99WIc_QysFx73htOf9O8XtuE8",
+        authDomain: "zatur-rpg.firebaseapp.com",
+        projectId: "zatur-rpg",
+        storageBucket: "zatur-rpg.firebasestorage.app",
+        messagingSenderId: "797058283992",
+        appId: "1:797058283992:web:7132e71691a225c1255aad"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // STATE
+    let mapTokens = {};
+    let mapPresets = [];
+    let audioPresets = [];
+    let tokenPresets = []; // Nova lista de tokens salvos
+    let entityList = [];
+
+    // ===========================================
+    // 1. INICIALIZAÇÃO
+    // ===========================================
+    window.onload = async () => {
+        initMapEngine();
+        loadEntities(); 
+        
+        onSnapshot(doc(db, "campaign_settings", "global"), (snap) => {
+            if(snap.exists()) {
+                const d = snap.data();
+                
+                // Mapa e Tokens
+                if(d.mapa_url) loadMapImage(d.mapa_url);
+                if(d.posicoes) {
+                    mapTokens = d.posicoes;
+                    drawMap();
+                }
+
+                // Carrega Presets
+                if(d.presets_map) {
+                    mapPresets = d.presets_map;
+                    renderMapPresets();
+                }
+                if(d.presets_audio) {
+                    audioPresets = d.presets_audio;
+                    renderAudioPresets();
+                }
+                // NOVO: Tokens Salvos
+                if(d.presets_tokens) {
+                    tokenPresets = d.presets_tokens;
+                    renderTokenPresets();
+                }
+            }
+        });
+    };
+
+    async function loadEntities() {
+        const sel = document.getElementById('source-select');
+        sel.innerHTML = '<option value="">Selecione...</option>';
+        entityList = [];
+
+        const players = await getDocs(collection(db, "characters"));
+        players.forEach(doc => {
+            const data = doc.data();
+            entityList.push({ id: doc.id, name: data.Nome, img: data.Imagem });
+            sel.innerHTML += `<option value="${doc.id}">👤 ${data.Nome}</option>`;
+        });
+
+        try {
+            const monsters = await getDocs(collection(db, "bestiary"));
+            monsters.forEach(doc => {
+                const data = doc.data();
+                entityList.push({ id: doc.id, name: data.Nome, img: data.Imagem });
+                sel.innerHTML += `<option value="${doc.id}">👹 ${data.Nome}</option>`;
+            });
+        } catch(e) {}
+    }
+
+    // ===========================================
+    // 2. ENGINE DO MAPA (MOUSE CORRIGIDO)
+    // ===========================================
+    let canvas, ctx, mapImg, view = {x:0, y:0, zoom:1};
+    let isDrag = false, isPan = false, lastPos = {x:0, y:0}, dragTokenId = null;
+
+    function initMapEngine() {
+        canvas = document.getElementById('gameCanvas');
+        ctx = canvas.getContext('2d');
+        resizeCanvas();
+        window.onresize = resizeCanvas;
+
+        // Mouse Events
+        canvas.addEventListener('mousedown', handleStart);
+        canvas.addEventListener('mousemove', handleMove);
+        canvas.addEventListener('mouseup', handleEnd);
+        canvas.addEventListener('mouseleave', handleEnd);
+        
+        // Touch Events
+        canvas.addEventListener('touchstart', e => handleStart(e.touches[0]), {passive:false});
+        canvas.addEventListener('touchmove', e => { e.preventDefault(); handleMove(e.touches[0]); }, {passive:false});
+        canvas.addEventListener('touchend', handleEnd);
+    }
+
+    // FIX VITAL: Pega a posição relativa ao Canvas, não à tela inteira
+    function getCanvasPos(evt) {
+        const rect = canvas.getBoundingClientRect();
+        return {
+            x: evt.clientX - rect.left,
+            y: evt.clientY - rect.top
+        };
+    }
+
+    function handleStart(evt) {
+        const pos = getCanvasPos(evt);
+        const wx = (pos.x - view.x) / view.zoom;
+        const wy = (pos.y - view.y) / view.zoom;
+        
+        lastPos = pos;
+        dragTokenId = null;
+        isPan = false;
+
+        // Verifica Tokens (ordem inversa para pegar o de cima)
+        const keys = Object.keys(mapTokens).reverse();
+        for(let key of keys) {
+            const t = mapTokens[key];
+            const dist = Math.sqrt( (t.x - wx)**2 + (t.y - wy)**2 );
+            if(dist <= (t.size||60)/2) {
+                dragTokenId = key;
+                isDrag = true;
+                return;
+            }
+        }
+        
+        // Se não pegou token, é pan
+        isPan = true;
+        isDrag = true;
+    }
+
+    function handleMove(evt) {
+        const pos = getCanvasPos(evt);
+        const dx = pos.x - lastPos.x;
+        const dy = pos.y - lastPos.y;
+        lastPos = pos;
+
+        if(!isDrag) return;
+
+        if(dragTokenId) {
+            mapTokens[dragTokenId].x += dx / view.zoom;
+            mapTokens[dragTokenId].y += dy / view.zoom;
+            drawMap();
+        } else if(isPan) {
+            view.x += dx;
+            view.y += dy;
+            drawMap();
+        }
+    }
+
+    function handleEnd() {
+        if(dragTokenId) {
+            updateDoc(doc(db, "campaign_settings", "global"), { posicoes: mapTokens });
+            dragTokenId = null;
+        }
+        isDrag = false;
+        isPan = false;
+    }
+
+    function loadMapImage(url) {
+        mapImg = new Image();
+        mapImg.crossOrigin = "anonymous";
+        mapImg.src = url;
+        mapImg.onload = drawMap;
+    }
+
+    function drawMap() {
+        if(!ctx) return;
+        ctx.fillStyle = "#050505";
+        ctx.fillRect(0,0, canvas.width, canvas.height);
+
+        ctx.save();
+        ctx.translate(view.x, view.y);
+        ctx.scale(view.zoom, view.zoom);
+
+        if(mapImg) ctx.drawImage(mapImg, 0, 0);
+
+        Object.values(mapTokens).forEach(t => {
+            const s = t.size || 60;
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(t.x, t.y, s/2, 0, Math.PI*2);
+            ctx.fillStyle = "#222"; ctx.fill();
+            ctx.strokeStyle = "gold"; ctx.lineWidth = 3; ctx.stroke();
+            
+            ctx.fillStyle = "white";
+            ctx.font = "bold 14px Arial";
+            ctx.textAlign = "center";
+            ctx.shadowColor="black"; ctx.shadowBlur=4;
+            ctx.fillText(t.name || "NPC", t.x, t.y - s/2 - 5);
+            ctx.restore();
+        });
+
+        ctx.restore();
+    }
+
+    function resizeCanvas() {
+        const container = document.getElementById('map-viewport');
+        if(container) {
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+            drawMap();
+        }
+    }
+
+    window.zoomMap = (amount) => { view.zoom = Math.max(0.1, view.zoom + amount); drawMap(); }
+
+    // ===========================================
+    // 3. TOKENS & PRESETS DE TOKENS
+    // ===========================================
+    
+    // Adiciona ao mapa sem salvar na lista
+    window.addCustomToken = () => {
+        const name = document.getElementById('token-name').value || "NPC";
+        const img = document.getElementById('token-img').value;
+        spawnToken(name, img);
+    }
+
+    // Salva na lista e adiciona ao mapa
+    window.saveTokenPreset = async () => {
+        const name = document.getElementById('token-name').value;
+        const img = document.getElementById('token-img').value;
+        if(!name || !img) return alert("Preencha nome e imagem");
+
+        tokenPresets.push({ name, img });
+        await updateDoc(doc(db, "campaign_settings", "global"), { presets_tokens: tokenPresets });
+        
+        spawnToken(name, img); // Já joga no mapa
+    }
+
+    // Renderiza a lista de tokens salvos
+    function renderTokenPresets() {
+        const container = document.getElementById('tokens-list');
+        container.innerHTML = "";
+        tokenPresets.forEach((t, idx) => {
+            const div = document.createElement('div');
+            div.className = 'preset-card';
+            div.innerHTML = `
+                <button class="del-btn" onclick="removeTokenPreset(${idx})">&times;</button>
+                <img src="${t.img}" class="preset-img">
+                <div class="preset-title">${t.name}</div>
+            `;
+            div.onclick = (e) => { if(e.target.tagName !== 'BUTTON') spawnToken(t.name, t.img); };
+            container.appendChild(div);
+        });
+    }
+
+    window.removeTokenPreset = async (idx) => {
+        if(!confirm("Remover da lista?")) return;
+        tokenPresets.splice(idx, 1);
+        await updateDoc(doc(db, "campaign_settings", "global"), { presets_tokens: tokenPresets });
+    }
+
+    window.addFromList = () => {
+        const id = document.getElementById('source-select').value;
+        if(!id) return;
+        const entity = entityList.find(e => e.id === id);
+        if(entity) spawnToken(entity.name, entity.img);
+    }
+
+    function spawnToken(name, img) {
+        const id = "tk_" + Date.now();
+        const cx = (canvas.width/2 - view.x) / view.zoom;
+        const cy = (canvas.height/2 - view.y) / view.zoom;
+        mapTokens[id] = { x: cx, y: cy, size: 60, name: name, img: img || "" };
+        updateDoc(doc(db, "campaign_settings", "global"), { posicoes: mapTokens });
+    }
+
+    window.clearMap = async () => {
+        if(confirm("Remover TODOS os tokens do mapa?")) {
+            await updateDoc(doc(db, "campaign_settings", "global"), { posicoes: {} });
+        }
+    }
+
+    // ===========================================
+    // 4. PRESETS (MAPAS & AUDIO)
+    // ===========================================
+    
+    // MAPAS
+    window.saveMapPreset = async () => {
+        const name = document.getElementById('new-preset-name').value;
+        const url = document.getElementById('new-preset-url').value;
+        if(!name || !url) return alert("Preencha nome e URL");
+        mapPresets.push({ name, url });
+        await updateDoc(doc(db, "campaign_settings", "global"), { presets_map: mapPresets });
+    }
+
+    function renderMapPresets() {
+        const container = document.getElementById('presets-list');
+        container.innerHTML = "";
+        mapPresets.forEach((p, idx) => {
+            const div = document.createElement('div');
+            div.className = 'preset-card';
+            div.innerHTML = `
+                <button class="del-btn" onclick="removeMapPreset(${idx})">&times;</button>
+                <img src="${p.url}" class="preset-img">
+                <div class="preset-title">${p.name}</div>
+            `;
+            div.onclick = (e) => { if(e.target.tagName !== 'BUTTON') applyMap(p.url); };
+            container.appendChild(div);
+        });
+    }
+
+    window.removeMapPreset = async (idx) => {
+        if(!confirm("Deletar?")) return;
+        mapPresets.splice(idx, 1);
+        await updateDoc(doc(db, "campaign_settings", "global"), { presets_map: mapPresets });
+    }
+
+    window.applyMap = async (url) => { await updateDoc(doc(db, "campaign_settings", "global"), { mapa_url: url }); }
+
+    // AUDIO
+    window.saveAudioPreset = async () => {
+        const name = document.getElementById('audio-name').value;
+        const url = document.getElementById('audio-url').value;
+        if(!name || !url) return alert("Preencha nome e URL");
+        audioPresets.push({ name, url });
+        await updateDoc(doc(db, "campaign_settings", "global"), { presets_audio: audioPresets });
+    }
+
+    function renderAudioPresets() {
+        const container = document.getElementById('audio-list');
+        container.innerHTML = "";
+        audioPresets.forEach((p, idx) => {
+            const div = document.createElement('div');
+            div.className = 'preset-card';
+            div.innerHTML = `
+                <button class="del-btn" onclick="removeAudioPreset(${idx})">&times;</button>
+                <div style="font-size:2rem; margin-bottom:5px;">🎵</div>
+                <div class="preset-title">${p.name}</div>
+            `;
+            div.onclick = (e) => { if(e.target.tagName !== 'BUTTON') applyMusic(p.url); };
+            container.appendChild(div);
+        });
+    }
+
+    window.removeAudioPreset = async (idx) => {
+        if(!confirm("Deletar?")) return;
+        audioPresets.splice(idx, 1);
+        await updateDoc(doc(db, "campaign_settings", "global"), { presets_audio: audioPresets });
+    }
+
+    window.applyMusic = async (url) => {
+        document.getElementById('current-music-url').value = url;
+        window.updateMusic();
+    }
+
+    window.updateMusic = async () => {
+        const url = document.getElementById('current-music-url').value;
+        await updateDoc(doc(db, "campaign_settings", "global"), { musica_url: url });
+        alert("Música trocada!");
+    }
+
+    // ===========================================
+    // 5. NAVEGAÇÃO
+    // ===========================================
+    window.setTab = (id) => {
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('tab-' + id).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+
+</script>
+</body>
+</html>
