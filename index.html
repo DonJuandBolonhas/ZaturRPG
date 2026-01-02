@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zatur RPG - Painel do Mestre Supremo</title>
+    <title>Zatur RPG - Painel do Mestre</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         /* =========================================
@@ -15,15 +15,18 @@
             --bg-dark: #050505;
             --bg-panel: #0f0f0f;
             --bg-card: #141414;
+            --bg-input: #0a0a0a;
             --gold: #d4af37;
             --gold-dim: #8f782b;
             --text-main: #e0e0e0;
             --text-muted: #888;
             --danger: #b91c1c;
+            --danger-dim: #681212;
             --success: #15803d;
             --mana: #1e4d8c;
             --border: #333;
             --shadow: 0 4px 6px rgba(0,0,0,0.5);
+            --radius: 6px;
         }
 
         * { box-sizing: border-box; outline: none; }
@@ -39,7 +42,7 @@
             overflow: hidden;
         }
 
-        /* SCROLLBAR */
+        /* SCROLLBAR CUSTOMIZATION */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #000; }
         ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
@@ -66,6 +69,7 @@
             margin-bottom: 30px;
             border-bottom: 1px solid var(--border);
             padding-bottom: 20px;
+            cursor: default;
         }
 
         nav { display: flex; flex-direction: column; gap: 10px; }
@@ -79,7 +83,7 @@
             cursor: pointer;
             font-family: 'Cinzel', serif;
             font-size: 1rem;
-            border-radius: 6px;
+            border-radius: var(--radius);
             transition: all 0.3s ease;
             display: flex; align-items: center; gap: 15px;
         }
@@ -103,6 +107,7 @@
             text-align: center;
             padding-top: 20px;
             border-top: 1px solid var(--border);
+            display: flex; justify-content: center; align-items: center; gap: 8px;
         }
 
         /* =========================================
@@ -130,6 +135,7 @@
             padding-bottom: 10px;
             margin-top: 0;
             display: flex; justify-content: space-between; align-items: center;
+            font-weight: 700;
         }
 
         h3 {
@@ -138,12 +144,12 @@
             margin-top: 30px;
             border-left: 4px solid var(--gold);
             padding-left: 10px;
+            font-size: 1.2rem;
         }
 
         /* =========================================
-           4. COMPONENTS: CARDS, FORMS, BUTTONS
+           4. FORM ELEMENTS & BUTTONS
            ========================================= */
-        /* FORMS */
         .form-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -151,10 +157,10 @@
             margin-bottom: 20px;
         }
 
-        .input-group { display: flex; flex-direction: column; gap: 5px; }
+        .input-group { display: flex; flex-direction: column; gap: 6px; position: relative; }
         
         label {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             text-transform: uppercase;
             letter-spacing: 1px;
             color: var(--text-muted);
@@ -162,42 +168,51 @@
         }
 
         input, select, textarea {
-            background: #000;
+            background: var(--bg-input);
             border: 1px solid var(--border);
             color: var(--text-main);
-            padding: 12px;
-            border-radius: 4px;
+            padding: 10px 12px;
+            border-radius: var(--radius);
             font-family: 'Roboto', sans-serif;
             transition: 0.3s;
+            font-size: 0.9rem;
         }
 
         input:focus, select:focus, textarea:focus {
             border-color: var(--gold);
-            box-shadow: 0 0 5px rgba(212, 175, 55, 0.3);
+            box-shadow: 0 0 8px rgba(212, 175, 55, 0.2);
         }
 
-        /* BUTTONS */
+        textarea { resize: vertical; min-height: 80px; }
+
         .btn {
-            padding: 10px 25px;
+            padding: 10px 20px;
             border: none;
-            border-radius: 4px;
+            border-radius: var(--radius);
             cursor: pointer;
             font-family: 'Cinzel', serif;
             font-weight: bold;
             text-transform: uppercase;
-            transition: 0.3s;
+            transition: 0.2s;
             display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            font-size: 0.9rem;
+            user-select: none;
         }
-        .btn:hover { filter: brightness(1.2); transform: translateY(-1px); }
-        .btn:active { transform: translateY(0); }
+        .btn:hover { filter: brightness(1.2); transform: translateY(-2px); }
+        .btn:active { transform: translateY(0); filter: brightness(0.9); }
 
-        .btn-gold { background: var(--gold); color: #000; }
-        .btn-danger { background: var(--danger); color: #fff; }
+        .btn-gold { background: var(--gold); color: #000; box-shadow: 0 2px 5px rgba(212,175,55,0.2); }
+        .btn-danger { background: var(--danger); color: #fff; box-shadow: 0 2px 5px rgba(185, 28, 28, 0.3); }
         .btn-success { background: var(--success); color: #fff; }
         .btn-neutral { background: #333; color: #fff; border: 1px solid #555; }
-        .btn-small { padding: 5px 10px; font-size: 0.8rem; }
+        .btn-blue { background: var(--mana); color: #fff; }
+        
+        .btn-small { padding: 5px 10px; font-size: 0.75rem; }
+        .btn-icon { width: 35px; height: 35px; padding: 0; border-radius: 50%; }
 
-        /* CARDS */
+        /* =========================================
+           5. CARDS & LAYOUTS
+           ========================================= */
         .card-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -211,30 +226,37 @@
             padding: 20px;
             position: relative;
             transition: 0.3s;
+            display: flex; flex-direction: column;
         }
         .card:hover { border-color: var(--gold-dim); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
 
-        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
-        .card-title { font-size: 1.2rem; font-weight: bold; color: var(--gold); font-family: 'Cinzel'; }
-        .card-subtitle { font-size: 0.8rem; color: #666; font-style: italic; }
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+        .card-title { font-size: 1.1rem; font-weight: bold; color: var(--gold); font-family: 'Cinzel'; }
+        .card-subtitle { font-size: 0.75rem; color: #666; font-style: italic; }
         
-        .card-body { font-size: 0.9rem; color: #bbb; line-height: 1.5; margin-bottom: 15px; }
+        .card-body { font-size: 0.85rem; color: #bbb; line-height: 1.5; margin-bottom: 15px; flex-grow: 1; }
         
+        /* Thumbnails for Items in DB */
+        .db-thumb {
+            width: 100%; height: 120px; object-fit: cover;
+            border-radius: 4px; border: 1px solid #333;
+            margin-bottom: 10px; display: block;
+        }
+
         .card-stats-grid {
             display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
             background: rgba(0,0,0,0.3); padding: 10px; border-radius: 4px;
-            font-family: 'Roboto Mono', monospace; font-size: 0.85rem;
+            font-family: 'Roboto Mono', monospace; font-size: 0.8rem; margin-bottom: 10px;
         }
 
         .card-actions {
-            display: flex; gap: 10px; margin-top: 15px; padding-top: 15px;
-            border-top: 1px solid var(--border);
+            display: flex; gap: 8px; margin-top: auto; padding-top: 15px;
+            border-top: 1px solid #222;
         }
 
         /* =========================================
-           5. SPECIFIC MODULES (Map, Combat)
+           6. MAP ENGINE STYLES
            ========================================= */
-        /* MAP CANVAS */
         #map-wrapper {
             position: relative;
             width: 100%;
@@ -243,42 +265,123 @@
             border: 2px solid var(--gold-dim);
             border-radius: 4px;
             overflow: hidden;
+            box-shadow: inset 0 0 20px #000;
         }
         canvas { display: block; cursor: grab; }
         canvas:active { cursor: grabbing; }
 
-        /* COMBAT LIST */
-        .combat-entry {
-            display: flex; align-items: center; gap: 15px;
-            background: #1a1a1a;
-            padding: 15px;
-            border-radius: 6px;
-            border-left: 4px solid var(--danger);
-            margin-bottom: 10px;
-        }
-        .combat-avatar {
-            width: 50px; height: 50px; border-radius: 50%;
-            background: #000; border: 1px solid var(--gold);
-            object-fit: cover;
-        }
-        .combat-info { flex: 1; }
-        .combat-name { font-weight: bold; color: #fff; font-size: 1.1rem; }
-        
-        /* HP BAR */
-        .hp-container {
-            width: 100%; height: 16px;
-            background: #000; border: 1px solid #444;
-            border-radius: 8px; margin-top: 5px;
-            position: relative; overflow: hidden;
-        }
-        .hp-fill { height: 100%; background: var(--danger); transition: width 0.4s ease; }
-        .hp-text {
-            position: absolute; width: 100%; text-align: center;
-            top: 0; line-height: 16px; font-size: 0.75rem;
-            color: #fff; text-shadow: 1px 1px 2px #000; font-weight: bold;
+        /* =========================================
+           7. COMBAT LAYOUT
+           ========================================= */
+        .combat-layout {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 25px;
+            height: calc(100vh - 140px);
+            overflow: hidden;
         }
 
-        /* MODALS */
+        .dice-container-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 10px; 
+            margin-top: 10px;
+        }
+
+        @media (max-width: 900px) {
+            .combat-layout {
+                grid-template-columns: 1fr; 
+                height: auto;
+                overflow-y: auto;
+            }
+            .combat-sidebar {
+                height: 600px;
+            }
+        }
+
+        .combat-monsters-area {
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .monster-card {
+            background: #141414;
+            border: 1px solid #333;
+            border-left: 4px solid var(--danger);
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex; flex-direction: column; gap: 10px;
+            transition: all 0.2s;
+        }
+        .monster-card:hover { border-color: #555; border-left-color: var(--danger); box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+
+        .monster-header { display: flex; justify-content: space-between; align-items: center; }
+        .monster-name { font-family: 'Cinzel'; font-size: 1.2rem; color: #fff; font-weight: bold; }
+        
+        .hp-wrapper { width: 100%; height: 20px; background: #000; border-radius: 10px; position: relative; overflow: hidden; border: 1px solid #444; }
+        .hp-bar { height: 100%; background: linear-gradient(90deg, #881313, #b91c1c); transition: width 0.3s ease; }
+        .hp-label { position: absolute; width: 100%; text-align: center; top: 0; line-height: 20px; font-size: 0.75rem; color: #fff; text-shadow: 1px 1px 1px #000; font-weight: bold; }
+
+        .dice-panel {
+            background: rgba(0,0,0,0.3);
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #222;
+        }
+        .dice-row {
+            display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+        }
+        .dice-row:last-child { margin-bottom: 0; }
+        .dice-label { width: 60px; font-size: 0.75rem; font-weight: bold; color: var(--gold); text-align: right; margin-right: 5px; }
+        
+        .d-input { width: 50px; text-align: center; padding: 5px; height: 32px; }
+        .d-select { width: 70px; padding: 5px; height: 32px; }
+        
+        .combat-sidebar {
+            display: flex; flex-direction: column; gap: 20px;
+            height: 100%;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .chat-narrator-box {
+            background: #111;
+            border: 1px solid var(--gold-dim);
+            border-radius: 8px;
+            display: flex; flex-direction: column;
+            flex: 1;
+            min-height: 350px;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .chat-header { background: #222; padding: 10px; font-family: 'Cinzel'; color: var(--gold); border-bottom: 1px solid #333; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
+        .chat-log { 
+            flex: 1; 
+            padding: 10px; 
+            overflow-y: auto; 
+            font-size: 0.8rem; 
+            background: #000; 
+            font-family: 'Roboto Mono', monospace;
+            color: #aaa;
+        }
+        .chat-log p { margin: 4px 0; border-bottom: 1px solid #1a1a1a; padding-bottom: 4px; }
+        .chat-controls { padding: 10px; background: #1a1a1a; border-top: 1px solid #333; }
+        
+        .player-mini-list {
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 15px;
+            max-height: 250px;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+        .mini-char { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #222; font-size: 0.85rem; }
+
+        /* =========================================
+           8. MODALS & INVENTORY STYLES
+           ========================================= */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: rgba(0,0,0,0.85); z-index: 1000;
@@ -293,18 +396,39 @@
             border-radius: 10px;
             padding: 30px;
             box-shadow: 0 0 50px rgba(0,0,0,0.8);
+            animation: zoomIn 0.2s ease-out;
         }
+        @keyframes zoomIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
         .modal-header { display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
-        .modal-close { background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; }
+        .modal-close { background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; transition: 0.2s; }
+        .modal-close:hover { color: var(--danger); transform: rotate(90deg); }
 
-        /* DB EDITOR LIST */
-        .db-row {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 10px; border-bottom: 1px solid #222;
-            background: rgba(255,255,255,0.02);
+        /* Estilo para lista de Itens com Imagem */
+        .loot-row {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 8px; border-bottom: 1px solid #333;
+            transition: background 0.2s;
         }
-        .db-row:hover { background: rgba(255,255,255,0.05); }
+        .loot-row:hover { background: #1a1a1a; }
+        
+        .loot-info { display: flex; align-items: center; gap: 10px; }
+        .item-thumb {
+            width: 40px; height: 40px; border-radius: 4px; 
+            object-fit: cover; border: 1px solid #555;
+            background: #000;
+        }
+        .item-placeholder {
+            width: 40px; height: 40px; border-radius: 4px;
+            background: #222; color: #555; display: flex; 
+            align-items: center; justify-content: center; font-size: 1.2rem;
+        }
 
+        /* UTILS */
+        .tag { font-size: 0.7rem; padding: 2px 6px; border-radius: 3px; background: #333; color: #ccc; }
+        .text-gold { color: var(--gold); }
+        .text-danger { color: var(--danger); }
+        
     </style>
 </head>
 <body>
@@ -315,9 +439,11 @@
         <button class="active" onclick="setView('dashboard')"><i class="fas fa-tachometer-alt"></i> Campanha & Mapa</button>
         <button onclick="setView('database')"><i class="fas fa-database"></i> Banco de Dados</button>
         <button onclick="setView('characters')"><i class="fas fa-users"></i> Personagens</button>
-        <button onclick="setView('combat')"><i class="fas fa-swords"></i> Combate</button>
+        <button onclick="setView('combat')"><i class="fas fa-swords"></i> Mesa de Combate</button>
     </nav>
-    <div class="server-status"><i class="fas fa-wifi"></i> Sistema Online V.Final</div>
+    <div class="server-status">
+        <i class="fas fa-circle" style="font-size: 8px;"></i> Sistema Online
+    </div>
 </aside>
 
 <main>
@@ -338,29 +464,29 @@
 
         <div class="form-grid">
             <div class="input-group">
-                <label>URL do Mapa (Imagem Direta)</label>
-                <input type="text" id="gm-map-url" onchange="updateMapImage()">
+                <label>URL do Mapa (Link Direto de Imagem)</label>
+                <input type="text" id="gm-map-url" onchange="updateMapImage()" placeholder="https://...">
             </div>
             <div class="input-group">
-                <label>URL da Música (MP3)</label>
-                <input type="text" id="gm-music-url">
+                <label>URL da Música (MP3 Stream)</label>
+                <input type="text" id="gm-music-url" placeholder="https://...">
             </div>
         </div>
 
         <h3>Mapa Tático</h3>
-        <div style="margin-bottom:10px; display:flex; gap:10px; align-items:flex-end;">
-            <div class="input-group" style="flex:1;">
+        <div style="margin-bottom:10px; display:flex; gap:10px; align-items:flex-end; flex-wrap: wrap;">
+            <div class="input-group" style="flex:1; min-width: 150px;">
                 <label>Adicionar Token</label>
                 <select id="map-token-select">
                     <option value="mob">Monstro/NPC Genérico</option>
-                    </select>
+                </select>
             </div>
-            <div class="input-group" style="flex:1;">
+            <div class="input-group" style="flex:1; min-width: 150px;">
                 <label>Nome Customizado</label>
                 <input type="text" id="map-token-name" placeholder="Opcional">
             </div>
-            <div class="input-group" style="flex:1;">
-                <label>Imagem Customizada</label>
+            <div class="input-group" style="flex:1; min-width: 150px;">
+                <label>Imagem (URL)</label>
                 <input type="text" id="map-token-img" placeholder="https://...">
             </div>
             <button class="btn btn-success" onclick="startPlaceToken()"><i class="fas fa-crosshairs"></i> Posicionar</button>
@@ -369,9 +495,9 @@
 
         <div id="map-wrapper">
             <canvas id="gameCanvas"></canvas>
-        </div>
-        <div style="font-size:0.8rem; color:#666; margin-top:5px;">
-            Controles: Scroll (Zoom), Clique e Arraste (Mover Câmera), Clique no Token (Arrastar Token).
+            <div style="position:absolute; bottom:10px; left:10px; background:rgba(0,0,0,0.6); padding:5px; font-size:0.75rem; color:#aaa; pointer-events:none;">
+                Scroll: Zoom | Clique+Arrastar: Mover Câmera | Clique Token: Mover Token
+            </div>
         </div>
     </div>
 
@@ -379,7 +505,7 @@
         <h2>A Forja do Mestre (Editor)</h2>
         
         <div style="background:var(--bg-card); padding:20px; border-radius:8px; margin-bottom:20px; border:1px solid var(--border);">
-            <div class="form-grid" style="align-items:end;">
+            <div class="form-grid" style="align-items:end; margin-bottom: 0;">
                 <div class="input-group">
                     <label>Tipo de Entidade</label>
                     <select id="db-type-select" onchange="renderDBList()" style="height:45px;">
@@ -394,8 +520,7 @@
             </div>
         </div>
 
-        <div id="db-content-list" class="card-grid">
-            </div>
+        <div id="db-content-list" class="card-grid"></div>
     </div>
 
     <div id="characters" class="section">
@@ -404,33 +529,51 @@
             <button class="btn btn-gold" onclick="openEditorModal('characters')">+ Novo Personagem</button>
         </div>
         <br>
-        <div id="players-list" class="card-grid">
-            </div>
+        <div id="players-list" class="card-grid"></div>
     </div>
 
     <div id="combat" class="section">
-        <h2>Gerenciador de Combate</h2>
+        <h2>Gerenciador de Batalha</h2>
         
-        <div style="background:var(--bg-card); padding:20px; border-radius:8px; margin-bottom:20px; border:1px solid var(--danger);">
-            <div class="form-grid" style="align-items:end; margin-bottom:0;">
-                <div class="input-group">
-                    <label>Selecionar Monstro do Bestiário</label>
-                    <select id="combat-spawn-select"></select>
-                </div>
-                <button class="btn btn-danger" onclick="spawnCombatant()">Invocar para Batalha</button>
-                <button class="btn btn-neutral" onclick="resetCombat()">Limpar Tudo</button>
+        <div style="background:var(--bg-card); padding:15px; border-radius:8px; margin-bottom:20px; border:1px solid var(--danger); display:flex; gap:15px; align-items:flex-end;">
+            <div class="input-group" style="flex:1;">
+                <label>Invocar Inimigo (Do Bestiário)</label>
+                <select id="combat-spawn-select"></select>
             </div>
+            <button class="btn btn-danger" onclick="spawnCombatant()">Invocar</button>
+            <button class="btn btn-neutral" onclick="resetCombat()">Limpar Campo</button>
         </div>
 
-        <div style="display:grid; grid-template-columns: 2fr 1fr; gap:25px;">
-            <div>
-                <h3 style="color:var(--danger); border-color:var(--danger)">Inimigos Ativos</h3>
-                <div id="combat-active-list"></div>
+        <div class="combat-layout">
+            <div class="combat-monsters-area" id="combat-active-list">
+                <div style="text-align:center; padding:50px; color:#444;">Nenhum inimigo em combate.</div>
             </div>
             
-            <div>
-                <h3 style="color:var(--success); border-color:var(--success)">Heróis</h3>
-                <div id="combat-player-summary"></div>
+            <div class="combat-sidebar">
+                
+                <div class="chat-narrator-box">
+                    <div class="chat-header">
+                        <i class="fas fa-comment-dots"></i> Voz do Narrador / NPCs
+                    </div>
+                    <div id="combat-log-display" class="chat-log">
+                        <p><em>Logs de sistema aparecerão aqui...</em></p>
+                    </div>
+                    <div class="chat-controls">
+                        <div class="input-group" style="margin-bottom:8px;">
+                            <input type="text" id="chat-sender-name" placeholder="Nome (Ex: Rei Goblin)" style="color:var(--gold); font-weight:bold; width:100%;">
+                        </div>
+                        <div style="display:flex; gap:5px;">
+                            <input type="text" id="chat-message-text" placeholder="Mensagem..." style="flex:1; width:100%;">
+                            <button class="btn btn-gold btn-small" onclick="sendCustomChat()"><i class="fas fa-paper-plane"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="player-mini-list">
+                    <h4 style="margin:0 0 10px 0; color:var(--success); border-bottom:1px solid #333; padding-bottom:5px;">Status dos Heróis</h4>
+                    <div id="combat-player-summary"></div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -443,8 +586,7 @@
             <h3 id="editor-title" style="margin:0; color:var(--gold)">Editar</h3>
             <button class="modal-close" onclick="closeModal('modal-editor')">&times;</button>
         </div>
-        <div id="editor-fields" class="form-grid">
-            </div>
+        <div id="editor-fields" class="form-grid"></div>
         <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
             <button class="btn btn-neutral" onclick="closeModal('modal-editor')">Cancelar</button>
             <button class="btn btn-success" onclick="saveEntity()">Salvar Registro</button>
@@ -455,7 +597,7 @@
 <div id="modal-loot" class="modal-overlay">
     <div class="modal-box" style="width:500px;">
         <div class="modal-header">
-            <h3 style="margin:0;">Gerenciar Inventário: <span id="loot-char-name" style="color:var(--gold)"></span></h3>
+            <h3 style="margin:0;">Inventário: <span id="loot-char-name" style="color:var(--gold)"></span></h3>
             <button class="modal-close" onclick="closeModal('modal-loot')">&times;</button>
         </div>
         
@@ -478,43 +620,13 @@
     </div>
 </div>
 
-<div id="modal-attack" class="modal-overlay">
-    <div class="modal-box" style="width:400px; border-color:var(--danger);">
-        <div class="modal-header">
-            <h3 style="margin:0; color:var(--danger)">Realizar Ataque</h3>
-            <button class="modal-close" onclick="closeModal('modal-attack')">&times;</button>
-        </div>
-        
-        <p>Atacante: <strong id="atk-attacker"></strong></p>
-        
-        <div class="input-group" style="margin-bottom:15px;">
-            <label>Alvo (Jogador)</label>
-            <select id="atk-target"></select>
-        </div>
-
-        <div class="input-group" style="margin-bottom:20px;">
-            <label>Dano Total</label>
-            <input type="number" id="atk-value" value="0" style="font-size:1.5rem; text-align:center; color:var(--danger);">
-        </div>
-
-        <div class="input-group">
-            <label>Rolagem de Dado (Simulador)</label>
-            <div style="display:flex; gap:5px;">
-                <input type="text" id="atk-dice-str" placeholder="ex: 1d20+5">
-                <button class="btn btn-neutral" onclick="simulateRoll()">Rolar</button>
-            </div>
-            <div id="atk-roll-result" style="text-align:center; font-weight:bold; margin-top:5px; color:var(--gold)"></div>
-        </div>
-
-        <button class="btn btn-danger" style="width:100%; margin-top:20px;" onclick="confirmAttack()">APLICAR DANO NO ALVO</button>
-    </div>
-</div>
-
 <script type="module">
+    // ==========================================
+    // 0. FIREBASE SETUP
+    // ==========================================
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, collection, addDoc, getDocs, updateDoc, onSnapshot, arrayUnion, arrayRemove, deleteDoc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, collection, addDoc, getDocs, updateDoc, onSnapshot, arrayUnion, arrayRemove, deleteDoc, setDoc, getDoc, serverTimestamp, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // CONFIGURAÇÃO DO FIREBASE (Substitua se necessário, mas esta é a que você forneceu)
     const firebaseConfig = {
         apiKey: "AIzaSyAgYVod9B99WIc_QysFx73htOf9O8XtuE8",
         authDomain: "zatur-rpg.firebaseapp.com",
@@ -528,7 +640,7 @@
     const db = getFirestore(app);
 
     // ==========================================
-    // 1. DATA SCHEMAS (A Estrutura Exata Pedida)
+    // 1. DATA SCHEMAS (UPDATED WITH IMAGE FOR ITEMS)
     // ==========================================
     const SCHEMAS = {
         characters: [
@@ -538,15 +650,16 @@
             {k:'Força', t:'number'}, {k:'Agilidade', t:'number'}, {k:'Intelecto', t:'number'}, {k:'Vigor', t:'number'}, {k:'Mana', t:'number'},
             {k:'XP', t:'number'}, {k:'Zeuros', t:'number'}, {k:'História', t:'area'}, {k:'Descrição', t:'area'}, {k:'Imagem', t:'text'}
         ],
-        bestiary: [ // Monstros (modelo)
+        bestiary: [
             {k:'Nome', t:'text'}, {k:'Nivel', t:'number'}, {k:'Imagem', t:'text'},
             {k:'Pontos de Vida Max', t:'number'}, {k:'Pontos de Mana Max', t:'number'},
-            // Campos extras para facilitar rolagem do mestre
-            {k:'DadoAtaque', t:'text', l:'Dado Ataque (Ex: 1d20+5)'}, 
-            {k:'DanoMedio', t:'text', l:'Dano (Ex: 1d8+3)'}
+            {k:'CA', t:'number', l:'Classe de Armadura'},
+            {k:'Descricao', t:'area', l:'Descrição / Habilidades'}
         ],
         items: [
-            {k:'Nome', t:'text'}, {k:'Valor', t:'number'}, {k:'Nivel', t:'number'},
+            {k:'Nome', t:'text'}, 
+            {k:'Imagem', t:'text', l:'URL da Imagem'}, // NOVO CAMPO
+            {k:'Valor', t:'number'}, {k:'Nivel', t:'number'},
             {k:'Dado', t:'text'}, {k:'Bonus', t:'number'}, {k:'Dano', t:'text'}, {k:'Descrição', t:'area'}
         ],
         spells: [
@@ -554,7 +667,7 @@
             {k:'Dado', t:'text'}, {k:'Bonus', t:'number'}, {k:'Dano', t:'text'}, {k:'Descrição', t:'area'}
         ],
         skills: [
-            {k:'Nome', t:'text'}, {k:'Dado', t:'text', l:'Atributo (ex: Agi)'}, {k:'Bonus', t:'number'}, 
+            {k:'Nome', t:'text'}, {k:'Dado', t:'text', l:'Atributo Base'}, {k:'Bonus', t:'number'}, 
             {k:'Dano', t:'text'}, {k:'Descrição', t:'area'}
         ],
         abilities: [
@@ -563,16 +676,17 @@
         ]
     };
 
-    // Variáveis de Estado
+    // Global State
     let currentEditCollection = null;
     let currentEditId = null;
     let lootCharId = null;
-    let activeAttackerId = null;
     let mapTokens = {};
     let mapImageObj = null;
+    
+    window.playerTargets = [];
 
     // ==========================================
-    // 2. INICIALIZAÇÃO & NAVEGAÇÃO
+    // 2. CORE NAVIGATION
     // ==========================================
     window.setView = (id) => {
         document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -580,21 +694,26 @@
         document.getElementById(id).classList.add('active');
         event.currentTarget.classList.add('active');
         
-        // Refresh specific data
         if(id === 'database') renderDBList();
+        if(id === 'combat') {
+             const sel = document.getElementById('combat-spawn-select');
+             if(sel.options.length <= 1) loadBestiaryDropdown(); 
+        }
     };
 
     window.closeModal = (id) => document.getElementById(id).style.display = 'none';
 
-    window.onload = () => {
-        initCampaign();
-        initCharacters();
-        initCombat();
-        renderDBList(); // Load initial DB tab
-    };
+    async function loadBestiaryDropdown() {
+        const sel = document.getElementById('combat-spawn-select');
+        const snap = await getDocs(collection(db, 'bestiary'));
+        sel.innerHTML = "";
+        snap.forEach(d => {
+            sel.innerHTML += `<option value="${d.id}">${d.data().Nome}</option>`;
+        });
+    }
 
     // ==========================================
-    // 3. CAMPANHA & MAPA
+    // 3. CAMPAIGN & MAP
     // ==========================================
     function initCampaign() {
         onSnapshot(doc(db, "campaign_settings", "global"), (snap) => {
@@ -608,7 +727,6 @@
                 btn.innerText = d.loja_aberta ? "LOJA ABERTA" : "LOJA FECHADA";
                 btn.className = d.loja_aberta ? "btn btn-success" : "btn btn-danger";
 
-                // Map Setup
                 if(d.mapa_url && (!mapImageObj || mapImageObj.src !== d.mapa_url)) {
                     mapImageObj = new Image();
                     mapImageObj.crossOrigin = "anonymous";
@@ -637,29 +755,26 @@
     };
 
     // ==========================================
-    // 4. CRUD ENGINE (Banco de Dados)
+    // 4. DATABASE CRUD (COM IMAGEM PARA ITENS)
     // ==========================================
     window.renderDBList = () => {
         const type = document.getElementById('db-type-select').value;
         const container = document.getElementById('db-content-list');
-        container.innerHTML = "<p>Carregando...</p>";
+        container.innerHTML = "<p style='color:#666; padding:20px;'>Carregando dados...</p>";
 
         onSnapshot(collection(db, type), (snap) => {
             container.innerHTML = "";
-            
-            // Popula selects de combate se for bestiário
-            if(type === 'bestiary') {
-                const sel = document.getElementById('combat-spawn-select');
-                sel.innerHTML = "";
-                snap.forEach(d => sel.innerHTML += `<option value="${d.id}">${d.data().Nome}</option>`);
-            }
-
             snap.forEach(doc => {
                 const d = doc.data();
-                // Info extra baseada no tipo
                 let details = "";
-                if(type === 'items') details = `$${d.Valor || 0} | ${d.Dano || ''}`;
+                if(type === 'items') details = `Valor: ${d.Valor || 0} Z`;
                 if(type === 'bestiary') details = `HP: ${d['Pontos de Vida Max']} | Nvl ${d.Nivel}`;
+
+                // Verifica se tem imagem (para Bestiário e agora Itens)
+                let imgHtml = "";
+                if(d.Imagem) {
+                    imgHtml = `<img src="${d.Imagem}" class="db-thumb" alt="${d.Nome}">`;
+                }
 
                 const card = document.createElement('div');
                 card.className = 'card';
@@ -668,9 +783,10 @@
                         <span class="card-title">${d.Nome}</span>
                         <span class="card-subtitle">${type}</span>
                     </div>
+                    ${imgHtml}
                     <div class="card-body">
-                        ${details}<br>
-                        <em>${(d.Descrição || d.Descricao || "").substring(0,60)}...</em>
+                        <strong>${details}</strong><br>
+                        <em>${(d.Descrição || d.Descricao || "").substring(0,80)}...</em>
                     </div>
                     <div class="card-actions">
                         <button class="btn btn-neutral btn-small" onclick="openEditorModal('${type}', '${doc.id}')">Editar</button>
@@ -679,6 +795,7 @@
                 `;
                 container.appendChild(card);
             });
+            if(snap.empty) container.innerHTML = "<p style='padding:20px; color:#666;'>Nenhum registro encontrado.</p>";
         });
     };
 
@@ -691,22 +808,18 @@
         const container = document.getElementById('editor-fields');
         container.innerHTML = "";
 
-        // Fetch data if editing
         let data = {};
         if(id) {
             const snap = await getDoc(doc(db, type, id));
             if(snap.exists()) data = snap.data();
         }
 
-        // Build Fields
         const schema = SCHEMAS[type] || SCHEMAS['items'];
         schema.forEach(field => {
             const wrapper = document.createElement('div');
             wrapper.className = 'input-group';
             wrapper.innerHTML = `<label>${field.l || field.k}</label>`;
-            
             const val = data[field.k] !== undefined ? data[field.k] : "";
-            
             if(field.t === 'area') {
                 wrapper.innerHTML += `<textarea id="f-${field.k}" rows="3">${val}</textarea>`;
             } else {
@@ -721,60 +834,43 @@
     window.saveEntity = async () => {
         const schema = SCHEMAS[currentEditCollection];
         const data = {};
-        
         schema.forEach(field => {
             let val = document.getElementById(`f-${field.k}`).value;
             if(field.t === 'number') val = Number(val);
             data[field.k] = val;
         });
 
-        // Garantir integridade de HP para monstros/chars
-        if(data['Pontos de Vida Max']) {
-            if(!data['Pontos de Vida Atual']) data['Pontos de Vida Atual'] = data['Pontos de Vida Max'];
-        }
-        if(data['Pontos de Mana Max']) {
-            if(!data['Pontos de Mana Atual']) data['Pontos de Mana Atual'] = data['Pontos de Mana Max'];
-        }
-
-        // Inicializar arrays para chars/monstros se for novo
-        if(['characters','bestiary'].includes(currentEditCollection) && !currentEditId) {
-            data.Itens = []; data.Magias = []; data.Habilidades = []; data.Pericias = [];
-        }
+        if(data['Pontos de Vida Max'] && !data['Pontos de Vida Atual']) data['Pontos de Vida Atual'] = data['Pontos de Vida Max'];
+        if(data['Pontos de Mana Max'] && !data['Pontos de Mana Atual']) data['Pontos de Mana Atual'] = data['Pontos de Mana Max'];
 
         try {
             if(currentEditId) await updateDoc(doc(db, currentEditCollection, currentEditId), data);
             else await addDoc(collection(db, currentEditCollection), data);
-            
             closeModal('modal-editor');
         } catch(e) { alert("Erro ao salvar: " + e.message); }
     };
 
     window.deleteEntity = async (col, id) => {
-        if(confirm("Tem certeza absoluta?")) await deleteDoc(doc(db, col, id));
+        if(confirm("Confirma exclusão permanente?")) await deleteDoc(doc(db, col, id));
     };
 
     // ==========================================
-    // 5. PERSONAGENS E LOOT
+    // 5. PLAYER MANAGEMENT & VISUAL LOOT
     // ==========================================
     function initCharacters() {
         onSnapshot(collection(db, "characters"), (snap) => {
             const container = document.getElementById('players-list');
             const mapSel = document.getElementById('map-token-select');
-            const combatSel = document.getElementById('atk-target'); // Select do modal de ataque
             
             container.innerHTML = "";
             mapSel.innerHTML = "<option value='mob'>NPC/Monstro</option>";
-            combatSel.innerHTML = "";
 
             snap.forEach(d => {
                 const p = d.data();
                 const pid = d.id;
                 
-                // Populate Selects
                 mapSel.innerHTML += `<option value="${pid}">${p.Nome}</option>`;
-                combatSel.innerHTML += `<option value="${pid}">${p.Nome}</option>`;
 
-                // Draw Card
                 const hpPct = Math.min(100, (p['Pontos de Vida Atual'] / p['Pontos de Vida Max']) * 100) || 0;
                 
                 const card = document.createElement('div');
@@ -788,13 +884,13 @@
                         <span>FOR: ${p.Força}</span><span>INT: ${p.Intelecto}</span>
                         <span>AGI: ${p.Agilidade}</span><span>VIG: ${p.Vigor}</span>
                     </div>
-                    <div class="hp-container" style="margin:10px 0;">
-                        <div class="hp-fill" style="width:${hpPct}%"></div>
-                        <div class="hp-text">${p['Pontos de Vida Atual']} / ${p['Pontos de Vida Max']} PV</div>
+                    <div class="hp-wrapper" style="margin:10px 0;">
+                        <div class="hp-bar" style="width:${hpPct}%; background:var(--success);"></div>
+                        <div class="hp-label">${p['Pontos de Vida Atual']} / ${p['Pontos de Vida Max']} PV</div>
                     </div>
                     <div class="card-actions">
                         <button class="btn btn-gold btn-small" onclick="openLootModal('${pid}', '${p.Nome}')"><i class="fas fa-gift"></i> Loot</button>
-                        <button class="btn btn-neutral btn-small" onclick="openEditorModal('characters', '${pid}')"><i class="fas fa-edit"></i> Editar</button>
+                        <button class="btn btn-neutral btn-small" onclick="openEditorModal('characters', '${pid}')"><i class="fas fa-edit"></i></button>
                         <button class="btn btn-danger btn-small" onclick="deleteEntity('characters', '${pid}')"><i class="fas fa-trash"></i></button>
                     </div>
                 `;
@@ -803,7 +899,7 @@
         });
     }
 
-    // Gerenciamento de Inventário
+    // LOOT LOGIC
     window.openLootModal = (pid, name) => {
         lootCharId = pid;
         document.getElementById('loot-char-name').innerText = name;
@@ -831,7 +927,6 @@
         const p = docSnap.data();
         
         container.innerHTML = "";
-        
         const lists = [
             {k: 'Itens', src: 'items', icon: '⚔️'},
             {k: 'Magias', src: 'spells', icon: '🔮'},
@@ -841,17 +936,36 @@
 
         for(let l of lists) {
             if(p[l.k] && p[l.k].length > 0) {
-                // Fetch names (simples) - em prod, cachearia
                 for(let id of p[l.k]) {
                     let name = id;
+                    let imgUrl = null;
                     try {
                         const iSnap = await getDoc(doc(db, l.src, id));
-                        if(iSnap.exists()) name = iSnap.data().Nome;
+                        if(iSnap.exists()) {
+                            const iData = iSnap.data();
+                            name = iData.Nome;
+                            // Se for Item, pega a imagem
+                            if(l.src === 'items' && iData.Imagem) {
+                                imgUrl = iData.Imagem;
+                            }
+                        }
                     } catch(e){}
                     
+                    // Render Visual do Item
+                    let visual = `<div class="item-placeholder">${l.icon}</div>`;
+                    if(imgUrl) {
+                        visual = `<img src="${imgUrl}" class="item-thumb" alt="item">`;
+                    }
+
                     const div = document.createElement('div');
-                    div.style.cssText = "display:flex; justify-content:space-between; padding:5px; border-bottom:1px solid #333";
-                    div.innerHTML = `<span>${l.icon} ${name}</span> <button class="btn btn-danger btn-small" onclick="removeLoot('${l.k}', '${id}')">X</button>`;
+                    div.className = 'loot-row';
+                    div.innerHTML = `
+                        <div class="loot-info">
+                            ${visual}
+                            <span>${name}</span>
+                        </div>
+                        <button class="btn btn-danger btn-small" onclick="removeLoot('${l.k}', '${id}')"><i class="fas fa-trash"></i></button>
+                    `;
                     container.appendChild(div);
                 }
             }
@@ -862,77 +976,175 @@
         const type = document.getElementById('loot-type-select').value;
         const itemId = document.getElementById('loot-item-select').value;
         const fieldMap = { 'items':'Itens', 'spells':'Magias', 'skills':'Pericias', 'abilities':'Habilidades' };
-        
-        await updateDoc(doc(db, "characters", lootCharId), {
-            [fieldMap[type]]: arrayUnion(itemId)
-        });
+        await updateDoc(doc(db, "characters", lootCharId), { [fieldMap[type]]: arrayUnion(itemId) });
         loadCurrentLoot();
     };
 
     window.removeLoot = async (field, id) => {
-        await updateDoc(doc(db, "characters", lootCharId), {
-            [field]: arrayRemove(id)
-        });
+        await updateDoc(doc(db, "characters", lootCharId), { [field]: arrayRemove(id) });
         loadCurrentLoot();
     };
 
     // ==========================================
-    // 6. SISTEMA DE COMBATE
+    // 6. COMBAT SYSTEM (UNCHANGED BUT INCLUDED)
     // ==========================================
     function initCombat() {
-        // Monstros Ativos
-        onSnapshot(collection(db, "active_encounters"), (snap) => {
-            const list = document.getElementById('combat-active-list');
-            list.innerHTML = "";
-            snap.forEach(d => {
-                const m = d.data();
-                const hpPct = (m['Pontos de Vida Atual'] / m['Pontos de Vida Max']) * 100;
-                
-                const div = document.createElement('div');
-                div.className = 'combat-entry';
-                div.innerHTML = `
-                    <div class="combat-info">
-                        <div class="combat-name">${m.Nome}</div>
-                        <div class="hp-container">
-                            <div class="hp-fill" style="width:${hpPct}%"></div>
-                            <div class="hp-text">${m['Pontos de Vida Atual']} / ${m['Pontos de Vida Max']}</div>
-                        </div>
-                    </div>
-                    <div style="display:flex; flex-direction:column; gap:5px;">
-                        <button class="btn btn-gold btn-small" onclick="prepareAttack('${d.id}', '${m.Nome}', '${m.DadoAtaque||''}')">⚔️ Atacar</button>
-                        <div style="display:flex; gap:2px;">
-                            <button class="btn btn-neutral btn-small" onclick="modCombatHP('${d.id}', -5, ${m['Pontos de Vida Atual']})">-5</button>
-                            <button class="btn btn-success btn-small" onclick="modCombatHP('${d.id}', 5, ${m['Pontos de Vida Atual']})">+5</button>
-                        </div>
-                        <button class="btn btn-danger btn-small" onclick="deleteEntity('active_encounters', '${d.id}')">💀</button>
-                    </div>
-                `;
-                list.appendChild(div);
-            });
-        });
-
-        // Resumo de Players
         onSnapshot(collection(db, "characters"), (snap) => {
             const list = document.getElementById('combat-player-summary');
             list.innerHTML = "";
+            window.playerTargets = [];
+
             snap.forEach(d => {
                 const p = d.data();
-                const hpClass = p['Pontos de Vida Atual'] < p['Pontos de Vida Max']*0.3 ? 'color:var(--danger)' : 'color:var(--success)';
-                list.innerHTML += `<div style="padding:10px; border-bottom:1px solid #333; display:flex; justify-content:space-between;">
-                    <span>${p.Nome}</span> <strong style="${hpClass}">${p['Pontos de Vida Atual']} PV</strong>
-                </div>`;
+                const pid = d.id;
+                window.playerTargets.push({ id: pid, name: p.Nome });
+
+                const lowHp = p['Pontos de Vida Atual'] < p['Pontos de Vida Max']*0.3;
+                list.innerHTML += `
+                    <div class="mini-char">
+                        <span style="color:${lowHp ? 'var(--danger)' : '#fff'}">${p.Nome}</span>
+                        <span style="font-family:monospace; color:${lowHp ? 'var(--danger)' : 'var(--success)'}">${p['Pontos de Vida Atual']} PV</span>
+                    </div>`;
             });
+            updateAllTargetDropdowns();
+        });
+
+        onSnapshot(collection(db, "active_encounters"), (snap) => {
+            const list = document.getElementById('combat-active-list');
+            list.innerHTML = "";
+            
+            if(snap.empty) {
+                list.innerHTML = "<div style='text-align:center; padding:50px; color:#444;'>Nenhum inimigo em combate.</div>";
+                return;
+            }
+
+            snap.forEach(d => {
+                const m = d.data();
+                const mid = d.id;
+                const hpPct = Math.max(0, Math.min(100, (m['Pontos de Vida Atual'] / m['Pontos de Vida Max']) * 100));
+                
+                let targetOptions = `<option value="">-- Ninguém --</option>`;
+                window.playerTargets.forEach(pt => {
+                    targetOptions += `<option value="${pt.id}">${pt.name}</option>`;
+                });
+
+                const card = document.createElement('div');
+                card.className = 'monster-card';
+                card.innerHTML = `
+                    <div class="monster-header">
+                        <span class="monster-name">${m.Nome}</span>
+                        <div style="display:flex; gap:5px;">
+                            <button class="btn btn-neutral btn-small" onclick="modCombatHP('${mid}', -1, ${m['Pontos de Vida Atual']})">-1</button>
+                            <button class="btn btn-neutral btn-small" onclick="modCombatHP('${mid}', -5, ${m['Pontos de Vida Atual']})">-5</button>
+                            <button class="btn btn-success btn-small" onclick="modCombatHP('${mid}', 5, ${m['Pontos de Vida Atual']})">+5</button>
+                            <button class="btn btn-danger btn-small btn-icon" title="Remover" onclick="deleteEntity('active_encounters', '${mid}')"><i class="fas fa-times"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="hp-wrapper">
+                        <div class="hp-bar" style="width:${hpPct}%"></div>
+                        <div class="hp-label">${m['Pontos de Vida Atual']} / ${m['Pontos de Vida Max']} PV</div>
+                    </div>
+
+                    <div class="dice-container-grid">
+                        <div class="dice-panel">
+                            <div class="dice-row">
+                                <span class="dice-label">ATAQUE</span>
+                                <input type="number" id="atk-qty-${mid}" class="d-input" value="1" min="1">
+                                <span style="color:#666">d</span>
+                                <select id="atk-face-${mid}" class="d-select">
+                                    <option value="20" selected>20</option>
+                                    <option value="4">4</option>
+                                    <option value="6">6</option>
+                                    <option value="8">8</option>
+                                    <option value="10">10</option>
+                                    <option value="12">12</option>
+                                    <option value="100">100</option>
+                                </select>
+                            </div>
+                            <div class="dice-row">
+                                <span class="dice-label">MOD +</span>
+                                <input type="number" id="atk-mod-${mid}" class="d-input" value="0">
+                                <button class="btn btn-gold btn-small" style="flex:1;" onclick="rollMonsterDice('${mid}', '${m.Nome}', 'atk')">ROLAR</button>
+                            </div>
+                        </div>
+
+                        <div class="dice-panel" style="border-color:#555;">
+                            <div style="margin-bottom:8px; display:flex; gap:5px; align-items:center;">
+                                <label style="font-size:0.65rem; color:#888;">ALVO:</label>
+                                <select id="target-${mid}" class="target-selector d-select" style="flex:1; width:auto; text-align:left;">
+                                    ${targetOptions}
+                                </select>
+                            </div>
+
+                            <div class="dice-row">
+                                <span class="dice-label" style="color:var(--danger)">DANO</span>
+                                <input type="number" id="dmg-qty-${mid}" class="d-input" value="1" min="1">
+                                <span style="color:#666">d</span>
+                                <select id="dmg-face-${mid}" class="d-select">
+                                    <option value="4">4</option>
+                                    <option value="6" selected>6</option>
+                                    <option value="8">8</option>
+                                    <option value="10">10</option>
+                                    <option value="12">12</option>
+                                    <option value="20">20</option>
+                                </select>
+                            </div>
+                            <div class="dice-row">
+                                <span class="dice-label" style="color:var(--danger)">MOD +</span>
+                                <input type="number" id="dmg-mod-${mid}" class="d-input" value="0">
+                                <button class="btn btn-danger btn-small" style="flex:1;" onclick="rollMonsterDice('${mid}', '${m.Nome}', 'dmg')">ROLAR</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+        });
+
+        const q = query(collection(db, "logs"), orderBy("timestamp", "desc"), limit(20));
+        onSnapshot(q, (snap) => {
+            const display = document.getElementById('combat-log-display');
+            display.innerHTML = "";
+            const docs = [];
+            snap.forEach(d => docs.push(d.data()));
+            docs.reverse().forEach(log => {
+                let content = "";
+                if(log.type === 'roll') {
+                   const color = log.isCrit ? 'var(--gold)' : (log.isFumble ? 'var(--danger)' : '#bbb');
+                   let dmgInfo = "";
+                   if(log.damageApplied) {
+                       dmgInfo = `<br><span style="color:var(--danger); font-size:0.9em;"> ➤ ${log.damageApplied}</span>`;
+                   }
+                   content = `<span style="color:var(--gold-dim)">[${log.charName}]</span> rolou <strong>${log.actionName}</strong>: <span style="color:${color}; font-weight:bold;">${log.total}</span> <span style="font-size:0.7em; color:#666;">(${log.detail})</span>${dmgInfo}`;
+                } else if (log.type === 'chat') {
+                   content = `<span style="color:#fff; font-weight:bold;">${log.charName}:</span> <span style="color:#ddd;">${log.message}</span>`;
+                }
+                display.innerHTML += `<p>${content}</p>`;
+            });
+            display.scrollTop = display.scrollHeight;
+        });
+    }
+
+    window.updateAllTargetDropdowns = () => {
+        const selects = document.querySelectorAll('.target-selector');
+        selects.forEach(sel => {
+            const currentVal = sel.value;
+            let opts = `<option value="">-- Ninguém --</option>`;
+            window.playerTargets.forEach(pt => {
+                opts += `<option value="${pt.id}">${pt.name}</option>`;
+            });
+            sel.innerHTML = opts;
+            sel.value = currentVal; 
         });
     }
 
     window.spawnCombatant = async () => {
         const mobId = document.getElementById('combat-spawn-select').value;
         if(!mobId) return;
-        
         const snap = await getDoc(doc(db, "bestiary", mobId));
         if(snap.exists()) {
             const data = snap.data();
-            // Cria cópia viva
             await addDoc(collection(db, "active_encounters"), {
                 ...data,
                 'Pontos de Vida Atual': data['Pontos de Vida Max'],
@@ -948,87 +1160,82 @@
     };
 
     window.resetCombat = async () => {
-        if(confirm("Limpar todo o combate?")) {
+        if(confirm("Deseja realmente limpar todos os monstros da batalha?")) {
             const snap = await getDocs(collection(db, "active_encounters"));
             snap.forEach(d => deleteDoc(d.ref));
         }
     };
 
-    // ATAQUE
-    window.prepareAttack = (mobId, mobName, diceStr) => {
-        activeAttackerId = mobId;
-        document.getElementById('atk-attacker').innerText = mobName;
-        if(diceStr) document.getElementById('atk-dice-str').value = diceStr;
-        document.getElementById('modal-attack').style.display = 'flex';
-    };
+    window.rollMonsterDice = async (mid, monsterName, type) => {
+        const qty = parseInt(document.getElementById(`${type}-qty-${mid}`).value) || 1;
+        const face = parseInt(document.getElementById(`${type}-face-${mid}`).value) || 20;
+        const mod = parseInt(document.getElementById(`${type}-mod-${mid}`).value) || 0;
 
-    window.simulateRoll = () => {
-        const str = document.getElementById('atk-dice-str').value;
-        // Parser simples: XdY+Z
-        try {
-            // Regex básico para pegar 1d20, +5, etc.
-            // Para simplificar, vamos assumir que o mestre digita algo ou usamos eval seguro de soma
-            // AQUI: Implementação dummy robusta
-            let total = 0;
-            const parts = str.toLowerCase().split('+');
-            let log = [];
-            
-            parts.forEach(p => {
-                p = p.trim();
-                if(p.includes('d')) {
-                    const [count, sides] = p.split('d').map(Number);
-                    for(let i=0; i<(count||1); i++) {
-                        let r = Math.floor(Math.random()*sides)+1;
-                        total += r;
-                        log.push(`d${sides}(${r})`);
-                    }
-                } else {
-                    const n = parseInt(p);
-                    if(!isNaN(n)) { total += n; log.push(n); }
+        let total = 0;
+        let rolls = [];
+        let isCrit = false;
+        let isFumble = false;
+
+        for(let i=0; i<qty; i++) {
+            const r = Math.floor(Math.random() * face) + 1;
+            rolls.push(r);
+            total += r;
+            if(face === 20) {
+                if(r === 20) isCrit = true;
+                if(r === 1) isFumble = true;
+            }
+        }
+        total += mod;
+
+        const detailStr = `[${rolls.join(', ')}] ${mod >=0 ? '+'+mod : mod}`;
+        const actionLabel = type === 'atk' ? "Ataque" : "Dano";
+        
+        let damageMsg = null;
+
+        if(type === 'dmg') {
+            const targetId = document.getElementById(`target-${mid}`).value;
+            if(targetId) {
+                const pSnap = await getDoc(doc(db, "characters", targetId));
+                if(pSnap.exists()) {
+                    const pData = pSnap.data();
+                    const oldHP = pData['Pontos de Vida Atual'];
+                    const newHP = Math.max(0, oldHP - total);
+                    await updateDoc(doc(db, "characters", targetId), {
+                        'Pontos de Vida Atual': newHP
+                    });
+                    damageMsg = `Causou ${total} de dano em ${pData.Nome} (PV: ${oldHP} -> ${newHP})`;
                 }
-            });
-            
-            document.getElementById('atk-roll-result').innerText = `Rolagem: ${total} [${log.join('+')}]`;
-            // O mestre pode ver isso e decidir quanto de dano colocar no input
-            document.getElementById('atk-value').value = total; // Sugestão
-        } catch(e) { 
-            document.getElementById('atk-roll-result').innerText = "Erro no dado"; 
+            }
         }
+
+        await addDoc(collection(db, "logs"), {
+            charName: monsterName,
+            actionName: actionLabel,
+            total: total,
+            detail: detailStr,
+            isCrit: isCrit,
+            isFumble: isFumble,
+            type: 'roll',
+            damageApplied: damageMsg, 
+            timestamp: serverTimestamp()
+        });
     };
 
-    window.confirmAttack = async () => {
-        const targetId = document.getElementById('atk-target').value;
-        const damage = parseInt(document.getElementById('atk-value').value);
-        
-        if(!targetId || isNaN(damage)) return alert("Dados inválidos");
-
-        const targetRef = doc(db, "characters", targetId);
-        const snap = await getDoc(targetRef);
-        
-        if(snap.exists()) {
-            const currentHP = snap.data()['Pontos de Vida Atual'];
-            const newHP = Math.max(0, currentHP - damage);
-            
-            await updateDoc(targetRef, { 'Pontos de Vida Atual': newHP });
-            
-            await addDoc(collection(db, "logs"), {
-                charName: "Mestre", 
-                actionName: `Atacou ${p.Nome}`,
-                total: damage,
-                detail: detailLog,
-                isCrit: false, 
-                isFumble: false,
-                type: 'roll',
-                timestamp: serverTimestamp()
-            });
-
-            closeModal('modal-attack');
-            alert("Ataque Confirmado e Registrado!");
-        }
+    window.sendCustomChat = async () => {
+        const sender = document.getElementById('chat-sender-name').value || "Narrador";
+        const msg = document.getElementById('chat-message-text').value;
+        if(!msg.trim()) return;
+        await addDoc(collection(db, "logs"), {
+            charName: sender,
+            message: msg,
+            type: 'chat',
+            timestamp: serverTimestamp()
+        });
+        document.getElementById('chat-message-text').value = "";
     };
 
     // ==========================================
-    // 7. MAPA (Canvas Engine)
+    // 7. MAP ENGINE
     // ==========================================
     let canvas, ctx, mapImg, tokens = {}, view = {x:0, y:0, zoom:1};
     let isDrag = false, dragId = null, lastPos = {x:0, y:0}, placingToken = false;
@@ -1046,7 +1253,6 @@
 
             if(placingToken) { finishPlaceToken(wx, wy); return; }
 
-            // Check collision
             let hit = null;
             Object.keys(tokens).forEach(k => {
                 const t = tokens[k];
@@ -1055,7 +1261,7 @@
             });
 
             if(hit) { isDrag = true; dragId = hit; }
-            else { isDrag = true; } // Pan
+            else { isDrag = true; } 
             lastPos = {x: e.clientX, y: e.clientY};
         };
 
@@ -1085,7 +1291,7 @@
         canvas.onwheel = e => {
             e.preventDefault();
             view.zoom += e.deltaY * -0.001;
-            view.zoom = Math.max(0.1, view.zoom);
+            view.zoom = Math.max(0.1, Math.min(view.zoom, 5));
             renderMap();
         };
     }
@@ -1100,17 +1306,13 @@
 
         if(mapImg) ctx.drawImage(mapImg, 0, 0);
 
-        // Draw Tokens
         Object.values(tokens).forEach(t => {
             const r = (t.size || 60) / 2;
             ctx.save();
             ctx.beginPath(); ctx.arc(t.x, t.y, r, 0, Math.PI*2);
-            ctx.fillStyle = "#555"; ctx.fill();
-            
-            // Se tivesse imagem no token (complexo carregar assincrono aqui, usando placeholder colorido)
+            ctx.fillStyle = "#333"; ctx.fill();
             ctx.strokeStyle = varCSS('--gold'); ctx.lineWidth = 3; ctx.stroke();
             
-            // Name
             ctx.fillStyle = "white"; ctx.font = "bold 14px Arial"; ctx.textAlign="center";
             ctx.shadowColor="black"; ctx.shadowBlur=4;
             ctx.fillText(t.name || "NPC", t.x, t.y - r - 8);
@@ -1138,7 +1340,7 @@
         const img = document.getElementById('map-token-img').value;
         
         if(!name && sel.value !== 'mob') name = sel.options[sel.selectedIndex].text;
-        if(!name) name = "Token";
+        if(!name) name = "Inimigo";
 
         const id = "tk_" + Date.now();
         tokens[id] = { x:x, y:y, size:60, name:name, img:img };
@@ -1159,8 +1361,14 @@
 
     function varCSS(v) { return getComputedStyle(document.body).getPropertyValue(v).trim(); }
 
-    // Start Canvas
-    setTimeout(initMapEngine, 500);
+    window.onload = () => {
+        initCampaign();
+        initCharacters();
+        initCombat();
+        loadBestiaryDropdown();
+        renderDBList();
+        setTimeout(initMapEngine, 500);
+    };
 
 </script>
 </body>
