@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Limpar Logs - Zatur RPG</title>
+  <style>
+    body {
+      background: #121212;
+      color: #eee;
+      font-family: Arial, sans-serif;
+      display: flex;
+      height: 100vh;
+      justify-content: center;
+      align-items: center;
+    }
+    button {
+      padding: 15px 30px;
+      font-size: 18px;
+      background: darkred;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 6px;
+    }
+    button:hover {
+      background: red;
+    }
+  </style>
+</head>
+<body>
+
+<button id="limpar">🗑️ Apagar TODOS os logs</button>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  import { 
+    getFirestore, 
+    collection, 
+    getDocs, 
+    deleteDoc, 
+    doc 
+  } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAgYVod9B99WIc_QysFx73htOf9O8XtuE8",
+    authDomain: "zatur-rpg.firebaseapp.com",
+    projectId: "zatur-rpg",
+    storageBucket: "zatur-rpg.firebasestorage.app",
+    messagingSenderId: "797058283992",
+    appId: "1:797058283992:web:7132e71691a225c1255aad"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  document.getElementById("limpar").onclick = async () => {
+    if (!confirm("Tem CERTEZA que deseja apagar TODOS os logs?")) return;
+
+    const logsRef = collection(db, "logs");
+    const snapshot = await getDocs(logsRef);
+
+    let count = 0;
+    for (const d of snapshot.docs) {
+      await deleteDoc(doc(db, "logs", d.id));
+      count++;
+    }
+
+    alert(`🔥 ${count} logs apagados com sucesso!`);
+  };
+</script>
+
+</body>
+</html>
