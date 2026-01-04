@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -429,6 +430,38 @@
         .text-gold { color: var(--gold); }
         .text-danger { color: var(--danger); }
         
+                /* =========================================
+        9. NOVOS ESTILOS (BANCO E ALIADOS)
+        ========================================= */
+        /* Estilo para Aliados no Combate (Borda Azul/Mana) */
+        .monster-card.ally-card {
+            border-left-color: var(--mana);
+        }
+        .monster-card.ally-card:hover {
+            border-left-color: #4a9eff;
+        }
+
+        /* Botões rápidos de HP/Mana */
+        .stat-mod-row {
+            display: flex; gap: 2px; justify-content: center; margin-top: 5px;
+        }
+        .btn-micro {
+            padding: 2px 5px; font-size: 0.65rem; border: 1px solid #333;
+            background: #222; color: #ccc; cursor: pointer;
+        }
+        .btn-micro:hover { background: #444; color: #fff; }
+        .btn-micro.plus { border-color: #15803d; color: #86efac; }
+        .btn-micro.minus { border-color: #b91c1c; color: #fca5a5; }
+
+        /* Grid do Banco */
+        .bank-row {
+            display: flex; justify-content: space-between; align-items: center;
+            background: #1a1a1a; padding: 15px; border-radius: 6px;
+            border-bottom: 1px solid #333; margin-bottom: 10px;
+        }
+        .zeuros-display {
+            font-family: 'Cinzel'; color: var(--gold); font-size: 1.2rem; margin-right: 15px;
+        }
     </style>
 </head>
 <body>
@@ -439,6 +472,7 @@
         <button class="active" onclick="setView('dashboard')"><i class="fas fa-tachometer-alt"></i> Campanha & Mapa</button>
         <button onclick="setView('database')"><i class="fas fa-database"></i> Banco de Dados</button>
         <button onclick="setView('characters')"><i class="fas fa-users"></i> Personagens</button>
+        <button onclick="setView('bank')"><i class="fas fa-coins"></i> Banco (Zeuros)</button> 
         <button onclick="setView('combat')"><i class="fas fa-swords"></i> Mesa de Combate</button>
     </nav>
     <div class="server-status">
@@ -451,6 +485,14 @@
     <div id="dashboard" class="section active">
         <h2>Painel de Controle <button class="btn btn-neutral btn-small" onclick="saveGlobalSettings()"><i class="fas fa-save"></i> Salvar Tudo</button></h2>
         
+
+        
+        <div>
+            <button class="btn btn-danger btn-small" onclick="clearAllLogs()"><i class="fas fa-trash"></i> Limpar Logs</button>
+            <button class="btn btn-neutral btn-small" onclick="saveGlobalSettings()"><i class="fas fa-save"></i> Salvar Tudo</button>
+        </div>
+        
+
         <div class="form-grid">
             <div class="input-group">
                 <label>Missão Atual (Exibida aos Players)</label>
@@ -514,6 +556,7 @@
                         <option value="spells">🔮 Magias</option>
                         <option value="skills">🎲 Perícias</option>
                         <option value="abilities">⚡ Habilidades</option>
+                        <option value="allies">🛡️ Aliados (NPCs)</option>
                     </select>
                 </div>
                 <button class="btn btn-gold" onclick="openEditorModal()" style="height:45px;">+ Criar Novo</button>
@@ -532,15 +575,32 @@
         <div id="players-list" class="card-grid"></div>
     </div>
 
+    <div id="bank" class="section">
+        <h2>Banco de Zeuros (Gringotes)</h2>
+        <div style="background:var(--bg-card); padding:15px; margin-bottom:20px; border-radius:8px; border:1px solid var(--gold-dim);">
+            <p style="margin:0; color:#aaa; font-size:0.9rem;">
+                Use esta área para adicionar recompensas de missões ou cobrar pagamentos de loja. 
+                As alterações são salvas automaticamente no perfil do personagem.
+            </p>
+        </div>
+        <div id="bank-list">Carregando contas...</div>
+    </div>
+
     <div id="combat" class="section">
         <h2>Gerenciador de Batalha</h2>
         
-        <div style="background:var(--bg-card); padding:15px; border-radius:8px; margin-bottom:20px; border:1px solid var(--danger); display:flex; gap:15px; align-items:flex-end;">
+        <div style="background:var(--bg-card); padding:15px; border-radius:8px; margin-bottom:20px; border:1px solid #333; display:flex; gap:15px; align-items:flex-end;">
             <div class="input-group" style="flex:1;">
-                <label>Invocar Inimigo (Do Bestiário)</label>
-                <select id="combat-spawn-select"></select>
+                <label>Invocar Entidade</label>
+                <div style="display:flex; gap:5px;">
+                    <select id="combat-spawn-type" onchange="loadCombatDropdown()" style="width:120px;">
+                        <option value="bestiary">Inimigo</option>
+                        <option value="allies">Aliado</option>
+                    </select>
+                    <select id="combat-spawn-select" style="flex:1;"></select>
+                </div>
             </div>
-            <button class="btn btn-danger" onclick="spawnCombatant()">Invocar</button>
+            <button class="btn btn-gold" onclick="spawnCombatant()">Invocar</button>
             <button class="btn btn-neutral" onclick="resetCombat()">Limpar Campo</button>
         </div>
 
@@ -627,6 +687,8 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, doc, collection, addDoc, getDocs, updateDoc, onSnapshot, arrayUnion, arrayRemove, deleteDoc, setDoc, getDoc, serverTimestamp, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+    
+
     const firebaseConfig = {
         apiKey: "AIzaSyAgYVod9B99WIc_QysFx73htOf9O8XtuE8",
         authDomain: "zatur-rpg.firebaseapp.com",
@@ -670,10 +732,20 @@
             {k:'Nome', t:'text'}, {k:'Dado', t:'text', l:'Atributo Base'}, {k:'Bonus', t:'number'}, 
             {k:'Dano', t:'text'}, {k:'Descrição', t:'area'}
         ],
+
+        allies: [
+        {k:'Nome', t:'text'}, {k:'Nivel', t:'number'}, {k:'Imagem', t:'text'},
+        {k:'Pontos de Vida Max', t:'number'}, {k:'Pontos de Mana Max', t:'number'},
+        {k:'CA', t:'number', l:'Classe de Armadura'},
+        {k:'Dado', t:'text'}, {k:'Bonus', t:'number'}, {k:'Dano', t:'text'}, // Campos de ataque para o aliado
+        {k:'Descricao', t:'area', l:'Descrição / Habilidades'}
+    ],
         abilities: [
             {k:'Nome', t:'text'}, {k:'Nivel', t:'number'}, {k:'Dado', t:'text'}, {k:'Bonus', t:'number'}, 
             {k:'Dano', t:'text'}, {k:'Descrição', t:'area'}
         ]
+
+        
     };
 
     // Global State
@@ -703,14 +775,17 @@
 
     window.closeModal = (id) => document.getElementById(id).style.display = 'none';
 
-    async function loadBestiaryDropdown() {
+    window.loadCombatDropdown = async () => {
+        const type = document.getElementById('combat-spawn-type') ? document.getElementById('combat-spawn-type').value : 'bestiary';
         const sel = document.getElementById('combat-spawn-select');
-        const snap = await getDocs(collection(db, 'bestiary'));
+        sel.innerHTML = "<option>Carregando...</option>";
+
+        const snap = await getDocs(collection(db, type));
         sel.innerHTML = "";
         snap.forEach(d => {
             sel.innerHTML += `<option value="${d.id}">${d.data().Nome}</option>`;
         });
-    }
+};
 
     // ==========================================
     // 3. CAMPAIGN & MAP
@@ -862,16 +937,37 @@
             const container = document.getElementById('players-list');
             const mapSel = document.getElementById('map-token-select');
             
+            window.playerTargets = [];
+
             container.innerHTML = "";
+            // Reset e carrega Select do mapa
             mapSel.innerHTML = "<option value='mob'>NPC/Monstro</option>";
+
+            
+
+
+            // Renderiza lista do Banco também (função auxiliar)
+            renderBankList(snap);
 
             snap.forEach(d => {
                 const p = d.data();
                 const pid = d.id;
+
+                window.playerTargets.push({
+                    id: pid,
+                    name: p.Nome
+                });
                 
                 mapSel.innerHTML += `<option value="${pid}">${p.Nome}</option>`;
 
-                const hpPct = Math.min(100, (p['Pontos de Vida Atual'] / p['Pontos de Vida Max']) * 100) || 0;
+                // Cálculos de Porcentagem
+                const hpCur = p['Pontos de Vida Atual'] || 0;
+                const hpMax = p['Pontos de Vida Max'] || 1;
+                const mpCur = p['Pontos de Mana Atual'] || 0;
+                const mpMax = p['Pontos de Mana Max'] || 1; // Evitar div por 0
+                
+                const hpPct = Math.min(100, (hpCur / hpMax) * 100);
+                const mpPct = Math.min(100, (mpCur / mpMax) * 100);
                 
                 const card = document.createElement('div');
                 card.className = 'card';
@@ -880,14 +976,29 @@
                         <span class="card-title">${p.Nome}</span>
                         <span class="card-subtitle">Nvl ${p.Nivel} ${p.Classe}</span>
                     </div>
-                    <div class="card-stats-grid">
+                    
+                    <div class="hp-wrapper" style="margin-top:10px;">
+                        <div class="hp-bar" style="width:${hpPct}%; background:var(--danger);"></div>
+                        <div class="hp-label">${hpCur} / ${hpMax} PV</div>
+                    </div>
+                    <div class="stat-mod-row">
+                        ${renderStatButtons(pid, 'Pontos de Vida Atual', hpCur)}
+                    </div>
+
+                    <div class="hp-wrapper" style="margin-top:8px; border-color:#1e4d8c;">
+                        <div class="hp-bar" style="width:${mpPct}%; background:var(--mana);"></div>
+                        <div class="hp-label">${mpCur} / ${mpMax} PM</div>
+                    </div>
+                    <div class="stat-mod-row">
+                        ${renderStatButtons(pid, 'Pontos de Mana Atual', mpCur)}
+                    </div>
+
+                    <div class="card-stats-grid" style="margin-top:15px;">
                         <span>FOR: ${p.Força}</span><span>INT: ${p.Intelecto}</span>
                         <span>AGI: ${p.Agilidade}</span><span>VIG: ${p.Vigor}</span>
+                        <span>MAN: ${p.Mana}</span>
                     </div>
-                    <div class="hp-wrapper" style="margin:10px 0;">
-                        <div class="hp-bar" style="width:${hpPct}%; background:var(--success);"></div>
-                        <div class="hp-label">${p['Pontos de Vida Atual']} / ${p['Pontos de Vida Max']} PV</div>
-                    </div>
+
                     <div class="card-actions">
                         <button class="btn btn-gold btn-small" onclick="openLootModal('${pid}', '${p.Nome}')"><i class="fas fa-gift"></i> Loot</button>
                         <button class="btn btn-neutral btn-small" onclick="openEditorModal('characters', '${pid}')"><i class="fas fa-edit"></i></button>
@@ -898,6 +1009,27 @@
             });
         });
     }
+
+    // Helpers para os botões de stat
+    window.renderStatButtons = (id, field, curVal) => {
+        return `
+            <button class="btn-micro minus" onclick="modCharStat('${id}', '${field}', -10)">-10</button>
+            <button class="btn-micro minus" onclick="modCharStat('${id}', '${field}', -5)">-5</button>
+            <button class="btn-micro minus" onclick="modCharStat('${id}', '${field}', -1)">-1</button>
+            <button class="btn-micro plus" onclick="modCharStat('${id}', '${field}', 1)">+1</button>
+            <button class="btn-micro plus" onclick="modCharStat('${id}', '${field}', 5)">+5</button>
+            <button class="btn-micro plus" onclick="modCharStat('${id}', '${field}', 10)">+10</button>
+        `;
+    }
+
+    window.modCharStat = async (id, field, val) => {
+        const docRef = doc(db, "characters", id);
+        const snap = await getDoc(docRef);
+        if(snap.exists()) {
+            const current = snap.data()[field] || 0;
+            await updateDoc(docRef, { [field]: current + val });
+        }
+    };
 
     // LOOT LOGIC
     window.openLootModal = (pid, name) => {
@@ -985,146 +1117,178 @@
         loadCurrentLoot();
     };
 
+    // --- SISTEMA DE BANCO ---
+    window.renderBankList = (snap) => {
+        const list = document.getElementById('bank-list');
+        if(!list) return; // Se não estiver na view
+        list.innerHTML = "";
+        
+        snap.forEach(d => {
+            const p = d.data();
+            const div = document.createElement('div');
+            div.className = 'bank-row';
+            div.innerHTML = `
+                <div style="display:flex; align-items:center; gap:15px;">
+                    <div style="width:40px; height:40px; background:#333; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; color:var(--gold);">
+                        ${p.Nome.substring(0,2).toUpperCase()}
+                    </div>
+                    <div>
+                        <div style="font-weight:bold; font-size:1.1rem;">${p.Nome}</div>
+                        <div style="font-size:0.8rem; color:#888;">Nvl ${p.Nivel}</div>
+                    </div>
+                </div>
+                <div style="display:flex; align-items:center;">
+                    <span class="zeuros-display"><i class="fas fa-coins"></i> ${p.Zeuros || 0}</span>
+                    <div class="input-group" style="flex-direction:row; gap:5px;">
+                        <input type="number" id="bank-val-${d.id}" placeholder="Valor" style="width:80px;">
+                        <button class="btn btn-success btn-small" onclick="modBank('${d.id}', 1)">DEPOSITAR (+)</button>
+                        <button class="btn btn-danger btn-small" onclick="modBank('${d.id}', -1)">SACAR (-)</button>
+                    </div>
+                </div>
+            `;
+            list.appendChild(div);
+        });
+    };
+
+    window.modBank = async (id, multiplier) => {
+        const input = document.getElementById(`bank-val-${id}`);
+        const amount = parseInt(input.value);
+        if(!amount || amount <= 0) return alert("Insira um valor válido.");
+        
+        const ref = doc(db, "characters", id);
+        const snap = await getDoc(ref);
+        const current = snap.data().Zeuros || 0;
+        
+        await updateDoc(ref, { Zeuros: current + (amount * multiplier) });
+        input.value = "";
+    };
+
+    // --- LIMPEZA DE LOGS ---
+    window.clearAllLogs = async () => {
+        if(confirm("ATENÇÃO: Isso apagará TODO o histórico do chat e rolagens. Confirma?")) {
+            const snap = await getDocs(collection(db, "logs"));
+            const promises = [];
+            snap.forEach(d => promises.push(deleteDoc(d.ref)));
+            await Promise.all(promises);
+            alert("Logs limpos com sucesso.");
+        }
+    };
+
     // ==========================================
     // 6. COMBAT SYSTEM (UNCHANGED BUT INCLUDED)
     // ==========================================
     function initCombat() {
-        onSnapshot(collection(db, "characters"), (snap) => {
-            const list = document.getElementById('combat-player-summary');
-            list.innerHTML = "";
-            window.playerTargets = [];
+        onSnapshot(collection(db, "active_encounters"), (snap) => {
+        const list = document.getElementById('combat-active-list');
+        list.innerHTML = "";
 
-            snap.forEach(d => {
-                const p = d.data();
-                const pid = d.id;
-                window.playerTargets.push({ id: pid, name: p.Nome });
+        // Separa quem é monstro e quem é aliado para montar os targets
+        let activeMonsters = [];
+        let activeAllies = [];
 
-                const lowHp = p['Pontos de Vida Atual'] < p['Pontos de Vida Max']*0.3;
-                list.innerHTML += `
-                    <div class="mini-char">
-                        <span style="color:${lowHp ? 'var(--danger)' : '#fff'}">${p.Nome}</span>
-                        <span style="font-family:monospace; color:${lowHp ? 'var(--danger)' : 'var(--success)'}">${p['Pontos de Vida Atual']} PV</span>
-                    </div>`;
-            });
-            updateAllTargetDropdowns();
+        snap.forEach(d => {
+            const data = d.data();
+            if(data.isAlly) activeAllies.push({ id: d.id, name: data.Nome });
+            else activeMonsters.push({ id: d.id, name: data.Nome });
         });
 
-        onSnapshot(collection(db, "active_encounters"), (snap) => {
-            const list = document.getElementById('combat-active-list');
-            list.innerHTML = "";
-            
-            if(snap.empty) {
-                list.innerHTML = "<div style='text-align:center; padding:50px; color:#444;'>Nenhum inimigo em combate.</div>";
-                return;
+        if(snap.empty) {
+            list.innerHTML = "<div style='text-align:center; padding:50px; color:#444;'>Campo de batalha vazio.</div>";
+            return;
+        }
+
+        snap.forEach(d => {
+            const m = d.data();
+            const mid = d.id;
+            const hpPct = Math.max(0, Math.min(100, (m['Pontos de Vida Atual'] / m['Pontos de Vida Max']) * 100));
+
+            // LÓGICA DE ALVOS
+            let targetOptions = `<option value="">-- Ninguém --</option>`;
+
+            if(m.isAlly) {
+                // Aliado ataca Monstros
+                activeMonsters.forEach(t => targetOptions += `<option value="${t.id}">[Inimigo] ${t.name}</option>`);
+            } else {
+                // Monstro ataca Players E Aliados
+                window.playerTargets.forEach(pt => targetOptions += `<option value="${pt.id}">[Player] ${pt.name}</option>`);
+                activeAllies.forEach(al => targetOptions += `<option value="${al.id}">[Aliado] ${al.name}</option>`);
             }
 
-            snap.forEach(d => {
-                const m = d.data();
-                const mid = d.id;
-                const hpPct = Math.max(0, Math.min(100, (m['Pontos de Vida Atual'] / m['Pontos de Vida Max']) * 100));
-                
-                let targetOptions = `<option value="">-- Ninguém --</option>`;
-                window.playerTargets.forEach(pt => {
-                    targetOptions += `<option value="${pt.id}">${pt.name}</option>`;
-                });
+            // Visual diferente se for aliado
+            const cardClass = m.isAlly ? "monster-card ally-card" : "monster-card";
+            const badge = m.isAlly ? `<span class="tag" style="background:var(--mana); color:#fff;">ALIADO</span>` : `<span class="tag text-danger">INIMIGO</span>`;
 
-                const card = document.createElement('div');
-                card.className = 'monster-card';
-                card.innerHTML = `
-                    <div class="monster-header">
-                        <span class="monster-name">${m.Nome}</span>
-                        <div style="display:flex; gap:5px;">
-                            <button class="btn btn-neutral btn-small" onclick="modCombatHP('${mid}', -1, ${m['Pontos de Vida Atual']})">-1</button>
-                            <button class="btn btn-neutral btn-small" onclick="modCombatHP('${mid}', -5, ${m['Pontos de Vida Atual']})">-5</button>
-                            <button class="btn btn-success btn-small" onclick="modCombatHP('${mid}', 5, ${m['Pontos de Vida Atual']})">+5</button>
-                            <button class="btn btn-danger btn-small btn-icon" title="Remover" onclick="deleteEntity('active_encounters', '${mid}')"><i class="fas fa-times"></i></button>
+            const card = document.createElement('div');
+            card.className = cardClass;
+            card.innerHTML = `
+                <div class="monster-header">
+                    <span class="monster-name">${badge} ${m.Nome}</span>
+                    <div style="display:flex; gap:5px;">
+                        <button class="btn btn-neutral btn-small" onclick="modCombatHP('${mid}', -1, ${m['Pontos de Vida Atual']})">-1</button>
+                        <button class="btn btn-neutral btn-small" onclick="modCombatHP('${mid}', -5, ${m['Pontos de Vida Atual']})">-5</button>
+                        <button class="btn btn-success btn-small" onclick="modCombatHP('${mid}', 5, ${m['Pontos de Vida Atual']})">+5</button>
+                        <button class="btn btn-danger btn-small btn-icon" title="Remover" onclick="deleteEntity('active_encounters', '${mid}')"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>
+
+                <div class="hp-wrapper">
+                    <div class="hp-bar" style="width:${hpPct}%; background:${m.isAlly ? 'var(--mana)' : 'var(--danger)'}"></div>
+                    <div class="hp-label">${m['Pontos de Vida Atual']} / ${m['Pontos de Vida Max']} PV</div>
+                </div>
+
+                <div class="dice-container-grid">
+                    <div class="dice-panel">
+                        <div class="dice-row">
+                            <span class="dice-label">ATAQUE</span>
+                            <input type="number" id="atk-qty-${mid}" class="d-input" value="1" min="1">
+                            <span style="color:#666">d</span>
+                            <select id="atk-face-${mid}" class="d-select">
+                                <option value="20" selected>d20</option>
+                                <option value="4">d4</option>
+                                <option value="6">d6</option>
+                                <option value="8">d8</option>
+                                <option value="10">d10</option>
+                                <option value="12">d12</option>
+                            </select>
+                        </div>
+                        <div class="dice-row">
+                            <span class="dice-label">MOD +</span>
+                            <input type="number" id="atk-mod-${mid}" class="d-input" value="${m.Bonus || 0}">
+                            <button class="btn btn-gold btn-small" style="flex:1;" onclick="rollMonsterDice('${mid}', '${m.Nome}', 'atk')">ROLAR</button>
                         </div>
                     </div>
 
-                    <div class="hp-wrapper">
-                        <div class="hp-bar" style="width:${hpPct}%"></div>
-                        <div class="hp-label">${m['Pontos de Vida Atual']} / ${m['Pontos de Vida Max']} PV</div>
-                    </div>
-
-                    <div class="dice-container-grid">
-                        <div class="dice-panel">
-                            <div class="dice-row">
-                                <span class="dice-label">ATAQUE</span>
-                                <input type="number" id="atk-qty-${mid}" class="d-input" value="1" min="1">
-                                <span style="color:#666">d</span>
-                                <select id="atk-face-${mid}" class="d-select">
-                                    <option value="20" selected>20</option>
-                                    <option value="4">4</option>
-                                    <option value="6">6</option>
-                                    <option value="8">8</option>
-                                    <option value="10">10</option>
-                                    <option value="12">12</option>
-                                    <option value="100">100</option>
-                                </select>
-                            </div>
-                            <div class="dice-row">
-                                <span class="dice-label">MOD +</span>
-                                <input type="number" id="atk-mod-${mid}" class="d-input" value="0">
-                                <button class="btn btn-gold btn-small" style="flex:1;" onclick="rollMonsterDice('${mid}', '${m.Nome}', 'atk')">ROLAR</button>
-                            </div>
+                    <div class="dice-panel" style="border-color:#555;">
+                        <div style="margin-bottom:8px; display:flex; gap:5px; align-items:center;">
+                            <label style="font-size:0.65rem; color:#888;">ALVO:</label>
+                            <select id="target-${mid}" class="d-select" style="flex:1; width:auto; text-align:left;">
+                                ${targetOptions}
+                            </select>
                         </div>
 
-                        <div class="dice-panel" style="border-color:#555;">
-                            <div style="margin-bottom:8px; display:flex; gap:5px; align-items:center;">
-                                <label style="font-size:0.65rem; color:#888;">ALVO:</label>
-                                <select id="target-${mid}" class="target-selector d-select" style="flex:1; width:auto; text-align:left;">
-                                    ${targetOptions}
-                                </select>
-                            </div>
-
-                            <div class="dice-row">
-                                <span class="dice-label" style="color:var(--danger)">DANO</span>
-                                <input type="number" id="dmg-qty-${mid}" class="d-input" value="1" min="1">
-                                <span style="color:#666">d</span>
-                                <select id="dmg-face-${mid}" class="d-select">
-                                    <option value="4">4</option>
-                                    <option value="6" selected>6</option>
-                                    <option value="8">8</option>
-                                    <option value="10">10</option>
-                                    <option value="12">12</option>
-                                    <option value="20">20</option>
-                                </select>
-                            </div>
-                            <div class="dice-row">
-                                <span class="dice-label" style="color:var(--danger)">MOD +</span>
-                                <input type="number" id="dmg-mod-${mid}" class="d-input" value="0">
-                                <button class="btn btn-danger btn-small" style="flex:1;" onclick="rollMonsterDice('${mid}', '${m.Nome}', 'dmg')">ROLAR</button>
-                            </div>
+                        <div class="dice-row">
+                            <span class="dice-label" style="color:var(--danger)">DANO</span>
+                            <input type="number" id="dmg-qty-${mid}" class="d-input" value="1" min="1">
+                            <span style="color:#666">d</span>
+                            <select id="dmg-face-${mid}" class="d-select">
+                                <option value="4">d4</option>
+                                <option value="6" selected>d6</option>
+                                <option value="8">d8</option>
+                                <option value="10">d10</option>
+                                <option value="12">d12</option>
+                            </select>
+                                                    </div>
+                        <div class="dice-row">
+                            <span class="dice-label" style="color:var(--danger)">MOD +</span>
+                            <input type="number" id="dmg-mod-${mid}" class="d-input" value="${m.Bonus || 0}">
+                            <button class="btn btn-danger btn-small" style="flex:1;" onclick="rollMonsterDice('${mid}', '${m.Nome}', 'dmg', ${m.isAlly})">ROLAR</button>
                         </div>
                     </div>
-                `;
-                list.appendChild(card);
-            });
+                </div>
+            `;
+            list.appendChild(card);
         });
-
-        const q = query(collection(db, "logs"), orderBy("timestamp", "desc"), limit(20));
-        onSnapshot(q, (snap) => {
-            const display = document.getElementById('combat-log-display');
-            display.innerHTML = "";
-            const docs = [];
-            snap.forEach(d => docs.push(d.data()));
-            docs.reverse().forEach(log => {
-                let content = "";
-                if(log.type === 'roll') {
-                   const color = log.isCrit ? 'var(--gold)' : (log.isFumble ? 'var(--danger)' : '#bbb');
-                   let dmgInfo = "";
-                   if(log.damageApplied) {
-                       dmgInfo = `<br><span style="color:var(--danger); font-size:0.9em;"> ➤ ${log.damageApplied}</span>`;
-                   }
-                   content = `<span style="color:var(--gold-dim)">[${log.charName}]</span> rolou <strong>${log.actionName}</strong>: <span style="color:${color}; font-weight:bold;">${log.total}</span> <span style="font-size:0.7em; color:#666;">(${log.detail})</span>${dmgInfo}`;
-                } else if (log.type === 'chat') {
-                   content = `<span style="color:#fff; font-weight:bold;">${log.charName}:</span> <span style="color:#ddd;">${log.message}</span>`;
-                }
-                display.innerHTML += `<p>${content}</p>`;
-            });
-            display.scrollTop = display.scrollHeight;
-        });
-    }
+    });
 
     window.updateAllTargetDropdowns = () => {
         const selects = document.querySelectorAll('.target-selector');
@@ -1140,15 +1304,18 @@
     }
 
     window.spawnCombatant = async () => {
+        const type = document.getElementById('combat-spawn-type').value; // bestiary ou allies
         const mobId = document.getElementById('combat-spawn-select').value;
         if(!mobId) return;
-        const snap = await getDoc(doc(db, "bestiary", mobId));
+
+        const snap = await getDoc(doc(db, type, mobId));
         if(snap.exists()) {
             const data = snap.data();
             await addDoc(collection(db, "active_encounters"), {
                 ...data,
                 'Pontos de Vida Atual': data['Pontos de Vida Max'],
-                activeID: Date.now()
+                activeID: Date.now(),
+                isAlly: (type === 'allies') // Flag importante para identificar aliado
             });
         }
     };
@@ -1168,59 +1335,69 @@
 
     window.rollMonsterDice = async (mid, monsterName, type) => {
         const qty = parseInt(document.getElementById(`${type}-qty-${mid}`).value) || 1;
-        const face = parseInt(document.getElementById(`${type}-face-${mid}`).value) || 20;
-        const mod = parseInt(document.getElementById(`${type}-mod-${mid}`).value) || 0;
+    const face = parseInt(document.getElementById(`${type}-face-${mid}`).value) || 20;
+    const mod = parseInt(document.getElementById(`${type}-mod-${mid}`).value) || 0;
 
-        let total = 0;
-        let rolls = [];
-        let isCrit = false;
-        let isFumble = false;
+    let total = 0;
+    let rolls = [];
+    let isCrit = false, isFumble = false;
 
-        for(let i=0; i<qty; i++) {
-            const r = Math.floor(Math.random() * face) + 1;
-            rolls.push(r);
-            total += r;
-            if(face === 20) {
-                if(r === 20) isCrit = true;
-                if(r === 1) isFumble = true;
+    for(let i=0; i<qty; i++) {
+        const r = Math.floor(Math.random() * face) + 1;
+        rolls.push(r);
+        total += r;
+        if(face===20) { if(r===20) isCrit=true; if(r===1) isFumble=true; }
+    }
+    total += mod;
+
+    const detailStr = `[${rolls.join(', ')}] ${mod >=0 ? '+'+mod : mod}`;
+    const actionLabel = type === 'atk' ? "Ataque" : "Dano";
+    let damageMsg = null;
+
+    if(type === 'dmg') {
+        const targetId = document.getElementById(`target-${mid}`).value;
+        if(targetId) {
+            // Tenta achar em Characters (Player)
+            let targetSnap = await getDoc(doc(db, "characters", targetId));
+            let collectionName = "characters";
+
+            // Se não achou em Player, tenta em Active Encounters (Monstro/Aliado)
+            if(!targetSnap.exists()) {
+                targetSnap = await getDoc(doc(db, "active_encounters", targetId));
+                collectionName = "active_encounters";
+            }
+
+            if(targetSnap.exists()) {
+                const tData = targetSnap.data();
+                const oldHP = tData['Pontos de Vida Atual'];
+                const newHP = Math.max(0, oldHP - total);
+
+                await updateDoc(doc(db, collectionName, targetId), {
+                    'Pontos de Vida Atual': newHP
+                });
+                damageMsg = `Causou ${total} de dano em ${tData.Nome} (PV: ${oldHP} -> ${newHP})`;
             }
         }
-        total += mod;
+    }
 
-        const detailStr = `[${rolls.join(', ')}] ${mod >=0 ? '+'+mod : mod}`;
-        const actionLabel = type === 'atk' ? "Ataque" : "Dano";
-        
-        let damageMsg = null;
+    // Log
+    const logData = {
+    charName: monsterName,
+    actionName: actionLabel,
+    total: total,
+    detail: detailStr,
+    isCrit: isCrit,
+    isFumble: isFumble,
+    type: 'roll',
+    timestamp: serverTimestamp()
+};
 
-        if(type === 'dmg') {
-            const targetId = document.getElementById(`target-${mid}`).value;
-            if(targetId) {
-                const pSnap = await getDoc(doc(db, "characters", targetId));
-                if(pSnap.exists()) {
-                    const pData = pSnap.data();
-                    const oldHP = pData['Pontos de Vida Atual'];
-                    const newHP = Math.max(0, oldHP - total);
-                    await updateDoc(doc(db, "characters", targetId), {
-                        'Pontos de Vida Atual': newHP
-                    });
-                    damageMsg = `Causou ${total} de dano em ${pData.Nome} (PV: ${oldHP} -> ${newHP})`;
-                }
-            }
-        }
+if (damageMsg) {
+    logData.damageApplied = damageMsg;
+}
 
-        await addDoc(collection(db, "logs"), {
-            charName: monsterName,
-            actionName: actionLabel,
-            total: total,
-            detail: detailStr,
-            isCrit: isCrit,
-            isFumble: isFumble,
-            type: 'roll',
-            damageApplied: damageMsg, 
-            timestamp: serverTimestamp()
-        });
-    };
-
+await addDoc(collection(db, "logs"), logData);
+};
     window.sendCustomChat = async () => {
         const sender = document.getElementById('chat-sender-name').value || "Narrador";
         const msg = document.getElementById('chat-message-text').value;
@@ -1233,7 +1410,7 @@
         });
         document.getElementById('chat-message-text').value = "";
     };
-
+    }
     // ==========================================
     // 7. MAP ENGINE
     // ==========================================
@@ -1361,11 +1538,13 @@
 
     function varCSS(v) { return getComputedStyle(document.body).getPropertyValue(v).trim(); }
 
+    
+
     window.onload = () => {
         initCampaign();
         initCharacters();
         initCombat();
-        loadBestiaryDropdown();
+        loadCombatDropdown(); // Nome atualizado
         renderDBList();
         setTimeout(initMapEngine, 500);
     };
