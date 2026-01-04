@@ -551,7 +551,7 @@
             snap.forEach(d => {
                 const m = d.data();
                 if(m['Pontos de Vida Atual'] > 0) {
-                    sel.innerHTML += `<option value="${d.id}">${m.Nome} (${m['Pontos de Vida Atual']} HP)</option>`;
+                    sel.innerHTML += `<option value="${d.id}">${m.Nome}</option>`;
                     const hpPct = Math.min(100, (m['Pontos de Vida Atual'] / m['Pontos de Vida Max'])*100);
                     const img = m.Imagem || "https://via.placeholder.com/100?text=Enemy";
                     const card = document.createElement('div');
