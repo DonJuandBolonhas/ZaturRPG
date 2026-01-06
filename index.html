@@ -462,6 +462,23 @@
         .zeuros-display {
             font-family: 'Cinzel'; color: var(--gold); font-size: 1.2rem; margin-right: 15px;
         }
+        .pvp-control {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .pvp-on {
+            color: #ff3b3b;
+            font-weight: bold;
+        }
+
+        .pvp-off {
+            color: #00ff99;
+            font-weight: bold;
+        }
+
     </style>
 </head>
 <body>
@@ -588,6 +605,13 @@
 
     <div id="combat" class="section">
         <h2>Gerenciador de Batalha</h2>
+        <div class="pvp-control">
+            <span id="pvp-status" class="pvp-off">PvP DESLIGADO</span>
+            <button class="btn btn-danger" onclick="togglePvP()">
+                Alternar PvP
+            </button>
+        </div>
+        
         
         <div style="background:var(--bg-card); padding:15px; border-radius:8px; margin-bottom:20px; border:1px solid #333; display:flex; gap:15px; align-items:flex-end;">
             <div class="input-group" style="flex:1;">
@@ -596,7 +620,10 @@
                     <select id="combat-spawn-type" onchange="loadCombatDropdown()" style="width:120px;">
                         <option value="bestiary">Inimigo</option>
                         <option value="allies">Aliado</option>
+                        <option value="player">Player --</option>
                     </select>
+
+
                     <select id="combat-spawn-select" style="flex:1;"></select>
                 </div>
             </div>
@@ -773,19 +800,33 @@
         }
     };
 
+    
+
     window.closeModal = (id) => document.getElementById(id).style.display = 'none';
 
     window.loadCombatDropdown = async () => {
-        const type = document.getElementById('combat-spawn-type') ? document.getElementById('combat-spawn-type').value : 'bestiary';
+        const type = document.getElementById('combat-spawn-type')
+            ? document.getElementById('combat-spawn-type').value
+            : 'bestiary';
+
         const sel = document.getElementById('combat-spawn-select');
         sel.innerHTML = "<option>Carregando...</option>";
 
-        const snap = await getDocs(collection(db, type));
+        let col = type;
+
+        // 🔵 CORREÇÃO AQUI
+        if (type === "player") {
+            col = "characters";
+        }
+
+        const snap = await getDocs(collection(db, col));
         sel.innerHTML = "";
+
         snap.forEach(d => {
-            sel.innerHTML += `<option value="${d.id}">${d.data().Nome}</option>`;
+            const data = d.data();
+            sel.innerHTML += `<option value="${d.id}">${data.Nome}</option>`;
         });
-};
+    };
 
     // ==========================================
     // 3. CAMPAIGN & MAP
@@ -827,6 +868,38 @@
         const btn = document.getElementById('btn-shop-toggle');
         const currentState = btn.innerText.includes("ABERTA");
         await updateDoc(doc(db, "campaign_settings", "global"), { loja_aberta: !currentState });
+    };
+
+    window.togglePvP = async () => {
+        const ref = doc(db, "campaign_settings", "global");
+        const snap = await getDoc(ref);
+
+        let current = false;
+        if (snap.exists() && snap.data().pvp_enabled !== undefined) {
+            current = snap.data().pvp_enabled;
+        }
+
+        await updateDoc(ref, {
+            pvp_enabled: !current
+        });
+
+        onSnapshot(doc(db, "campaign_settings", "global"), (snap) => {
+            if (!snap.exists()) return;
+            const d = snap.data();
+            const lbl = document.getElementById('pvp-status');
+
+            if (!lbl) return;
+
+            if (d.pvp_enabled) {
+                lbl.innerText = "PvP ATIVO";
+                lbl.classList.remove('pvp-off');
+                lbl.classList.add('pvp-on');
+            } else {
+                lbl.innerText = "PvP DESLIGADO";
+                lbl.classList.remove('pvp-on');
+                lbl.classList.add('pvp-off');
+            }
+        });
     };
 
     // ==========================================
@@ -1022,6 +1095,7 @@
         `;
     }
 
+    
     window.modCharStat = async (id, field, val) => {
         const docRef = doc(db, "characters", id);
         const snap = await getDoc(docRef);
@@ -1304,18 +1378,38 @@
     }
 
     window.spawnCombatant = async () => {
-        const type = document.getElementById('combat-spawn-type').value; // bestiary ou allies
+        const type = document.getElementById('combat-spawn-type').value;
         const mobId = document.getElementById('combat-spawn-select').value;
-        if(!mobId) return;
+        if (!mobId) return;
 
+        // 🔵 CASO PLAYER
+        if (type === "player") {
+            const charRef = doc(db, "characters", mobId);
+            const snap = await getDoc(charRef);
+            if (!snap.exists()) return;
+
+            const data = snap.data();
+
+            await addDoc(collection(db, "active_encounters"), {
+                Nome: data.Nome,
+                type: "player",          // 🔥 identifica como player
+                refId: mobId,            // 🔥 link direto com a ficha
+                activeID: Date.now(),
+                isAlly: false            // PvP habilitado
+            });
+
+            return; // ⛔ NÃO CAI NA LÓGICA DE NPC
+        }
+
+        // 🔴 NPC / ALIADO (SEU CÓDIGO ORIGINAL, QUASE IGUAL)
         const snap = await getDoc(doc(db, type, mobId));
-        if(snap.exists()) {
+        if (snap.exists()) {
             const data = snap.data();
             await addDoc(collection(db, "active_encounters"), {
                 ...data,
                 'Pontos de Vida Atual': data['Pontos de Vida Max'],
                 activeID: Date.now(),
-                isAlly: (type === 'allies') // Flag importante para identificar aliado
+                isAlly: (type === 'allies')
             });
         }
     };
