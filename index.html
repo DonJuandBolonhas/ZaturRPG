@@ -479,10 +479,32 @@
             font-weight: bold;
         }
 
-    </style>
-</head>
-<body>
+        .login-screen {
+            display:flex;
+            flex-direction:column;
+            max-width:300px;
+            margin:100px auto;
+            gap:10px;
+        }
+        .login-screen input, .login-screen button {
+            padding:10px;
+        }
 
+
+    </style>
+    <div id="login-screen" class="login-screen">
+        <h2>Painel do Mestre</h2>
+        <input type="email" id="login-email" placeholder="E-mail">
+        <input type="password" id="login-pass" placeholder="Senha">
+        <button onclick="login()">Entrar</button>
+        <p id="login-error"></p>
+    </div>
+</head>
+
+<body>
+    
+    
+    
 <aside>
     <div class="brand"><i class="fas fa-dragon"></i> ZATUR</div>
     <nav>
@@ -497,7 +519,7 @@
     </div>
 </aside>
 
-<main>
+<main id="master-panel">
 
     <div id="dashboard" class="section active">
         <h2>Painel de Controle <button class="btn btn-neutral btn-small" onclick="saveGlobalSettings()"><i class="fas fa-save"></i> Salvar Tudo</button></h2>
@@ -706,6 +728,8 @@
         <div id="loot-current-list" style="max-height:300px; overflow-y:auto; border:1px solid #333; padding:10px; border-radius:4px;"></div>
     </div>
 </div>
+        
+
 
 <script type="module">
     // ==========================================
@@ -713,7 +737,11 @@
     // ==========================================
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, doc, collection, addDoc, getDocs, updateDoc, onSnapshot, arrayUnion, arrayRemove, deleteDoc, setDoc, getDoc, serverTimestamp, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
+    import { 
+        getAuth, 
+        signInWithEmailAndPassword, 
+        onAuthStateChanged 
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     
 
     const firebaseConfig = {
@@ -727,6 +755,8 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    const auth = getAuth(app);
+
 
     // ==========================================
     // 1. DATA SCHEMAS (UPDATED WITH IMAGE FOR ITEMS)
@@ -783,6 +813,41 @@
     let mapImageObj = null;
     
     window.playerTargets = [];
+
+    window.login = async () => {
+        const email = document.getElementById('login-email').value;
+        const pass  = document.getElementById('login-pass').value;
+        const err   = document.getElementById('login-error');
+
+        try {
+            await signInWithEmailAndPassword(auth, email, pass);
+            err.innerText = "";
+        } catch (e) {
+            err.innerText = "Login inválido";
+        }
+    };
+
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+            document.getElementById('login-screen').style.display = 'flex';
+            document.getElementById('master-panel').style.display = 'none';
+            return;
+        }
+
+        // 🔍 Verifica se é mestre
+        const ref = doc(db, "masters", user.uid);
+        const snap = await getDoc(ref);
+
+        if (!snap.exists()) {
+            alert("Acesso negado: você não é o mestre.");
+            auth.signOut();
+            return;
+        }
+
+        // ✅ É mestre
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('master-panel').style.display = 'block';
+    });
 
     // ==========================================
     // 2. CORE NAVIGATION
