@@ -702,6 +702,16 @@
         switchTab('chat');
     };
 
+    window.addEventListener("DOMContentLoaded", () => {
+       document.getElementById("chat-input").addEventListener("keydown", function(e){
+            if(e.key === "Enter"){
+                e.preventDefault();
+                sendChat();
+            }
+       });
+    });
+
+
     window.rollAttack = async () => {
         const val = document.getElementById('atk-attr').value;
         const qty = val === 'manual' ? parseInt(document.getElementById('atk-qty').value) : parseInt(val);
